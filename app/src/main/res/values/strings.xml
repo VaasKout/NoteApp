@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Note Example</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title">Название</string>
+    <string name="note">Заметка</string>
+    <string name="save">Сохранить</string>
+    <string name="delete_all">Удалить все</string>
+    <string name="update">Редактировать</string>
+    <string name="delete">Delete</string>
+</resources>
