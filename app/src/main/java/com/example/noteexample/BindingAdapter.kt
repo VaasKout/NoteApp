@@ -4,8 +4,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.example.noteexample.database.Note
-import com.example.noteexample.note.NoteListener
-import com.google.android.material.card.MaterialCardView
 
 
 /**
@@ -34,16 +32,3 @@ import com.google.android.material.card.MaterialCardView
             else text = it.note
         }
     }
-
-
-     @BindingAdapter(value = ["android:note", "android:onLongClick"], requireAll = true)
-    fun MaterialCardView.setCheckedState(note: Note?, clickListener: NoteListener){
-        this.setOnLongClickListener {
-            note?.let { note ->
-                this.isChecked = !this.isChecked
-                note.isChecked = this.isChecked
-                clickListener.onLongClick(note)
-        }
-            true
-        }
-     }

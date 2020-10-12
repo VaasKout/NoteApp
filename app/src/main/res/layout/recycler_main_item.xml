@@ -5,12 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-    <variable
-        name="note"
-        type="com.example.noteexample.database.Note" />
         <variable
-            name="clickListener"
-            type="com.example.noteexample.note.NoteListener" />
+            name="note"
+            type="com.example.noteexample.database.Note" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -22,32 +19,48 @@
         android:clickable="true"
         android:focusable="true"
         android:longClickable="true"
-        app:cardCornerRadius="4dp"
-        android:note="@{note}"
-        android:onLongClick="@{clickListener}">
+        app:cardCornerRadius="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/titleRecyclerItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="16dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                app:titleTextVisibility="@{note}"
+                android:singleLine="false"
                 tools:text="Title"
-                app:titleTextVisibility="@{note}"/>
+                android:ellipsize="end"
+                android:maxLines="10"/>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary" />
 
             <TextView
                 android:id="@+id/noteRecyclerItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                app:noteTextVisibility="@{note}"
                 tools:text="Note"
-                app:noteTextVisibility="@{note}"/>
+                android:ellipsize="end"
+                android:maxLines="10"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

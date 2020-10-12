@@ -2,9 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
-            name="updateViewModel"
+            name="viewModel"
             type="com.example.noteexample.updateNote.UpdateNoteViewModel" />
     </data>
 
@@ -12,8 +14,8 @@
         android:id="@+id/noteContentConstraintUpdate"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".note.NoteContent"
-        android:padding="8dp">
+        android:padding="8dp"
+        tools:context=".note.NoteContent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/edit_button"
@@ -22,7 +24,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="?attr/colorPrimary"
-            android:onClick="@{() -> updateViewModel.onStartNavigating()}"
+            android:onClick="@{() -> viewModel.onStartNavigating()}"
             android:text="@string/update"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             android:textColor="#FFFFFF"
@@ -46,51 +48,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/titleUpdate"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <EditText
+                    android:id="@+id/title_editText_update"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/title"
-                    app:endIconMode="clear_text"
-                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:background="@android:color/transparent"
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/title_editText_update"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/noteUpdate"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <EditText
+                    android:id="@+id/note_editText_update"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:hint="@string/note"
-                    app:endIconMode="clear_text"
+                    android:background="@android:color/transparent"
+                    android:inputType="textMultiLine|text"
+                    android:padding="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/titleUpdate">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/note_editText_update"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textMultiLine|text" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    app:layout_constraintTop_toBottomOf="@+id/title_editText_update" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-
         </androidx.core.widget.NestedScrollView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

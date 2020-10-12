@@ -27,12 +27,11 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
         allNotes = repository.allNotes
     }
 
-    var actionMode: ActionMode? = null
 
+    var actionMode: ActionMode? = null
     private val actionModeController = object : ActionMode.Callback{
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu, menu)
-
             return true
         }
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
@@ -47,7 +46,7 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
             }
         }
         override fun onDestroyActionMode(mode: ActionMode?) {
-           actionMode = null
+            actionMode = null
             if (allNotes.value?.any { it.isChecked } == true){
            allNotes.value?.map {it.isChecked = false}
             }
@@ -85,11 +84,17 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
         _navigateToUpdateNoteFragment.value = null
     }
 
+
+
     fun onInitCheckList(isChecked: Boolean, noteId: Int){
         currentNote = repository.selectNote(noteId)
         currentNote.value?.isChecked = isChecked
         _checkedState.value = true
     }
+
+    /**
+     * Action mode lifecycle functions
+     */
 
     fun onStartActionMode(activity: FragmentActivity){
         actionMode = activity.startActionMode(actionModeController)
@@ -109,30 +114,18 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
     }
 
     /**
-     * Coroutine pattern
+     * Coroutine functions
      */
 
     fun onDeleteSelected(){
         viewModelScope.launch {
-            deleteSelected()
-        }
-    }
-
-    private suspend fun deleteSelected(){
-        withContext(Dispatchers.IO){
             selected?.let { repository.deleteNote(it) }
         }
     }
 
     fun onClear(){
        viewModelScope.launch {
-           clear()
+           repository.deleteAll()
        }
-    }
-
-    private suspend fun clear(){
-        withContext(Dispatchers.IO){
-            repository.deleteAll()
-        }
     }
 }

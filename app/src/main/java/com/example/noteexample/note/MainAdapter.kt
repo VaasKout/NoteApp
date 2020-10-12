@@ -9,42 +9,36 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
-import com.example.noteexample.databinding.RecyclerItemBinding
+import com.example.noteexample.databinding.RecyclerMainItemBinding
 
-class NoteAdapter(private val clickListener: NoteListener):
-    ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()){
-
-    private val _isActive = MutableLiveData<NoteViewHolder>()
-    val isActive: LiveData<NoteViewHolder> = _isActive
-
-    val click = clickListener
+class NoteAdapter: ListAdapter<Note, NoteAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()){
     /**
-     * holder takes item with position and define, which note it is, then pass it into note variable
-     * from recycler_item where onClick method calls from NoteListener. Same as setOnClickListener,
-     * but with binding and viewModel
+     * [isActive] gets instance of InsertUpdateViewHolder and observed in [NoteFragment]
+     * to set clickListeners for recycler items
      */
+    private val _isActive = MutableLiveData<InsertUpdateViewHolder>()
+    val isActive: LiveData<InsertUpdateViewHolder> = _isActive
 
-    override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.bind(getItem(position), clickListener)
+    override fun onBindViewHolder(holder: InsertUpdateViewHolder, position: Int) {
+        holder.bind(getItem(position))
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InsertUpdateViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         /**
-         * Use only DataBindingUtil else layout options crash in recycler_item
+         * Use only DataBindingUtil else layout options crash in recycler_main_item
          */
-        val binding: RecyclerItemBinding =
-            DataBindingUtil.inflate(layoutInflater, R.layout.recycler_item, parent, false)
-        return NoteViewHolder(binding)
+        val binding: RecyclerMainItemBinding =
+            DataBindingUtil.inflate(layoutInflater, R.layout.recycler_main_item, parent, false)
+        return InsertUpdateViewHolder(binding)
     }
 
-     inner class NoteViewHolder (val binding: RecyclerItemBinding):
+     inner class InsertUpdateViewHolder (val binding: RecyclerMainItemBinding):
         RecyclerView.ViewHolder(binding.root){
 
-         fun bind(note: Note, clickListener: NoteListener){
+         fun bind(note: Note){
              _isActive.value = this
             binding.note = note
-            binding.clickListener = clickListener
             binding.materialCard.isChecked = note.isChecked
             binding.executePendingBindings()
         }
@@ -60,23 +54,13 @@ class NoteDiffCallBack : DiffUtil.ItemCallback<Note>(){
         return oldItem == newItem
     }
 }
-
-/**
- * ClickListener for RecyclerView
- */
-class NoteListener(val noteListener: (noteId: Int) -> Unit,
-                   val actionModeListener: (isChecked: Boolean, noteId: Int) -> Unit){
-    fun onClick(note: Note) = noteListener(note.id)
-    fun onLongClick(note: Note) = actionModeListener(note.isChecked, note.id)
-}
-
     /**
      * Classic RecyclerView.Adapter, do not delete, use it to handle problems with database
     */
 //class NoteAdapter(private val clickListener: NoteListener)
-//        : ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()){
+//        : ListAdapter<Note, NoteAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()){
 //        val checkedList = mutableListOf<Boolean>()
-//    inner class NoteViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
+//    inner class InsertUpdateViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
 //        private val titleTextView : TextView = itemView.findViewById(R.id.titleRecyclerItem)
 //        private val noteText : TextView = itemView.findViewById(R.id.noteRecyclerItem)
 //        val materialCard: MaterialCardView = itemView.findViewById(R.id.materialCard)
@@ -94,15 +78,15 @@ class NoteListener(val noteListener: (noteId: Int) -> Unit,
 //        }
 //    }
 //
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InsertUpdateViewHolder {
 //        val layoutInflater = LayoutInflater.from(parent.context)
 //        val view = layoutInflater.
-//        inflate(R.layout.recycler_item, parent, false)
-//        return NoteViewHolder(view)
+//        inflate(R.layout.recycler_main_item, parent, false)
+//        return InsertUpdateViewHolder(view)
 //    }
 //
 //
-//    override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
+//    override fun onBindViewHolder(holder: InsertUpdateViewHolder, position: Int) {
 //        holder.bind(getItem(position), clickListener, checkedList[position])
 //    }
 //}

@@ -35,21 +35,21 @@ class InsertNoteFragment : Fragment() {
         /**
          *  insert data in database and navigate back to NoteFragment
          */
-        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
-            val title = binding.titleEditText.text.toString()
-            val noteText = binding.noteEditText.text.toString()
-            if (it == true){
-
-                if (title.isNotEmpty() || noteText.isNotEmpty()){
-                val note = Note(title = title, note = noteText)
-                viewModel.onInsert(note)
-                }
-                this.findNavController()
-                    .navigate(InsertNoteFragmentDirections
-                        .actionEditNoteFragmentToNoteFragment())
-                viewModel.onDoneNavigating()
-            }
-        })
+//        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
+//            val title = binding.titleEditText.text.toString()
+//            val noteText = binding.noteEditText.text.toString()
+//            if (it == true){
+//
+//                if (title.isNotEmpty() || noteText.isNotEmpty()){
+//                val note = Note(title = title, note = noteText)
+//                viewModel.onInsert(note)
+//                }
+//                this.findNavController()
+//                    .navigate(InsertNoteFragmentDirections
+//                        .actionEditNoteFragmentToNoteFragment())
+//                viewModel.onDoneNavigating()
+//            }
+//        })
 
         binding.lifecycleOwner = this
         return binding.root

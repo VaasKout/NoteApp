@@ -26,29 +26,29 @@ class UpdateNoteFragment : Fragment() {
          //
          val application = requireNotNull(this.activity).application
          val updateViewModelFactory = UpdateNoteViewModelFactory(args.noteId, application)
-         val updateViewModel =
+         val viewModel =
              ViewModelProvider(this, updateViewModelFactory)
                  .get(UpdateNoteViewModel::class.java)
 
-         binding.updateViewModel = updateViewModel
+         binding.viewModel = viewModel
 
-         updateViewModel.currentNote.observe(viewLifecycleOwner, {
+         viewModel.currentNote.observe(viewLifecycleOwner, {
              binding.titleEditTextUpdate.setText(it.title)
              binding.noteEditTextUpdate.setText(it.note)
          })
 
-         updateViewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
+         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
              if (it == true){
                  val title = binding.titleEditTextUpdate.text.toString()
                  val noteText = binding.noteEditTextUpdate.text.toString()
                  if (title.isNotEmpty() || noteText.isNotEmpty()){
                  val note = Note(id = args.noteId, title = title, note = noteText)
-                 updateViewModel.onUpdate(note)
+                     viewModel.onUpdate(note)
                  }
 
                  this.findNavController()
                      .navigate(UpdateNoteFragmentDirections.actionUpdateNoteFragmentToNoteFragment())
-                 updateViewModel.onStopNavigating()
+                 viewModel.onStopNavigating()
              }
          })
 

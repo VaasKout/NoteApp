@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class NoteFragment : Fragment() {
 
-    private var actionModeActivate: Boolean = true
+    private var actionModeOnResume: Boolean = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -27,26 +28,7 @@ class NoteFragment : Fragment() {
          val viewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
         binding.noteViewModel = viewModel
 
-        binding.toolbarNoteMain.setOnMenuItemClickListener {
-            when(it.itemId){
-                R.id.delete_from_main -> {
-                    viewModel.onClear()
-                    true
-                } else -> false
-            }
-        }
-
-        /**
-         *  set clickListener in constructor for each item in recyclerView
-         */
-
-        val noteAdapter = NoteAdapter(NoteListener(
-            {noteId -> viewModel.onNoteClicked(noteId)},
-            {checkList, noteId -> viewModel.onInitCheckList(checkList, noteId)}))
-
-        /**
-         * set adapter options
-         */
+        val noteAdapter = NoteAdapter()
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
@@ -54,8 +36,32 @@ class NoteFragment : Fragment() {
                 StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
         }
 
+
+        binding.toolbarNoteMain.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.delete_from_main -> {
+                    if (noteAdapter.currentList.isNotEmpty()){
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setMessage("Удалить все заметки?")
+                            .setNegativeButton("Нет") { _, _ ->
+                            }
+                            .setPositiveButton("Да") { _, _ ->
+                                viewModel.onClear()
+                            }.show()
+                    }
+                    true
+                } else -> false
+            }
+        }
+
         /**
-         * observes allNotes[LiveData<List<Note>>]
+         * initialize and set adapter options
+         */
+
+
+
+        /**
+         *  Observes allNotes [NoteViewModel.allNotes]
             from view model and makes it equal to notes[listOf<Notes>()] from adapter
          */
 
@@ -67,48 +73,59 @@ class NoteFragment : Fragment() {
         })
 
         viewModel.navigateToUpdateNoteFragment.observe(viewLifecycleOwner, {noteId ->
-            if (viewModel.actionMode == null){
-            noteId?.let {
-                this.findNavController()
-                    .navigate(NoteFragmentDirections
-                        .actionNoteFragmentToUpdateNoteFragment(noteId))
-                viewModel.onDoneUpdateNavigating()}
+            if (viewModel.actionMode == null && noteId != null){
+                    this.findNavController()
+                        .navigate(NoteFragmentDirections
+                            .actionNoteFragmentToUpdateNoteFragment(noteId))
+                    viewModel.onDoneUpdateNavigating()
             }
         })
-
-        fun destroyActionMode(){
+        /**
+         * Inside function, checks if any notes are checked,
+         * if not
+         *
+         */
+        fun checkAndDestroyActionMode(){
     if (viewModel.allNotes.value?.filter { it.isChecked }?.size == 0){
         viewModel.onDoneActionMode()
         binding.materialButton.visibility = View.VISIBLE
         noteAdapter.notifyDataSetChanged()
-        actionModeActivate = true
+        actionModeOnResume = true
     }
 }
-
+        /**
+         * [NoteViewModel.checkedState] checks if action mode is activated
+         * [actionModeOnResume] checks if action mode needs to be start again
+         */
         viewModel.checkedState.observe(viewLifecycleOwner, { state ->
 
-            if (state == true && actionModeActivate){
+            if (state == true && actionModeOnResume){
                 binding.materialButton.visibility = View.GONE
-                 viewModel.onStartActionMode(requireActivity())
-                actionModeActivate = false
-            } else if (state == true && !actionModeActivate){
+                viewModel.onStartActionMode(requireActivity())
+                actionModeOnResume = false
+            } else if (state == true && !actionModeOnResume){
                      viewModel.onResumeActionMode()
                  }
-            destroyActionMode()
+            checkAndDestroyActionMode()
         })
 
         noteAdapter.isActive.observe(viewLifecycleOwner, {adapter ->
-
+            val item = noteAdapter.currentList[adapter.adapterPosition]
+            val card = adapter.binding.materialCard
+            adapter.binding.materialCard.setOnLongClickListener {
+                card.isChecked = !card.isChecked
+                item.isChecked = card.isChecked
+                viewModel.onInitCheckList(item.isChecked, item.id)
+                true
+            }
                 adapter.binding.materialCard.setOnClickListener {
                     if (viewModel.actionMode != null){
-                    adapter.binding.materialCard.isChecked = !adapter.binding.materialCard.isChecked
-                    noteAdapter.currentList[adapter.adapterPosition].isChecked =
-                    adapter.binding.materialCard.isChecked
+                    card.isChecked = !card.isChecked
+                    item.isChecked = card.isChecked
                     viewModel.onResumeActionMode()
-                    destroyActionMode()
+                    checkAndDestroyActionMode()
                     } else if (viewModel.actionMode == null){
-                            noteAdapter.click.onClick(noteAdapter
-                                .currentList[adapter.adapterPosition])
+                           viewModel.onNoteClicked(item.id)
                     }
                 }
             })
