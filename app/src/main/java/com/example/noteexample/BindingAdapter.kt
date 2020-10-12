@@ -1,9 +1,10 @@
-package com.example.noteexample.note
+package com.example.noteexample
 
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.example.noteexample.database.Note
+import com.example.noteexample.note.NoteListener
 import com.google.android.material.card.MaterialCardView
 
 
