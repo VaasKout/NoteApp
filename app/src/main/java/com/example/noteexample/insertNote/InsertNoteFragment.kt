@@ -1,4 +1,4 @@
-package com.example.noteexample.editNote
+package com.example.noteexample.insertNote
 
 
 import android.os.Bundle
@@ -11,26 +11,26 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
-import com.example.noteexample.databinding.FragmentEditNoteBinding
+import com.example.noteexample.databinding.FragmentInsertNoteBinding
 
 
-class EditNoteFragment : Fragment() {
+class InsertNoteFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         //binding for EditNoteFragment
-        val binding : FragmentEditNoteBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note, container, false)
+        val binding : FragmentInsertNoteBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_insert_note, container, false)
 
         /**
          * define viewModel for EditNoteFragment
          */
         val viewModel =
-            ViewModelProvider(this).get(EditNoteViewModel::class.java)
+            ViewModelProvider(this).get(InsertNoteViewModel::class.java)
 
-        binding.editNoteViewModel = viewModel
+        binding.viewModel = viewModel
 
         /**
          *  insert data in database and navigate back to NoteFragment
@@ -45,7 +45,8 @@ class EditNoteFragment : Fragment() {
                 viewModel.onInsert(note)
                 }
                 this.findNavController()
-                    .navigate(EditNoteFragmentDirections.actionEditNoteFragmentToNoteFragment())
+                    .navigate(InsertNoteFragmentDirections
+                        .actionEditNoteFragmentToNoteFragment())
                 viewModel.onDoneNavigating()
             }
         })

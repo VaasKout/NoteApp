@@ -27,6 +27,15 @@ class NoteFragment : Fragment() {
          val viewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
         binding.noteViewModel = viewModel
 
+        binding.toolbarNoteMain.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.delete_from_main -> {
+                    viewModel.onClear()
+                    true
+                } else -> false
+            }
+        }
+
         /**
          *  set clickListener in constructor for each item in recyclerView
          */
@@ -61,7 +70,8 @@ class NoteFragment : Fragment() {
             if (viewModel.actionMode == null){
             noteId?.let {
                 this.findNavController()
-                    .navigate(NoteFragmentDirections.actionNoteFragmentToUpdateNoteFragment(noteId))
+                    .navigate(NoteFragmentDirections
+                        .actionNoteFragmentToUpdateNoteFragment(noteId))
                 viewModel.onDoneUpdateNavigating()}
             }
         })
@@ -81,29 +91,27 @@ class NoteFragment : Fragment() {
                 binding.materialButton.visibility = View.GONE
                  viewModel.onStartActionMode(requireActivity())
                 actionModeActivate = false
-            } else
-                 if (state == true && !actionModeActivate){
+            } else if (state == true && !actionModeActivate){
                      viewModel.onResumeActionMode()
                  }
             destroyActionMode()
         })
+
         noteAdapter.isActive.observe(viewLifecycleOwner, {adapter ->
 
                 adapter.binding.materialCard.setOnClickListener {
                     if (viewModel.actionMode != null){
-                   adapter.binding.materialCard.isChecked = !adapter.binding.materialCard.isChecked
+                    adapter.binding.materialCard.isChecked = !adapter.binding.materialCard.isChecked
                     noteAdapter.currentList[adapter.adapterPosition].isChecked =
                     adapter.binding.materialCard.isChecked
                     viewModel.onResumeActionMode()
                     destroyActionMode()
-                    } else{
-                        if (viewModel.actionMode == null){
-                            noteAdapter.click.onClick(noteAdapter.currentList[adapter.adapterPosition])
-                        }
+                    } else if (viewModel.actionMode == null){
+                            noteAdapter.click.onClick(noteAdapter
+                                .currentList[adapter.adapterPosition])
                     }
                 }
             })
-
 
 
         /**
@@ -121,6 +129,4 @@ class NoteFragment : Fragment() {
         binding.lifecycleOwner = this
         return binding.root
     }
-
-
 }

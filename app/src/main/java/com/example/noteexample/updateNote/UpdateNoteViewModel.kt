@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
@@ -32,22 +33,14 @@ class UpdateNoteViewModel(noteId: Int = 0,
         _navigateToNoteFragment.value = false
     }
 
-
-    private val viewModelJob = Job()
-    private val scope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
     private suspend fun update(note: Note){
         withContext(Dispatchers.IO){
             repository.updateNote(note)
         }
     }
     fun onUpdate(note: Note){
-        scope.launch {
+        viewModelScope.launch {
             update(note)
         }
-    }
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 }

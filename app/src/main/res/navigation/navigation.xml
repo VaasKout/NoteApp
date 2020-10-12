@@ -20,9 +20,9 @@
     </fragment>
     <fragment
         android:id="@+id/editNoteFragment"
-        android:name="com.example.noteexample.editNote.EditNoteFragment"
+        android:name="com.example.noteexample.insertNote.InsertNoteFragment"
         android:label="Add"
-        tools:layout="@layout/fragment_edit_note">
+        tools:layout="@layout/fragment_insert_note">
         <action
             android:id="@+id/action_editNoteFragment_to_noteFragment"
             app:destination="@id/noteFragment"

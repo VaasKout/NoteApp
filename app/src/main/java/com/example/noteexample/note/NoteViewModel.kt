@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteRoomDatabase
@@ -53,15 +54,6 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
             _checkedState.value = false
         }
     }
-
-
-
-    /**
-     * Coroutines
-     */
-    
-    private val viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     /**
      * LiveData
@@ -116,16 +108,12 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
        actionMode?.finish()
     }
 
-
-
-
-
     /**
      * Coroutine pattern
      */
 
     fun onDeleteSelected(){
-        uiScope.launch {
+        viewModelScope.launch {
             deleteSelected()
         }
     }
@@ -137,7 +125,7 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
     }
 
     fun onClear(){
-       uiScope.launch {
+       viewModelScope.launch {
            clear()
        }
     }
@@ -146,10 +134,5 @@ class NoteViewModel(application: Application) : AndroidViewModel(application){
         withContext(Dispatchers.IO){
             repository.deleteAll()
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 }

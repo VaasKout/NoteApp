@@ -11,4 +11,5 @@ data class Note (
     @PrimaryKey(autoGenerate = true) var id : Int = 0,
     @ColumnInfo(name = "title") val title : String = "",
     @ColumnInfo(name = "content") val note : String = "",
-    @ColumnInfo(name = "isChecked") var isChecked: Boolean = false)
+    @ColumnInfo(name = "isChecked") var isChecked: Boolean = false
+)

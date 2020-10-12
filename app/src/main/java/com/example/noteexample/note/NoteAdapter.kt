@@ -13,8 +13,10 @@ import com.example.noteexample.databinding.RecyclerItemBinding
 
 class NoteAdapter(private val clickListener: NoteListener):
     ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()){
+
     private val _isActive = MutableLiveData<NoteViewHolder>()
     val isActive: LiveData<NoteViewHolder> = _isActive
+
     val click = clickListener
     /**
      * holder takes item with position and define, which note it is, then pass it into note variable
@@ -38,7 +40,6 @@ class NoteAdapter(private val clickListener: NoteListener):
 
      inner class NoteViewHolder (val binding: RecyclerItemBinding):
         RecyclerView.ViewHolder(binding.root){
-
 
          fun bind(note: Note, clickListener: NoteListener){
              _isActive.value = this
@@ -68,8 +69,6 @@ class NoteListener(val noteListener: (noteId: Int) -> Unit,
     fun onClick(note: Note) = noteListener(note.id)
     fun onLongClick(note: Note) = actionModeListener(note.isChecked, note.id)
 }
-
-
 
     /**
      * Classic RecyclerView.Adapter, do not delete, use it to handle problems with database

@@ -1,20 +1,18 @@
-package com.example.noteexample.editNote
+package com.example.noteexample.insertNote
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.*
 
-class EditNoteViewModel(application: Application) : AndroidViewModel(application){
+class InsertNoteViewModel(application: Application) : AndroidViewModel(application){
     //Repository
     private val repository : NoteRepository
-    //Coroutines
-    private val viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     //Live Data
     private val _navigateToNoteFragment = MutableLiveData<Boolean>()
     val navigateToNoteFragment : LiveData<Boolean> = _navigateToNoteFragment
@@ -39,7 +37,7 @@ class EditNoteViewModel(application: Application) : AndroidViewModel(application
      * Coroutine Pattern
      */
 
-    fun onInsert(note: Note) = uiScope.launch {
+    fun onInsert(note: Note) = viewModelScope.launch {
         insert(note)
     }
 
@@ -47,13 +45,5 @@ class EditNoteViewModel(application: Application) : AndroidViewModel(application
         withContext(Dispatchers.IO){
             repository.insert(note)
         }
-    }
-
-    /**
-     * clear viewModelJob
-     */
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 }

@@ -7,6 +7,7 @@ import com.example.noteexample.database.NoteDao
 class NoteRepository (private val noteDao: NoteDao){
 
     val allNotes : LiveData<List<Note>> = noteDao.getAllNotes()
+
     suspend fun insert(note : Note){
         noteDao.insert(note)
     }
