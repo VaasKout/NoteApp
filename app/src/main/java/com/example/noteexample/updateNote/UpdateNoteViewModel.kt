@@ -10,12 +10,14 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.*
 
-class UpdateNoteViewModel(noteId: Int = 0,
-                          application: Application) : AndroidViewModel(application){
+class UpdateNoteViewModel(
+    noteId: Int = 0,
+    application: Application
+) : AndroidViewModel(application) {
 
     //Repository
-    private val repository : NoteRepository
-    val currentNote : LiveData<Note>
+    private val repository: NoteRepository
+    val currentNote: LiveData<Note>
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
@@ -24,23 +26,19 @@ class UpdateNoteViewModel(noteId: Int = 0,
     }
 
     private val _navigateToNoteFragment = MutableLiveData<Boolean>()
-    val navigateToNoteFragment : LiveData<Boolean> = _navigateToNoteFragment
+    val navigateToNoteFragment: LiveData<Boolean> = _navigateToNoteFragment
 
-    fun onStartNavigating(){
+    fun onStartNavigating() {
         _navigateToNoteFragment.value = true
     }
-    fun onStopNavigating(){
+
+    fun onStopNavigating() {
         _navigateToNoteFragment.value = false
     }
 
-    private suspend fun update(note: Note){
-        withContext(Dispatchers.IO){
-            repository.updateNote(note)
-        }
-    }
-    fun onUpdate(note: Note){
+    fun onUpdate(note: Note) {
         viewModelScope.launch {
-            update(note)
+            repository.updateNote(note)
         }
     }
 }

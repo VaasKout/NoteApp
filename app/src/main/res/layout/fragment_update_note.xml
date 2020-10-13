@@ -10,12 +10,29 @@
             type="com.example.noteexample.updateNote.UpdateNoteViewModel" />
     </data>
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar_note_update"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
+                app:title="@string/app_name"
+                app:menu="@menu/note_edit_menu"/>
+        </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/noteContentConstraintUpdate"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp"
-        tools:context=".note.NoteContent">
+        tools:context=".allNotes.NoteContent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/edit_button"
@@ -74,4 +91,5 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

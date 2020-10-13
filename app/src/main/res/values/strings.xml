@@ -8,4 +8,5 @@
     <string name="update">Редактировать</string>
     <string name="delete">Delete</string>
     <string name="photo">photo</string>
+    <string name="camera_error">Произошла ошибка при попытке открыть камеру</string>
 </resources>

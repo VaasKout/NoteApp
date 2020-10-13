@@ -6,7 +6,7 @@
     <data>
         <variable
             name="noteViewModel"
-            type="com.example.noteexample.note.NoteViewModel" />
+            type="com.example.noteexample.allNotes.AllNotesViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:context=".note.NoteFragment">
+            tools:context=".allNotes.AllNotesFragment">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"

@@ -9,13 +9,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.database.Note
+import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.RecyclerInsertUpdateItemBinding
 
 //TODO make new data class with note and image, observe it here and insert it in fragments
 //
 
-class InsertUpdateAdapter :
-    ListAdapter<Note, InsertUpdateAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()) {
+class InsertUpdateAdapter(val layout: Int) :
+    ListAdapter<NoteContent, InsertUpdateAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()) {
 
     private val _holder = MutableLiveData<InsertUpdateViewHolder>()
     val holder: LiveData<InsertUpdateViewHolder> = _holder
@@ -32,31 +33,30 @@ class InsertUpdateAdapter :
         val binding: RecyclerInsertUpdateItemBinding =
             DataBindingUtil.inflate(
                 layoutInflater,
-                R.layout.recycler_insert_update_item,
+                layout,
                 parent,
                 false
             )
         return InsertUpdateViewHolder(binding)
     }
 
-    inner class InsertUpdateViewHolder(val binding: RecyclerInsertUpdateItemBinding) :
+    inner class InsertUpdateViewHolder(private val binding: RecyclerInsertUpdateItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(note: Note) {
+        fun bind(noteContent: NoteContent) {
             _holder.value = this
 //            binding.note = note
-//            binding.materialCard.isChecked = note.isChecked
             binding.executePendingBindings()
         }
     }
 }
 
-class NoteDiffCallBack : DiffUtil.ItemCallback<Note>() {
-    override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem.id == newItem.id
+class NoteDiffCallBack : DiffUtil.ItemCallback<NoteContent>() {
+    override fun areItemsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {
+       return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+    override fun areContentsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {
         return oldItem == newItem
     }
 }

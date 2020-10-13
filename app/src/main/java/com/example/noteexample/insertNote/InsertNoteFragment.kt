@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.noteexample.R
-import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.FragmentInsertNoteBinding
+import com.example.noteexample.utils.Camera
 
 
 class InsertNoteFragment : Fragment() {
@@ -29,8 +29,25 @@ class InsertNoteFragment : Fragment() {
          */
         val viewModel =
             ViewModelProvider(this).get(InsertNoteViewModel::class.java)
-
         binding.viewModel = viewModel
+
+        /**
+         * toolbar clickListener
+         */
+
+        binding.toolbarNoteInsert.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.insert_photo ->{
+                    val camera = Camera(requireActivity())
+                    camera.dispatchTakePictureIntent(binding.saveButton)
+                    Glide.with(this)
+                        .load(camera.currentPhotoPath)
+                        .into(binding.testImage)
+                    true
+                }
+                else -> false
+            }
+        }
 
         /**
          *  insert data in database and navigate back to NoteFragment

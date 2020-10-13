@@ -46,21 +46,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/colorPrimary" />
-
-            <TextView
-                android:id="@+id/noteRecyclerItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="16dp"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:noteTextVisibility="@{note}"
-                tools:text="Note"
-                android:ellipsize="end"
-                android:maxLines="10"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

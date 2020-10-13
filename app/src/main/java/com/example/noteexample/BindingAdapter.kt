@@ -25,10 +25,10 @@ import com.example.noteexample.database.Note
         else text = it.title
     }
 }
-@BindingAdapter("noteTextVisibility")
-    fun TextView.setNoteVisibility(note: Note?){
-        note?.let {
-            if (it.note.isEmpty()) visibility = View.GONE
-            else text = it.note
-        }
-    }
+//@BindingAdapter("noteTextVisibility")
+//    fun TextView.setNoteVisibility(note: Note?){
+//        note?.let {
+//            if (it.note.isEmpty()) visibility = View.GONE
+//            else text = it.note
+//        }
+//    }

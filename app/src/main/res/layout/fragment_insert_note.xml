@@ -19,7 +19,7 @@
             android:layout_height="?attr/actionBarSize"
             style="@style/Widget.MaterialComponents.Toolbar.Primary"
             app:title="@string/app_name"
-            app:menu="@menu/note_insert_menu"/>
+            app:menu="@menu/note_edit_menu"/>
         </com.google.android.material.appbar.AppBarLayout>
 
 
@@ -27,7 +27,7 @@
         android:id="@+id/noteContentConstraint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".note.NoteContent"
+        tools:context=".allNotes.NoteContent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.core.widget.NestedScrollView
@@ -59,14 +59,25 @@
                     android:background="@android:color/transparent"
                     android:padding="16dp"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/insert_recycler"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
+                <ImageView
+                    android:id="@+id/test_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/title_editText" />
+
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:id="@+id/insert_recycler"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="0dp"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/title_editText" />-->
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
 

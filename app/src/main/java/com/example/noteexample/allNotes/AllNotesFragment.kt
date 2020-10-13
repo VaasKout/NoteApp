@@ -1,4 +1,4 @@
-package com.example.noteexample.note
+package com.example.noteexample.allNotes
 
 import android.os.Bundle
 import android.view.*
@@ -12,20 +12,20 @@ import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class NoteFragment : Fragment() {
+class AllNotesFragment : Fragment() {
 
     private var actionModeOnResume: Boolean = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding : FragmentNoteBinding=
+        val binding: FragmentNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note, container, false)
 
         /**
          *  define viewModel for NoteFragment
          */
-         val viewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
         binding.noteViewModel = viewModel
 
         val noteAdapter = NoteAdapter()
@@ -38,9 +38,9 @@ class NoteFragment : Fragment() {
 
 
         binding.toolbarNoteMain.setOnMenuItemClickListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.delete_from_main -> {
-                    if (noteAdapter.currentList.isNotEmpty()){
+                    if (noteAdapter.currentList.isNotEmpty()) {
                         MaterialAlertDialogBuilder(requireContext())
                             .setMessage("Удалить все заметки?")
                             .setNegativeButton("Нет") { _, _ ->
@@ -50,7 +50,8 @@ class NoteFragment : Fragment() {
                             }.show()
                     }
                     true
-                } else -> false
+                }
+                else -> false
             }
         }
 
@@ -59,25 +60,26 @@ class NoteFragment : Fragment() {
          */
 
 
-
         /**
-         *  Observes allNotes [NoteViewModel.allNotes]
-            from view model and makes it equal to notes[listOf<Notes>()] from adapter
+         *  Observes allNotes [AllNotesViewModel.allNotes]
+        from view model and makes it equal to notes[listOf<Notes>()] from adapter
          */
 
         viewModel.allNotes.observe(viewLifecycleOwner, {
             it?.let {
-             noteAdapter.submitList(it)
+                noteAdapter.submitList(it)
 //                noteAdapter.notes = it
             }
         })
 
-        viewModel.navigateToUpdateNoteFragment.observe(viewLifecycleOwner, {noteId ->
-            if (viewModel.actionMode == null && noteId != null){
-                    this.findNavController()
-                        .navigate(NoteFragmentDirections
-                            .actionNoteFragmentToUpdateNoteFragment(noteId))
-                    viewModel.onDoneUpdateNavigating()
+        viewModel.navigateToUpdateNoteFragment.observe(viewLifecycleOwner, { noteId ->
+            if (viewModel.actionMode == null && noteId != null) {
+                this.findNavController()
+                    .navigate(
+                        AllNotesFragmentDirections
+                            .actionNoteFragmentToUpdateNoteFragment(noteId)
+                    )
+                viewModel.onDoneUpdateNavigating()
             }
         })
         /**
@@ -85,31 +87,31 @@ class NoteFragment : Fragment() {
          * if not
          *
          */
-        fun checkAndDestroyActionMode(){
-    if (viewModel.allNotes.value?.filter { it.isChecked }?.size == 0){
-        viewModel.onDoneActionMode()
-        binding.materialButton.visibility = View.VISIBLE
-        noteAdapter.notifyDataSetChanged()
-        actionModeOnResume = true
-    }
-}
+        fun checkAndDestroyActionMode() {
+            if (viewModel.allNotes.value?.filter { it.isChecked }?.size == 0) {
+                viewModel.onDoneActionMode()
+                binding.materialButton.visibility = View.VISIBLE
+                noteAdapter.notifyDataSetChanged()
+                actionModeOnResume = true
+            }
+        }
         /**
-         * [NoteViewModel.checkedState] checks if action mode is activated
+         * [AllNotesViewModel.checkedState] checks if action mode is activated
          * [actionModeOnResume] checks if action mode needs to be start again
          */
         viewModel.checkedState.observe(viewLifecycleOwner, { state ->
 
-            if (state == true && actionModeOnResume){
+            if (state == true && actionModeOnResume) {
                 binding.materialButton.visibility = View.GONE
                 viewModel.onStartActionMode(requireActivity())
                 actionModeOnResume = false
-            } else if (state == true && !actionModeOnResume){
-                     viewModel.onResumeActionMode()
-                 }
+            } else if (state == true && !actionModeOnResume) {
+                viewModel.onResumeActionMode()
+            }
             checkAndDestroyActionMode()
         })
 
-        noteAdapter.isActive.observe(viewLifecycleOwner, {adapter ->
+        noteAdapter.isActive.observe(viewLifecycleOwner, { adapter ->
             val item = noteAdapter.currentList[adapter.adapterPosition]
             val card = adapter.binding.materialCard
             adapter.binding.materialCard.setOnLongClickListener {
@@ -118,26 +120,29 @@ class NoteFragment : Fragment() {
                 viewModel.onInitCheckList(item.isChecked, item.id)
                 true
             }
-                adapter.binding.materialCard.setOnClickListener {
-                    if (viewModel.actionMode != null){
+            adapter.binding.materialCard.setOnClickListener {
+                if (viewModel.actionMode != null) {
                     card.isChecked = !card.isChecked
                     item.isChecked = card.isChecked
                     viewModel.onResumeActionMode()
                     checkAndDestroyActionMode()
-                    } else if (viewModel.actionMode == null){
-                           viewModel.onNoteClicked(item.id)
-                    }
+                } else if (viewModel.actionMode == null) {
+                    viewModel.onNoteClicked(item.id)
                 }
-            })
+            }
+        })
 
 
         /**
          * listen to fab click
          */
         viewModel.navigateToEditNoteFragment.observe(viewLifecycleOwner, {
-            if (it == true && viewModel.actionMode == null){
+            if (it == true && viewModel.actionMode == null) {
                 this.findNavController()
-                    .navigate(NoteFragmentDirections.actionNoteFragmentToEditNoteFragment())
+                    .navigate(
+                        AllNotesFragmentDirections
+                            .actionNoteFragmentToEditNoteFragment()
+                    )
                 viewModel.onDoneEditNavigating()
             }
         })

@@ -1,4 +1,4 @@
-package com.example.noteexample.note
+package com.example.noteexample.allNotes
 
 import android.view.*
 import androidx.databinding.DataBindingUtil
@@ -11,9 +11,10 @@ import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 
-class NoteAdapter: ListAdapter<Note, NoteAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()){
+class NoteAdapter():
+    ListAdapter<Note, NoteAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()){
     /**
-     * [isActive] gets instance of InsertUpdateViewHolder and observed in [NoteFragment]
+     * [isActive] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]
      * to set clickListeners for recycler items
      */
     private val _isActive = MutableLiveData<InsertUpdateViewHolder>()

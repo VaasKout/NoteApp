@@ -1,4 +1,4 @@
-package com.example.noteexample.note
+package com.example.noteexample.allNotes
 
 import android.app.Application
 import android.view.ActionMode
@@ -15,7 +15,7 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.*
 
-class NoteViewModel(application: Application) : AndroidViewModel(application){
+class AllNotesViewModel(application: Application) : AndroidViewModel(application){
 
     private var selected: List<Note>? = null
     private val repository : NoteRepository

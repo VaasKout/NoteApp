@@ -12,6 +12,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.FragmentUpdateNoteBinding
+import com.example.noteexample.utils.Camera
 
 class UpdateNoteFragment : Fragment() {
 
@@ -22,8 +23,6 @@ class UpdateNoteFragment : Fragment() {
         val binding : FragmentUpdateNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_update_note, container, false)
 
-
-         //
          val application = requireNotNull(this.activity).application
          val updateViewModelFactory = UpdateNoteViewModelFactory(args.noteId, application)
          val viewModel =
@@ -32,9 +31,19 @@ class UpdateNoteFragment : Fragment() {
 
          binding.viewModel = viewModel
 
+         binding.toolbarNoteUpdate.setOnMenuItemClickListener {
+             when(it.itemId){
+                 R.id.insert_photo -> {
+//                     val camera = Camera(requireActivity())
+//                     camera.dispatchTakePictureIntent(binding.editButton)
+                     true
+                 } else -> false
+             }
+         }
+
+
          viewModel.currentNote.observe(viewLifecycleOwner, {
              binding.titleEditTextUpdate.setText(it.title)
-             binding.noteEditTextUpdate.setText(it.note)
          })
 
          viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
@@ -42,12 +51,13 @@ class UpdateNoteFragment : Fragment() {
                  val title = binding.titleEditTextUpdate.text.toString()
                  val noteText = binding.noteEditTextUpdate.text.toString()
                  if (title.isNotEmpty() || noteText.isNotEmpty()){
-                 val note = Note(id = args.noteId, title = title, note = noteText)
-                     viewModel.onUpdate(note)
+//                 val note = Note(id = args.noteId, title = title, note = noteText)
+//                     viewModel.onUpdate(note)
                  }
 
                  this.findNavController()
-                     .navigate(UpdateNoteFragmentDirections.actionUpdateNoteFragmentToNoteFragment())
+                     .navigate(UpdateNoteFragmentDirections
+                         .actionUpdateNoteFragmentToNoteFragment())
                  viewModel.onStopNavigating()
              }
          })

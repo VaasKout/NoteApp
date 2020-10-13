@@ -10,6 +10,12 @@ import androidx.room.PrimaryKey
 data class Note (
     @PrimaryKey(autoGenerate = true) var id : Int = 0,
     @ColumnInfo(name = "title") val title : String = "",
-    @ColumnInfo(name = "content") val note : String = "",
     @ColumnInfo(name = "isChecked") var isChecked: Boolean = false
+)
+
+//TODO make second @Entity, add it into db
+
+data class NoteContent(
+    val note: String = "",
+    val photoPath: String = ""
 )
