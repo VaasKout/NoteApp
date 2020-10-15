@@ -1,6 +1,7 @@
 package com.example.noteexample.insertNote
 
 
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +9,10 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentInsertNoteBinding
-import com.example.noteexample.utils.Camera
+import com.example.noteexample.gallery.GalleryFragment
+
 
 
 class InsertNoteFragment : Fragment() {
@@ -38,11 +39,17 @@ class InsertNoteFragment : Fragment() {
         binding.toolbarNoteInsert.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.insert_photo ->{
-                    val camera = Camera(requireActivity())
-                    camera.dispatchTakePictureIntent(binding.saveButton)
-                    Glide.with(this)
-                        .load(camera.currentPhotoPath)
-                        .into(binding.testImage)
+//                    camera.dispatchTakePictureIntent(binding.saveButton)
+//                    Glide.with(this)
+//                        .load(camera.currentPhotoPath)
+//                        .into(binding.testImage)
+//                    if (::intent.isInitialized){
+//                        camera.albumImages(intent)
+//                    }
+                    val modalBottomSheet = GalleryFragment()
+                    modalBottomSheet.show(childFragmentManager, GalleryFragment.TAG)
+
+
                     true
                 }
                 else -> false

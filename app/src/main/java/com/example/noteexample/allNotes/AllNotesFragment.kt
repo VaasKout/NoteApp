@@ -28,6 +28,10 @@ class AllNotesFragment : Fragment() {
         val viewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
         binding.noteViewModel = viewModel
 
+        /**
+         * initialize and set adapter options
+         */
+
         val noteAdapter = NoteAdapter()
         binding.recyclerView.apply {
             adapter = noteAdapter
@@ -55,9 +59,7 @@ class AllNotesFragment : Fragment() {
             }
         }
 
-        /**
-         * initialize and set adapter options
-         */
+
 
 
         /**

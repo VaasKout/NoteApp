@@ -2,6 +2,7 @@ package com.example.noteexample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.noteexample.gallery.GalleryFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

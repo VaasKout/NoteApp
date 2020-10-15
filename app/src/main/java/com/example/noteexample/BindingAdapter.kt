@@ -1,8 +1,11 @@
 package com.example.noteexample
 
+import android.net.Uri
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
 import com.example.noteexample.database.Note
 
 
@@ -25,6 +28,13 @@ import com.example.noteexample.database.Note
         else text = it.title
     }
 }
+
+//@BindingAdapter("galleryImage")
+//    fun ImageView.setImage(uri: String){
+//    Glide.with(this.context)
+//        .load(uri)
+//        .into(this)
+//}
 //@BindingAdapter("noteTextVisibility")
 //    fun TextView.setNoteVisibility(note: Note?){
 //        note?.let {

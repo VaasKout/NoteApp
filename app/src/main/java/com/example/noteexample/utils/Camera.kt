@@ -2,7 +2,11 @@ package com.example.noteexample.utils
 
 
 import android.app.Activity
+import android.content.ContentUris
 import android.content.Intent
+import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
@@ -23,7 +27,6 @@ class Camera(private val activity: Activity) {
     lateinit var currentPhotoPath: String
 
     fun dispatchTakePictureIntent(barView: View) {
-
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(activity.packageManager)?.also {
@@ -51,8 +54,10 @@ class Camera(private val activity: Activity) {
             }
         }
         val file = File(currentPhotoPath)
-        MediaScannerConnection.scanFile(activity, arrayOf(file.toString()),
-            arrayOf(file.name), null)
+        MediaScannerConnection.scanFile(
+            activity, arrayOf(file.toString()),
+            arrayOf(file.name), null
+        )
     }
 
     @Throws(IOException::class)
@@ -69,5 +74,33 @@ class Camera(private val activity: Activity) {
         ).apply {
             currentPhotoPath = absolutePath
         }
+    }
+
+     fun loadImagesFromStorage(): List<Bitmap> {
+
+        val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val cursor: Cursor?
+        val columnIndexId: Int
+        val listOfAllImages = mutableListOf<Bitmap>()
+        val projection = arrayOf(MediaStore.Images.Media._ID)
+        cursor = activity.contentResolver
+            .query( uri, projection, null, null, null)
+
+        if ( cursor != null ){
+            columnIndexId = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            while (cursor.moveToNext()){
+                val contentUri = ContentUris.withAppendedId(uri, cursor.getLong(columnIndexId))
+                var image: Bitmap
+                //TODO figure out why it works only on emulator
+                activity.contentResolver.openFileDescriptor(contentUri, "r").use { pfd ->
+                    if( pfd != null ){
+                        image = BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor)
+                        listOfAllImages.add(image)
+                    }
+                }
+            }
+            cursor.close()
+        }
+        return listOfAllImages
     }
 }

@@ -13,7 +13,7 @@ import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.RecyclerInsertUpdateItemBinding
 
 //TODO make new data class with note and image, observe it here and insert it in fragments
-//
+
 
 class InsertUpdateAdapter(val layout: Int) :
     ListAdapter<NoteContent, InsertUpdateAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()) {
