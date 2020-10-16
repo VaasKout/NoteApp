@@ -1,21 +1,21 @@
 package com.example.noteexample.gallery
 
 import android.app.Activity
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.noteexample.R
+import com.example.noteexample.database.GalleryData
 import com.example.noteexample.databinding.GalleryRecyclerItemBinding
 
 
-class GalleryAdapter(private val activity: Activity):
-    androidx.recyclerview.widget.ListAdapter<Bitmap, GalleryAdapter.GalleryViewHolder>(
+class GalleryAdapter(private val activity: Activity) :
+    ListAdapter<GalleryData, GalleryAdapter.GalleryViewHolder>(
         NoteDiffCallBack()
     ) {
 
@@ -30,6 +30,7 @@ class GalleryAdapter(private val activity: Activity):
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
+
         /**
          * Use only DataBindingUtil else layout options crash in recycler_main_item
          */
@@ -38,8 +39,7 @@ class GalleryAdapter(private val activity: Activity):
                 layoutInflater,
                 R.layout.gallery_recycler_item,
                 parent,
-                false
-            )
+                false)
 
 //        val size = Point()
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
@@ -64,26 +64,24 @@ class GalleryAdapter(private val activity: Activity):
         return GalleryViewHolder(binding)
     }
 
-    inner class GalleryViewHolder(private val binding: GalleryRecyclerItemBinding) :
+    inner class GalleryViewHolder(val binding: GalleryRecyclerItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(bitmap: Bitmap) {
+        fun bind(data: GalleryData) {
             _holder.value = this
-            Glide.with(activity)
-                .load(bitmap)
-                .into(binding.galleryImage)
+            binding.data = data
             binding.executePendingBindings()
-
         }
     }
 }
 
-class NoteDiffCallBack : DiffUtil.ItemCallback<Bitmap>() {
-    override fun areItemsTheSame(oldItem: Bitmap, newItem: Bitmap): Boolean {
+class NoteDiffCallBack : DiffUtil.ItemCallback<GalleryData>() {
+    override fun areItemsTheSame(oldItem: GalleryData, newItem: GalleryData): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: Bitmap, newItem: Bitmap): Boolean {
-        return oldItem.generationId == newItem.generationId
+    override fun areContentsTheSame(oldItem: GalleryData, newItem: GalleryData): Boolean {
+        return oldItem == newItem
     }
+
 }

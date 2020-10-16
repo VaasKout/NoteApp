@@ -21,22 +21,11 @@ class GalleryFragment : BottomSheetDialogFragment() {
         val binding: FragmentGalleryBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_gallery, container, false)
         val viewModel = ViewModelProvider(this).get(GalleryViewModel::class.java)
-        val camera = Camera(requireActivity())
-        val imgList = camera.loadImagesFromStorage()
+        binding.galleryRecyclerView.adapter = GalleryAdapter(requireActivity())
+        viewModel.getData(requireActivity())
 
-        val recyclerAdapter = GalleryAdapter(requireActivity())
-        recyclerAdapter.submitList(imgList)
-
-        binding.galleryRecyclerView.apply {
-            adapter = recyclerAdapter
-            setHasFixedSize(true)
-        }
-
-
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
         return binding.root
-    }
-    companion object{
-        const val TAG = "ModalBottomSheet"
     }
 }

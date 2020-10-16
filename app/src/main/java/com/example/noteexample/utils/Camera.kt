@@ -11,20 +11,40 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
+import com.example.noteexample.database.GalleryData
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
 const val REQUEST_TAKE_PHOTO = 1
 
 class Camera(private val activity: Activity) {
     lateinit var currentPhotoPath: String
+
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String =
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? =
+            activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            currentPhotoPath = absolutePath
+        }
+    }
 
     fun dispatchTakePictureIntent(barView: View) {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
@@ -60,47 +80,27 @@ class Camera(private val activity: Activity) {
         )
     }
 
-    @Throws(IOException::class)
-    private fun createImageFile(): File {
-        // Create an image file name
-        val timeStamp: String =
-            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir: File? =
-            activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
-        ).apply {
-            currentPhotoPath = absolutePath
-        }
-    }
 
-     fun loadImagesFromStorage(): List<Bitmap> {
-
-        val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    fun loadImagesFromStorage(): List<GalleryData> {
+        val uriExternal: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val cursor: Cursor?
-        val columnIndexId: Int
-        val listOfAllImages = mutableListOf<Bitmap>()
+        val columnIndexID: Int
+        val listOfAllImages: MutableList<GalleryData> = mutableListOf()
         val projection = arrayOf(MediaStore.Images.Media._ID)
-        cursor = activity.contentResolver
-            .query( uri, projection, null, null, null)
-
-        if ( cursor != null ){
-            columnIndexId = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            while (cursor.moveToNext()){
-                val contentUri = ContentUris.withAppendedId(uri, cursor.getLong(columnIndexId))
-                var image: Bitmap
-                //TODO figure out why it works only on emulator
-                activity.contentResolver.openFileDescriptor(contentUri, "r").use { pfd ->
-                    if( pfd != null ){
-                        image = BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor)
-                        listOfAllImages.add(image)
-                    }
-                }
+        var imageId: Long
+        cursor =
+            activity.contentResolver.query(uriExternal, projection, null, null, null)
+        if (cursor != null) {
+            columnIndexID = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            while (cursor.moveToNext()) {
+                imageId = cursor.getLong(columnIndexID)
+                val uriImage = Uri.withAppendedPath(uriExternal, imageId.toString())
+                val imgUrl = GalleryData(uriImage)
+                Log.e("uri", "$uriImage")
+                listOfAllImages.add(imgUrl)
             }
             cursor.close()
         }
-        return listOfAllImages
+        return listOfAllImages.reversed()
     }
 }

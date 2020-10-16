@@ -116,13 +116,13 @@ class AllNotesFragment : Fragment() {
         noteAdapter.isActive.observe(viewLifecycleOwner, { adapter ->
             val item = noteAdapter.currentList[adapter.adapterPosition]
             val card = adapter.binding.materialCard
-            adapter.binding.materialCard.setOnLongClickListener {
+            card.setOnLongClickListener {
                 card.isChecked = !card.isChecked
                 item.isChecked = card.isChecked
                 viewModel.onInitCheckList(item.isChecked, item.id)
                 true
             }
-            adapter.binding.materialCard.setOnClickListener {
+            card.setOnClickListener {
                 if (viewModel.actionMode != null) {
                     card.isChecked = !card.isChecked
                     item.isChecked = card.isChecked
@@ -148,7 +148,6 @@ class AllNotesFragment : Fragment() {
                 viewModel.onDoneEditNavigating()
             }
         })
-
 
         binding.lifecycleOwner = this
         return binding.root

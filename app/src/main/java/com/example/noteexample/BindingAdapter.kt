@@ -5,8 +5,12 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
+import com.example.noteexample.database.GalleryData
 import com.example.noteexample.database.Note
+import com.example.noteexample.gallery.GalleryAdapter
 
 
 /**
@@ -21,6 +25,9 @@ import com.example.noteexample.database.Note
  * note is instance of Note from database
  */
 
+@GlideModule
+class GlideAppModule : AppGlideModule()
+
 @BindingAdapter("titleTextVisibility")
     fun TextView.setTitleVisibility(note: Note?){
     note?.let {
@@ -29,12 +36,23 @@ import com.example.noteexample.database.Note
     }
 }
 
-//@BindingAdapter("galleryImage")
-//    fun ImageView.setImage(uri: String){
-//    Glide.with(this.context)
-//        .load(uri)
-//        .into(this)
-//}
+@BindingAdapter("imageUrl")
+    fun ImageView.bindImage(imgUrl: Uri?){
+    imgUrl?.let {
+        GlideApp.with(this.context)
+            .load(it)
+            .fitCenter()
+            .into(this)
+    }
+}
+
+@BindingAdapter("listData")
+fun bindRecyclerView(recyclerView: RecyclerView, data: List<GalleryData>?){
+    val adapter = recyclerView.adapter as GalleryAdapter
+    adapter.submitList(data)
+}
+
+
 //@BindingAdapter("noteTextVisibility")
 //    fun TextView.setNoteVisibility(note: Note?){
 //        note?.let {
@@ -42,3 +60,17 @@ import com.example.noteexample.database.Note
 //            else text = it.note
 //        }
 //    }
+
+
+//@BindingAdapter("imageUrl")
+//fun bindImage(imgView: ImageView, imgUrl: String?){
+//    imgUrl?.let {
+//       val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+//        Glide.with(imgView.context)
+//                .load(imgUri)
+//                .apply(RequestOptions()
+//                        .placeholder(R.drawable.loading_animation)
+//                        .error(R.drawable.ic_broken_image))
+//                .into(imgView)
+//    }
+//}

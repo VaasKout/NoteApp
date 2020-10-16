@@ -11,7 +11,7 @@ import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 
-class NoteAdapter():
+class NoteAdapter:
     ListAdapter<Note, NoteAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()){
     /**
      * [isActive] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]

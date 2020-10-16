@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.example.noteexample.gallery.GalleryViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,6 +37,7 @@
             app:layout_constraintTop_toBottomOf="@id/textView"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="3"
+            app:listData="@{viewModel.galleryData}"
             tools:listitem="@layout/gallery_recycler_item" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

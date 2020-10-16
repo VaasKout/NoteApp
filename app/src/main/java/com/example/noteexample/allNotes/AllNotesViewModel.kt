@@ -60,8 +60,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     private val _navigateToEditNoteFragment = MutableLiveData<Boolean>()
     val navigateToEditNoteFragment : LiveData<Boolean> = _navigateToEditNoteFragment
 
-    private val _navigateToUpdateNoteFragment = MutableLiveData<Int>()
-    val navigateToUpdateNoteFragment : LiveData<Int> = _navigateToUpdateNoteFragment
+    private val _navigateToUpdateNoteFragment = MutableLiveData<Int?>()
+    val navigateToUpdateNoteFragment : LiveData<Int?> = _navigateToUpdateNoteFragment
 
     private val _checkedState = MutableLiveData<Boolean>()
     var checkedState: LiveData<Boolean> = _checkedState
