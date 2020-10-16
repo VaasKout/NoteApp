@@ -9,13 +9,15 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.noteexample.GlideApp
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentInsertNoteBinding
 import com.example.noteexample.gallery.GalleryFragment
+import com.example.noteexample.utils.Camera
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class InsertNoteFragment : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,15 +40,23 @@ class InsertNoteFragment : Fragment() {
         binding.toolbarNoteInsert.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
-//                    camera.dispatchTakePictureIntent(binding.saveButton)
-//                    Glide.with(this)
-//                        .load(camera.currentPhotoPath)
-//                        .into(binding.testImage)
-//                    if (::intent.isInitialized){
-//                        camera.albumImages(intent)
-//                    }
-                    val modalBottomSheet = GalleryFragment()
-                    modalBottomSheet.show(childFragmentManager, "GalleryFragment")
+                    val camera = Camera(requireActivity())
+                    val items = camera.dialogList
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setItems(items) { _, index ->
+                            when (index) {
+                                0 -> {
+                                    camera.dispatchTakePictureIntent(binding.saveButton)
+//                                    GlideApp.with(this)
+//                                        .load(camera.currentPhotoPath)
+//                                        .into(binding.testImage)
+                                }
+                                1 -> {
+                                    val modalBottomSheet = GalleryFragment()
+                                    modalBottomSheet.show(childFragmentManager, "GalleryFragment")
+                                }
+                            }
+                        }.show()
 
                     true
                 }

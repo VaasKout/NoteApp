@@ -2,11 +2,8 @@ package com.example.noteexample.utils
 
 
 import android.app.Activity
-import android.content.ContentUris
 import android.content.Intent
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
@@ -22,13 +19,12 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.abs
 
 const val REQUEST_TAKE_PHOTO = 1
 
 class Camera(private val activity: Activity) {
     lateinit var currentPhotoPath: String
-
+    val dialogList = arrayOf("Фото с камеры", "Фото из галереи")
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -71,13 +67,13 @@ class Camera(private val activity: Activity) {
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(activity, takePictureIntent, REQUEST_TAKE_PHOTO, null)
                 }
+                val file = File(currentPhotoPath)
+                MediaScannerConnection.scanFile(
+                    activity, arrayOf(file.toString()),
+                    arrayOf(file.name), null
+                )
             }
         }
-        val file = File(currentPhotoPath)
-        MediaScannerConnection.scanFile(
-            activity, arrayOf(file.toString()),
-            arrayOf(file.name), null
-        )
     }
 
 

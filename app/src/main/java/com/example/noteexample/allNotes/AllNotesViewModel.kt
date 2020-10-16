@@ -125,7 +125,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     fun onClear(){
        viewModelScope.launch {
-           repository.deleteAll()
+           repository.deleteAllNotes()
        }
     }
 }

@@ -43,7 +43,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     private suspend fun insert(note: Note){
         withContext(Dispatchers.IO){
-            repository.insert(note)
+            repository.insertNote(note)
         }
     }
 }

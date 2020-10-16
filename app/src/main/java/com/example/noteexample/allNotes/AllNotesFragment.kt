@@ -79,7 +79,7 @@ class AllNotesFragment : Fragment() {
                 this.findNavController()
                     .navigate(
                         AllNotesFragmentDirections
-                            .actionNoteFragmentToUpdateNoteFragment(noteId)
+                            .actionAllNotesFragmentToOneNoteFragment(noteId)
                     )
                 viewModel.onDoneUpdateNavigating()
             }

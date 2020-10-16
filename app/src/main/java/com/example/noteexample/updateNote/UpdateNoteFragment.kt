@@ -9,10 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.noteexample.GlideApp
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.FragmentUpdateNoteBinding
+import com.example.noteexample.gallery.GalleryFragment
 import com.example.noteexample.utils.Camera
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class UpdateNoteFragment : Fragment() {
 
@@ -34,8 +37,24 @@ class UpdateNoteFragment : Fragment() {
          binding.toolbarNoteUpdate.setOnMenuItemClickListener {
              when(it.itemId){
                  R.id.insert_photo -> {
-//                     val camera = Camera(requireActivity())
-//                     camera.dispatchTakePictureIntent(binding.editButton)
+                     val camera = Camera(requireActivity())
+                     val items = camera.dialogList
+                     MaterialAlertDialogBuilder(requireContext())
+                         .setItems(items) { _, index ->
+                             when (index) {
+                                 0 -> {
+                                     camera.dispatchTakePictureIntent(binding.editButton)
+//                                     GlideApp.with(this)
+//                                         .load(camera.currentPhotoPath)
+//                                         .into(binding.image)
+                                 }
+                                 1 -> {
+                                     val modalBottomSheet = GalleryFragment()
+                                     modalBottomSheet.show(childFragmentManager, "GalleryFragment")
+                                 }
+                             }
+                         }.show()
+
                      true
                  } else -> false
              }
@@ -43,21 +62,21 @@ class UpdateNoteFragment : Fragment() {
 
 
          viewModel.currentNote.observe(viewLifecycleOwner, {
-             binding.titleEditTextUpdate.setText(it.title)
+             binding.titleEditUpdate.setText(it.title)
          })
 
          viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
              if (it == true){
-                 val title = binding.titleEditTextUpdate.text.toString()
-                 val noteText = binding.noteEditTextUpdate.text.toString()
-                 if (title.isNotEmpty() || noteText.isNotEmpty()){
+                 val title = binding.titleEditUpdate.text.toString()
+//                 val noteText = binding.noteEditTextUpdate.text.toString()
+//                 if (title.isNotEmpty() || noteText.isNotEmpty()){
 //                 val note = Note(id = args.noteId, title = title, note = noteText)
 //                     viewModel.onUpdate(note)
-                 }
+//                 }
 
                  this.findNavController()
                      .navigate(UpdateNoteFragmentDirections
-                         .actionUpdateNoteFragmentToNoteFragment())
+                         .actionUpdateNoteFragmentToOneNoteFragment(args.noteId))
                  viewModel.onStopNavigating()
              }
          })
