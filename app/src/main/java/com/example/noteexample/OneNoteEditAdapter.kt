@@ -9,9 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.database.NoteContent
-import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.databinding.RecyclerNoteContentEditItemBinding
-import com.example.noteexample.databinding.RecyclerNoteContentViewItemBinding
 
 class OneNoteEditAdapter :
     ListAdapter<NoteContent, OneNoteEditAdapter.NoteContentEditHolder>(NoteDiffCallBack()) {
@@ -36,6 +34,7 @@ class OneNoteEditAdapter :
 
         fun bind(noteContent: NoteContent) {
             _holder.value = this
+            binding.data = noteContent
         }
     }
 }

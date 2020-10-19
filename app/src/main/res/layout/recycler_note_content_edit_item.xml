@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="data"
+            type="com.example.noteexample.database.NoteContent" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,7 +36,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/note_editText_first"
-            tools:layout_height="50dp" />
+            tools:layout_height="50dp"
+            app:imageUrl="@{data.photoPath}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

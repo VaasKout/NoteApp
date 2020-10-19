@@ -17,7 +17,6 @@ import kotlinx.coroutines.*
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application){
 
-    private var selected: List<Note>? = null
     private val repository : NoteRepository
     val allNotes : LiveData<List<Note>>
 
@@ -98,13 +97,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     fun onStartActionMode(activity: FragmentActivity){
         actionMode = activity.startActionMode(actionModeController)
-        selected = allNotes.value?.filter { it.isChecked }
         actionMode?.title =
             "${allNotes.value?.filter { it.isChecked }?.size}"
 
     }
     fun onResumeActionMode() {
-       selected = allNotes.value?.filter { it.isChecked }
        actionMode?.title =
            "${allNotes.value?.filter { it.isChecked }?.size}"
     }
@@ -118,8 +115,12 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun onDeleteSelected(){
-        viewModelScope.launch {
-            selected?.let { repository.deleteNote(it) }
+        allNotes.value?.let {
+            viewModelScope.launch {
+                val deleteNoteList =
+                    it.filter { it.isChecked }
+                repository.deleteNotes(deleteNoteList)
+            }
         }
     }
 

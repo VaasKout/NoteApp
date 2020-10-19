@@ -36,7 +36,9 @@ class NoteAdapter:
 
      inner class NoteViewHolder (val binding: RecyclerMainItemBinding):
         RecyclerView.ViewHolder(binding.root){
-
+         /**
+          * Checked state of card depends on [Note.isChecked] state
+          */
          fun bind(note: Note){
              _isActive.value = this
             binding.note = note

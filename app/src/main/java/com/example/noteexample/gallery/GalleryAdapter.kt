@@ -1,6 +1,5 @@
 package com.example.noteexample.gallery
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -14,11 +13,10 @@ import com.example.noteexample.database.GalleryData
 import com.example.noteexample.databinding.GalleryRecyclerItemBinding
 
 
-class GalleryAdapter(private val activity: Activity) :
+class GalleryAdapter :
     ListAdapter<GalleryData, GalleryAdapter.GalleryViewHolder>(
         NoteDiffCallBack()
     ) {
-
 
     private val _holder = MutableLiveData<GalleryViewHolder>()
     val holder: LiveData<GalleryViewHolder> = _holder
@@ -41,35 +39,18 @@ class GalleryAdapter(private val activity: Activity) :
                 parent,
                 false)
 
-//        val size = Point()
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-//            val display = activity.display
-//            display?.getRealSize(size)
-//            val width: Int = size.x / 3
-//            binding.galleryCard.minimumWidth = width
-//            binding.galleryCard.minimumHeight = width
-//            binding.galleryImage.maxHeight = width
-//            binding.galleryImage.maxWidth = width
-//
-//        } else{
-//            val display: Display = activity.windowManager.defaultDisplay
-//            display.getRealSize(size)
-//            val width: Int = size.x / 3
-//            binding.galleryCard.minimumWidth = width
-//            binding.galleryCard.minimumHeight = width
-//            binding.galleryImage.maxHeight = width
-//            binding.galleryImage.maxWidth = width
-//        }
-
         return GalleryViewHolder(binding)
     }
 
     inner class GalleryViewHolder(val binding: GalleryRecyclerItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
+        /**
+         * Checked state of card depends on [GalleryData.isChecked] state
+         */
         fun bind(data: GalleryData) {
             _holder.value = this
             binding.data = data
+            binding.galleryCard.isChecked = data.isChecked
             binding.executePendingBindings()
         }
     }

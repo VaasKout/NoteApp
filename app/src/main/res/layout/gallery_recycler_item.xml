@@ -15,7 +15,10 @@
         android:layout_height="wrap_content"
         app:strokeWidth="1dp"
         app:strokeColor="@color/grey"
-        android:padding="2dp">
+        android:padding="2dp"
+        android:checkable="true"
+        android:clickable="true"
+        android:focusable="true">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

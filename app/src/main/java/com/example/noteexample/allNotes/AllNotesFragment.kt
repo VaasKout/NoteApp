@@ -1,20 +1,20 @@
 package com.example.noteexample.allNotes
 
 import android.os.Bundle
-import android.view.*
-import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AllNotesFragment : Fragment() {
 
-    private var actionModeOnResume: Boolean = true
+    private var actionModeNotStarted: Boolean = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,8 +36,6 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-            layoutManager =
-                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
         }
 
 
@@ -58,8 +56,6 @@ class AllNotesFragment : Fragment() {
                 else -> false
             }
         }
-
-
 
 
         /**
@@ -86,7 +82,7 @@ class AllNotesFragment : Fragment() {
         })
         /**
          * Inside function, checks if any notes are checked,
-         * if not
+        * if not, destroys action mode
          *
          */
         fun checkAndDestroyActionMode() {
@@ -94,7 +90,7 @@ class AllNotesFragment : Fragment() {
                 viewModel.onDoneActionMode()
                 binding.materialButton.visibility = View.VISIBLE
                 noteAdapter.notifyDataSetChanged()
-                actionModeOnResume = true
+                actionModeNotStarted= true
             }
         }
         /**
@@ -103,11 +99,11 @@ class AllNotesFragment : Fragment() {
          */
         viewModel.checkedState.observe(viewLifecycleOwner, { state ->
 
-            if (state == true && actionModeOnResume) {
+            if (state == true && actionModeNotStarted) {
                 binding.materialButton.visibility = View.GONE
                 viewModel.onStartActionMode(requireActivity())
-                actionModeOnResume = false
-            } else if (state == true && !actionModeOnResume) {
+                actionModeNotStarted = false
+            } else if (state == true && !actionModeNotStarted) {
                 viewModel.onResumeActionMode()
             }
             checkAndDestroyActionMode()

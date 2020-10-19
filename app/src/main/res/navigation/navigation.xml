@@ -27,6 +27,9 @@
             app:destination="@id/allNotesFragment"
             app:popUpTo="@id/allNotesFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_editNoteFragment_to_galleryFragment"
+            app:destination="@id/galleryFragment" />
     </fragment>
     <fragment
         android:id="@+id/updateNoteFragment"
@@ -41,6 +44,9 @@
             app:destination="@id/oneNoteFragment"
             app:popUpTo="@id/updateNoteFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_updateNoteFragment_to_galleryFragment"
+            app:destination="@id/galleryFragment" />
     </fragment>
     <fragment
         android:id="@+id/oneNoteFragment"
@@ -54,4 +60,13 @@
             android:id="@+id/action_oneNoteFragment_to_updateNoteFragment"
             app:destination="@id/updateNoteFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/galleryFragment"
+        android:name="com.example.noteexample.gallery.GalleryFragment"
+        android:label="GalleryFragment"
+        tools:layout="@layout/fragment_gallery">
+        <argument
+            android:name="noteId"
+            app:argType="integer" />
+    </dialog>
 </navigation>

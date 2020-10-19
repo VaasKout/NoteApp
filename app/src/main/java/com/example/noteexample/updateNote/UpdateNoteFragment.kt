@@ -9,9 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.noteexample.GlideApp
 import com.example.noteexample.R
-import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.FragmentUpdateNoteBinding
 import com.example.noteexample.gallery.GalleryFragment
 import com.example.noteexample.utils.Camera
@@ -49,8 +47,9 @@ class UpdateNoteFragment : Fragment() {
 //                                         .into(binding.image)
                                  }
                                  1 -> {
-                                     val modalBottomSheet = GalleryFragment()
-                                     modalBottomSheet.show(childFragmentManager, "GalleryFragment")
+                                     this.findNavController()
+                                         .navigate(UpdateNoteFragmentDirections
+                                             .actionUpdateNoteFragmentToGalleryFragment(args.noteId))
                                  }
                              }
                          }.show()

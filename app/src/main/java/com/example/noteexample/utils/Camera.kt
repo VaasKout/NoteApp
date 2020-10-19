@@ -90,9 +90,9 @@ class Camera(private val activity: Activity) {
             columnIndexID = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             while (cursor.moveToNext()) {
                 imageId = cursor.getLong(columnIndexID)
-                val uriImage = Uri.withAppendedPath(uriExternal, imageId.toString())
+                val uriImage = Uri.withAppendedPath(uriExternal, imageId.toString()).toString()
                 val imgUrl = GalleryData(uriImage)
-                Log.e("uri", "$uriImage")
+                Log.e("url", uriImage)
                 listOfAllImages.add(imgUrl)
             }
             cursor.close()
