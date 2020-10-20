@@ -1,6 +1,7 @@
 package com.example.noteexample.gallery
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentGalleryBinding
+import com.example.noteexample.utils.Camera
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
@@ -25,6 +27,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_gallery, container, false)
         val viewModel = ViewModelProvider(this).get(GalleryViewModel::class.java)
         val galleryAdapter = GalleryAdapter()
+        val camera = Camera(requireActivity())
 
         /**
          * RecyclerView options
@@ -33,7 +36,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
             adapter = galleryAdapter
             setHasFixedSize(true)
         }
-        viewModel.getData(requireActivity())
+        viewModel.getData(camera)
         viewModel.galleryData.observe(viewLifecycleOwner, {
             galleryAdapter.submitList(it)
         })
@@ -68,6 +71,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
         binding.acceptSelectedPhotos.setOnClickListener {
             viewModel.insertImages(args.noteId)
+            Log.e("argsID", "${args.noteId}")
             this.findNavController().popBackStack()
         }
 

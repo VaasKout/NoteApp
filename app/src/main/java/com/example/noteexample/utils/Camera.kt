@@ -1,8 +1,10 @@
 package com.example.noteexample.utils
 
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -10,7 +12,11 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
 import com.example.noteexample.database.GalleryData
@@ -78,6 +84,7 @@ class Camera(private val activity: Activity) {
 
 
     fun loadImagesFromStorage(): List<GalleryData> {
+
         val uriExternal: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val cursor: Cursor?
         val columnIndexID: Int
@@ -100,3 +107,28 @@ class Camera(private val activity: Activity) {
         return listOfAllImages.reversed()
     }
 }
+
+//if (ContextCompat.checkSelfPermission(thisActivity,
+//            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//            != PackageManager.PERMISSION_GRANTED) {
+//
+//        // Permission is not granted
+//        // Should we show an explanation?
+//        if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//            // Show an explanation to the user *asynchronously* -- don't block
+//            // this thread waiting for the user's response! After the user
+//            // sees the explanation, try again to request the permission.
+//        } else {
+//            // No explanation needed; request the permission
+//            ActivityCompat.requestPermissions(thisActivity,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
+//
+//            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+//            // app-defined int constant. The callback method gets the
+//            // result of the request.
+//        }
+//    } else {
+//        // Permission has already been granted
+//    }

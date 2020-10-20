@@ -2,6 +2,7 @@ package com.example.noteexample.gallery
 
 import android.app.Activity
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.noteexample.database.GalleryData
 import com.example.noteexample.database.Note
@@ -24,9 +25,8 @@ class GalleryViewModel(application: Application): AndroidViewModel(application){
         repository = NoteRepository(noteDao)
     }
     
-    fun getData(activity: Activity){
+    fun getData(camera: Camera){
         viewModelScope.launch {
-            val camera = Camera(activity)
             _galleryData.value = camera.loadImagesFromStorage()
         }
     }
@@ -46,6 +46,7 @@ class GalleryViewModel(application: Application): AndroidViewModel(application){
                         noteId = noteId,
                         photoPath = photo.imgSrcUrl
                     )
+                    Log.e("noteIDGal", "$noteId")
                     repository.insertNoteContent(noteContentList)
                 }
             }
