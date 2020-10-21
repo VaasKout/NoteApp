@@ -2,10 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-
-    </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -17,7 +13,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                app:title="@string/app_name" />
+                app:title="@string/app_name"
+                app:menu="@menu/note_view_menu"/>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,7 +24,7 @@
             tools:layout_editor_absoluteY="56dp">
 
             <androidx.core.widget.NestedScrollView
-                android:layout_width="411dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:fillViewport="true"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -49,7 +46,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:text="@string/title"/>
+                        tools:text="@string/title" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_one_note"

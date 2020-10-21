@@ -1,10 +1,6 @@
 package com.example.noteexample.insertNote
 
-import android.Manifest
 import android.app.Application
-import android.content.pm.PackageManager
-import android.graphics.Camera
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
@@ -14,8 +10,9 @@ import kotlinx.coroutines.*
 
 class InsertNoteViewModel(application: Application) : AndroidViewModel(application) {
 
-    //Flag
+    //Flags
     var noteInserted = false
+    var noteContentIsEmpty = true
 
     //Repository
     private val repository: NoteRepository
@@ -34,9 +31,8 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
+        getLastNote()
     }
-
-
 
     /**
      * functions for navigating
@@ -54,15 +50,18 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      * Coroutine methods
      */
 
-    fun onInsert(note: Note) {
+     fun getLastNote(text: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.insertNote(note)
-        }
-    }
-
-     fun getLastNote() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _currentNote.postValue(repository.getLastNote())
+            if (!noteInserted){
+                repository.insertNote(Note())
+                noteInserted = true
+            }
+            val note = repository.getLastNote()
+            if (text.isNotEmpty()){
+                note.title = text
+                repository.updateNote(note)
+            }
+            _currentNote.postValue(note)
         }
     }
 

@@ -5,7 +5,7 @@ import androidx.room.*
 
 @Dao
 interface NoteDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertNote(note : Note)
     @Query("DELETE FROM note_table")
     suspend fun deleteAllNotes()

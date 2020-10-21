@@ -36,6 +36,7 @@ class OneNoteViewAdapter :
 
         fun bind(noteContent: NoteContent) {
             _holder.value = this
+            binding.data = noteContent
         }
     }
 }

@@ -1,9 +1,15 @@
 package com.example.noteexample.updateNote
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -12,11 +18,13 @@ import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentUpdateNoteBinding
 import com.example.noteexample.gallery.GalleryFragment
+import com.example.noteexample.insertNote.InsertNoteFragmentDirections
 import com.example.noteexample.utils.Camera
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class UpdateNoteFragment : Fragment() {
 
+    lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val args by navArgs<UpdateNoteFragmentArgs>()
 
      override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -30,7 +38,26 @@ class UpdateNoteFragment : Fragment() {
              ViewModelProvider(this, updateViewModelFactory)
                  .get(UpdateNoteViewModel::class.java)
 
-         binding.viewModel = viewModel
+
+
+         viewModel.currentNote.observe(viewLifecycleOwner, {
+             binding.titleEditUpdate.setText(it.title)
+         })
+
+         requestPermissionLauncher =
+             registerForActivityResult(
+                 ActivityResultContracts.RequestPermission()
+             ) { isGranted: Boolean ->
+                 if (isGranted) {
+                     this.findNavController()
+                         .navigate(
+                             InsertNoteFragmentDirections
+                                 .actionEditNoteFragmentToGalleryFragment
+                                     (args.noteId)
+                         )
+                     Log.e("requestId", "${args.noteId}")
+                 }
+             }
 
          binding.toolbarNoteUpdate.setOnMenuItemClickListener {
              when(it.itemId){
@@ -47,9 +74,23 @@ class UpdateNoteFragment : Fragment() {
 //                                         .into(binding.image)
                                  }
                                  1 -> {
-                                     this.findNavController()
-                                         .navigate(UpdateNoteFragmentDirections
-                                             .actionUpdateNoteFragmentToGalleryFragment(args.noteId))
+                                     if (ContextCompat.checkSelfPermission(
+                                             requireContext(),
+                                             Manifest.permission.READ_EXTERNAL_STORAGE
+                                         ) == PackageManager.PERMISSION_GRANTED
+                                     ) {
+                                             this.findNavController()
+                                                 .navigate(
+                                                     InsertNoteFragmentDirections
+                                                         .actionEditNoteFragmentToGalleryFragment
+                                                             (args.noteId)
+                                                 )
+                                             Log.e("permittionAccessID", "$args")
+                                     } else {
+                                         requestPermissionLauncher.launch(
+                                             Manifest.permission.READ_EXTERNAL_STORAGE
+                                         )
+                                     }
                                  }
                              }
                          }.show()
@@ -60,26 +101,25 @@ class UpdateNoteFragment : Fragment() {
          }
 
 
-         viewModel.currentNote.observe(viewLifecycleOwner, {
-             binding.titleEditUpdate.setText(it.title)
-         })
 
-         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
-             if (it == true){
-                 val title = binding.titleEditUpdate.text.toString()
+
+//         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
+//             if (it == true){
+//                 val title = binding.titleEditUpdate.text.toString()
 //                 val noteText = binding.noteEditTextUpdate.text.toString()
 //                 if (title.isNotEmpty() || noteText.isNotEmpty()){
 //                 val note = Note(id = args.noteId, title = title, note = noteText)
 //                     viewModel.onUpdate(note)
 //                 }
+//
+//                 this.findNavController()
+//                     .navigate(UpdateNoteFragmentDirections
+//                         .actionUpdateNoteFragmentToOneNoteFragment(args.noteId))
+//                 viewModel.onStopNavigating()
+//             }
+//         })
 
-                 this.findNavController()
-                     .navigate(UpdateNoteFragmentDirections
-                         .actionUpdateNoteFragmentToOneNoteFragment(args.noteId))
-                 viewModel.onStopNavigating()
-             }
-         })
-
+         binding.viewModel = viewModel
          binding.lifecycleOwner = this
         return binding.root
     }

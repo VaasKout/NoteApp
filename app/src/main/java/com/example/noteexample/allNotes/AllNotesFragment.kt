@@ -25,6 +25,7 @@ class AllNotesFragment : Fragment() {
         /**
          *  define viewModel for NoteFragment
          */
+
         val viewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
         binding.noteViewModel = viewModel
 
@@ -57,7 +58,6 @@ class AllNotesFragment : Fragment() {
             }
         }
 
-
         /**
          *  Observes allNotes [AllNotesViewModel.allNotes]
         from view model and makes it equal to notes[listOf<Notes>()] from adapter
@@ -65,6 +65,7 @@ class AllNotesFragment : Fragment() {
 
         viewModel.allNotes.observe(viewLifecycleOwner, {
             it?.let {
+                //TODO Filter list for RecyclerView
                 noteAdapter.submitList(it)
 //                noteAdapter.notes = it
             }

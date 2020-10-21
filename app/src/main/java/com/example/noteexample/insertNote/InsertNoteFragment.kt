@@ -13,6 +13,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -53,46 +54,63 @@ class InsertNoteFragment : Fragment() {
             setHasFixedSize(true)
         }
 
-            requestPermissionLauncher =
-                registerForActivityResult(
-                    ActivityResultContracts.RequestPermission()
-                ) { isGranted: Boolean ->
-                    if (isGranted) {
-                        this@InsertNoteFragment.findNavController()
-                            .navigate(
-                                InsertNoteFragmentDirections
-                                    .actionEditNoteFragmentToGalleryFragment
-                                        (noteId)
-                            )
-                        Log.e("requestId", "$noteId")
-                    }
+        requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+                    this.findNavController()
+                        .navigate(
+                            InsertNoteFragmentDirections
+                                .actionEditNoteFragmentToGalleryFragment
+                                    (noteId)
+                        )
+                    Log.e("requestId", "$noteId")
                 }
-            if (!viewModel.noteInserted) {
-                val note = Note()
-                viewModel.onInsert(note)
-                viewModel.noteInserted = true
             }
-            viewModel.getLastNote()
-            viewModel.currentNote.observe(viewLifecycleOwner, {
-                if (it != null) {
-                    noteId = it.id
-                    Log.e("currentNoteId", "$noteId")
-                    Log.e("noteId", "$noteId")
-                } else {
-                    viewModel.getLastNote()
-                }
-            })
+        /**
+         * [InsertNoteViewModel.getLastNote] initializes current note, if(it == null)
+         * and updates it data
+         */
+        viewModel.currentNote.observe(viewLifecycleOwner, {
+            if (it != null) {
+                noteId = it.id
+                Log.e("title", it.title)
+                Log.e("noteID_observe", "$noteId")
+            }
+            else {
+                viewModel.getLastNote()
+            }
+        })
 
-            viewModel.allNoteContent.observe(viewLifecycleOwner, {
-                val list = it.filter { list -> list.noteId == noteId }
-                Log.e("photoList", list.toString())
-                noteAdapter.submitList(list)
-            })
+        viewModel.allNoteContent.observe(viewLifecycleOwner, {
+            val list = it.filter { list -> list.noteId == noteId }
+            viewModel.noteContentIsEmpty = list.isEmpty()
+            Log.e("photoList", list.toString())
+            noteAdapter.submitList(list)
+        })
 
-
+        /**
+         * Back button clickListener with dialog window, it is called if note wasn't empty,
+         * to prevent accidentally remove data
+         */
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            viewModel.deleteUnused()
-            this@InsertNoteFragment.findNavController().popBackStack()
+            if (viewModel.noteContentIsEmpty &&
+                binding.titleEditInsert.text.toString().isEmpty()){
+                this@InsertNoteFragment.findNavController().popBackStack()
+                viewModel.deleteUnused()
+            } else{
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage("Сохранить изменения?")
+                    .setNegativeButton("Нет") { _, _ ->
+                        viewModel.deleteUnused()
+                        this@InsertNoteFragment.findNavController().popBackStack()
+                    }
+                    .setPositiveButton("Да") { _, _ ->
+                        viewModel.getLastNote(binding.titleEditInsert.text.toString())
+                        this@InsertNoteFragment.findNavController().popBackStack()
+                    }.show()
+            }
         }
 
         /**
