@@ -16,7 +16,7 @@
             android:id="@+id/note_edit_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            tools:text="Note"
             android:padding="16dp"
             app:noteTextVisibility="@{data}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
@@ -24,7 +24,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
         <ImageView
-            android:id="@+id/photo"
+            android:id="@+id/photo_one_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:contentDescription="@string/photo"
@@ -32,7 +32,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/note_edit_view"
-            tools:layout_height="50dp"
+            tools:src="@tools:sample/backgrounds/scenic"
+            android:adjustViewBounds="true"
             app:imageUrl="@{data.photoPath}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

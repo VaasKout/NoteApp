@@ -8,6 +8,9 @@
         <variable
             name="note"
             type="com.example.noteexample.database.Note" />
+       <variable
+           name="data"
+           type="com.example.noteexample.database.NoteContent" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -19,7 +22,9 @@
         android:clickable="true"
         android:focusable="true"
         android:longClickable="true"
-        app:cardCornerRadius="4dp">
+        app:cardCornerRadius="4dp"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,13 +44,31 @@
                 android:singleLine="false"
                 tools:text="Title"
                 android:ellipsize="end"
-                android:maxLines="10"/>
-
-
+                android:maxLines="10" />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/colorPrimary" />
+            <TextView
+                android:id="@+id/note_main"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Note"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                app:noteTextVisibility="@{data}"/>
+            <ImageView
+                android:id="@+id/photo_main"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:scaleType="centerCrop"
+                tools:src="@tools:sample/backgrounds/scenic"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/photo_main"
+                app:imageUrl="@{data.photoPath}" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

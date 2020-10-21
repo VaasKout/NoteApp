@@ -9,11 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.noteexample.R
+import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.FragmentNoteBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AllNotesFragment : Fragment() {
-
     private var actionModeNotStarted: Boolean = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,13 +32,11 @@ class AllNotesFragment : Fragment() {
         /**
          * initialize and set adapter options
          */
-
         val noteAdapter = NoteAdapter()
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
         }
-
 
         binding.toolbarNoteMain.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -110,9 +108,18 @@ class AllNotesFragment : Fragment() {
             checkAndDestroyActionMode()
         })
 
+        var list = emptyList<NoteContent>()
+        viewModel.allNoteContent.observe(viewLifecycleOwner, {
+            list = it
+        })
+
         noteAdapter.isActive.observe(viewLifecycleOwner, { adapter ->
             val item = noteAdapter.currentList[adapter.adapterPosition]
             val card = adapter.binding.materialCard
+            val contentList = list.filter { it.noteId == item.id }
+            if (contentList.isNotEmpty()){
+                adapter.binding.data = contentList[0]
+            }
             card.setOnLongClickListener {
                 card.isChecked = !card.isChecked
                 item.isChecked = card.isChecked

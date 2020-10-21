@@ -1,6 +1,7 @@
 package com.example.noteexample.allNotes
 
 import android.app.Application
+import android.util.Log
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -11,31 +12,35 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
+import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.*
 
-class AllNotesViewModel(application: Application) : AndroidViewModel(application){
+class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository : NoteRepository
-    val allNotes : LiveData<List<Note>>
+    private val repository: NoteRepository
+    val allNotes: LiveData<List<Note>>
+    val allNoteContent: LiveData<List<NoteContent>>
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNotes = repository.allNotes
+        allNoteContent = repository.allNoteContent
     }
 
 
     var actionMode: ActionMode? = null
-    private val actionModeController = object : ActionMode.Callback{
+    private val actionModeController = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu, menu)
             return true
         }
+
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
-        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean{
-            return when(item?.itemId){
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            return when (item?.itemId) {
                 R.id.delete_action -> {
                     onDeleteSelected()
                     mode?.finish()
@@ -44,10 +49,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                 else -> false
             }
         }
+
         override fun onDestroyActionMode(mode: ActionMode?) {
             actionMode = null
-            if (allNotes.value?.any { it.isChecked } == true){
-           allNotes.value?.map {it.isChecked = false}
+            if (allNotes.value?.any { it.isChecked } == true) {
+                allNotes.value?.map { it.isChecked = false }
             }
             _checkedState.value = false
         }
@@ -57,35 +63,37 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * LiveData
      */
     private val _navigateToEditNoteFragment = MutableLiveData<Boolean>()
-    val navigateToEditNoteFragment : LiveData<Boolean> = _navigateToEditNoteFragment
+    val navigateToEditNoteFragment: LiveData<Boolean> = _navigateToEditNoteFragment
 
     private val _navigateToUpdateNoteFragment = MutableLiveData<Int?>()
-    val navigateToUpdateNoteFragment : LiveData<Int?> = _navigateToUpdateNoteFragment
+    val navigateToUpdateNoteFragment: LiveData<Int?> = _navigateToUpdateNoteFragment
 
     private val _checkedState = MutableLiveData<Boolean>()
     var checkedState: LiveData<Boolean> = _checkedState
 
     private lateinit var currentNote: LiveData<Note>
+
     /**
      * Navigating methods
      */
-    fun onStartNavigating(){
+    fun onStartNavigating() {
         _navigateToEditNoteFragment.value = true
     }
-    fun onDoneEditNavigating(){
+
+    fun onDoneEditNavigating() {
         _navigateToEditNoteFragment.value = false
     }
 
-    fun onNoteClicked(id: Int){
+    fun onNoteClicked(id: Int) {
         _navigateToUpdateNoteFragment.value = id
     }
-    fun onDoneUpdateNavigating(){
+
+    fun onDoneUpdateNavigating() {
         _navigateToUpdateNoteFragment.value = null
     }
 
 
-
-    fun onInitCheckList(isChecked: Boolean, noteId: Int){
+    fun onInitCheckList(isChecked: Boolean, noteId: Int) {
         currentNote = repository.selectNote(noteId)
         currentNote.value?.isChecked = isChecked
         _checkedState.value = true
@@ -95,39 +103,56 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * Action mode lifecycle functions
      */
 
-    fun onStartActionMode(activity: FragmentActivity){
+    fun onStartActionMode(activity: FragmentActivity) {
         actionMode = activity.startActionMode(actionModeController)
         actionMode?.title =
             "${allNotes.value?.filter { it.isChecked }?.size}"
 
     }
+
     fun onResumeActionMode() {
-       actionMode?.title =
-           "${allNotes.value?.filter { it.isChecked }?.size}"
+        actionMode?.title =
+            "${allNotes.value?.filter { it.isChecked }?.size}"
     }
 
-    fun onDoneActionMode(){
-       actionMode?.finish()
+    fun onDoneActionMode() {
+        actionMode?.finish()
     }
 
     /**
      * Coroutine functions
      */
 
-    fun onDeleteSelected(){
-        allNotes.value?.let {
-            viewModelScope.launch {
+    fun onDeleteSelected() {
+        viewModelScope.launch {
+            allNotes.value?.let { noteList ->
                 val deleteNoteList =
-                    it.filter { it.isChecked }
+                    noteList.filter { it.isChecked }
+
+                allNoteContent.value?.let { content ->
+                    Log.e("allContent", allNoteContent.toString())
+                    val deleteNoteContentList = mutableListOf<NoteContent>()
+                    deleteNoteList.forEach { note ->
+                        content
+                            .filter { it.noteId == note.id }
+                            .forEach {
+                                deleteNoteContentList.add(it)
+                            }
+                    }
+                    if (deleteNoteContentList.isNotEmpty()) {
+                        Log.e("NoteContent deleted", deleteNoteContentList.toString())
+                        repository.deleteNoteContent(deleteNoteContentList)
+                    }
+                }
                 repository.deleteNotes(deleteNoteList)
             }
         }
     }
 
-    fun onClear(){
-       viewModelScope.launch {
-           repository.deleteAllNotes()
-           repository.deleteAllNoteContent()
-       }
+    fun onClear() {
+        viewModelScope.launch {
+            repository.deleteAllNotes()
+            repository.deleteAllNoteContent()
+        }
     }
 }
