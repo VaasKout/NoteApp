@@ -1,11 +1,10 @@
 package com.example.noteexample.gallery
 
-import android.app.Activity
+
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.noteexample.database.GalleryData
-import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository

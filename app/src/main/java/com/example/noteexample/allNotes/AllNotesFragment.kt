@@ -42,9 +42,8 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-//            layoutManager =
-//                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager =
+                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
         }
 
         binding.toolbarNoteMain.setOnMenuItemClickListener {
@@ -134,7 +133,6 @@ class AllNotesFragment : Fragment() {
                 adapter.binding.data = contentList[0]
                 Log.e("dataID", "${contentList[0].noteId}")
                 Log.e("noteID", "${item.id}")
-
             }
             card.setOnLongClickListener {
                 card.isChecked = !card.isChecked

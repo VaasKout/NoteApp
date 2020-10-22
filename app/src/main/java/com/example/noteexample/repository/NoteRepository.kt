@@ -44,6 +44,9 @@ class NoteRepository (private val noteDao: NoteDao){
     suspend fun updateNoteContent(noteContent: NoteContent){
         noteDao.updateNoteContent(noteContent)
     }
+    suspend fun updateNoteContentList(noteContent: List<NoteContent>){
+        noteDao.updateNoteContentList(noteContent)
+    }
     fun selectNoteContent(key: Int){
         noteDao.selectNoteContent(key)
     }

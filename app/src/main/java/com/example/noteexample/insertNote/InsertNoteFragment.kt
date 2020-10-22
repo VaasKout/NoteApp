@@ -11,12 +11,14 @@ import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.noteexample.OneNoteEditAdapter
 import com.example.noteexample.R
+import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.FragmentInsertNoteBinding
 import com.example.noteexample.utils.Camera
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -83,11 +85,25 @@ class InsertNoteFragment : Fragment() {
             noteAdapter.submitList(list)
         })
 
+
+        val noteContentList = mutableListOf<NoteContent>()
+        noteAdapter.holder.observe(viewLifecycleOwner, {adapter ->
+            val item = noteAdapter.currentList[adapter.adapterPosition]
+            noteContentList.add(item)
+            adapter.binding.noteEditTextFirst.addTextChangedListener {
+                item.note = it.toString()
+                noteContentList[adapter.adapterPosition] = item
+            }
+        })
+
         /**
          *  insert data in database and navigate back to NoteFragment
          */
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
+                if (noteContentList.isNotEmpty()){
+                    viewModel.updateNoteContent(noteContentList)
+                }
                 when {
                     viewModel.noteContentIsEmpty &&
                             binding.titleEditInsert.text.toString().isEmpty() -> {

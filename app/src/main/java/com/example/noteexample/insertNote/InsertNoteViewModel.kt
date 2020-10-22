@@ -51,6 +51,12 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      * Coroutine methods
      */
 
+    fun updateNoteContent(noteContent: List<NoteContent>){
+        viewModelScope.launch {
+            repository.updateNoteContentList(noteContent)
+        }
+    }
+
      fun updateCurrentNote(text: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
             if (!noteInserted){
