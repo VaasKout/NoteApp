@@ -20,7 +20,7 @@ import kotlinx.coroutines.*
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: NoteRepository
-    val allNotes: LiveData<List<Note>>
+    var allNotes: LiveData<List<Note>>
     val allNoteContent: LiveData<List<NoteContent>>
 
     init {
@@ -51,10 +51,10 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            actionMode = null
             if (allNotes.value?.any { it.isChecked } == true) {
                 allNotes.value?.map { it.isChecked = false }
             }
+            actionMode = null
             _checkedState.value = false
         }
     }
@@ -69,7 +69,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     val navigateToUpdateNoteFragment: LiveData<Int?> = _navigateToUpdateNoteFragment
 
     private val _checkedState = MutableLiveData<Boolean>()
-    var checkedState: LiveData<Boolean> = _checkedState
+    val checkedState: LiveData<Boolean> = _checkedState
 
     private lateinit var currentNote: LiveData<Note>
 

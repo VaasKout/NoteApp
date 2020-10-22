@@ -83,7 +83,6 @@
             android:text="@string/save"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

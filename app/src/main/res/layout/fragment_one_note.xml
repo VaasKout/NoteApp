@@ -20,11 +20,10 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:layout_editor_absoluteY="56dp">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.core.widget.NestedScrollView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:fillViewport="true"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -50,9 +49,10 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_one_note"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/title_view"

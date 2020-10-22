@@ -38,6 +38,8 @@
             app:layout_constraintTop_toBottomOf="@+id/note_editText_first"
             tools:src="@tools:sample/backgrounds/scenic"
             android:adjustViewBounds="true"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:imageUrl="@{data.photoPath}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

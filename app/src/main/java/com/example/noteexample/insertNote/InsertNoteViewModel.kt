@@ -11,8 +11,9 @@ import kotlinx.coroutines.*
 class InsertNoteViewModel(application: Application) : AndroidViewModel(application) {
 
     //Flags
-    var noteInserted = false
+    private var noteInserted = false
     var noteContentIsEmpty = true
+    var backPressed = false
 
     //Repository
     private val repository: NoteRepository
@@ -31,7 +32,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
-        getLastNote()
+        updateCurrentNote()
     }
 
     /**
@@ -50,7 +51,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      * Coroutine methods
      */
 
-     fun getLastNote(text: String = "") {
+     fun updateCurrentNote(text: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
             if (!noteInserted){
                 repository.insertNote(Note())

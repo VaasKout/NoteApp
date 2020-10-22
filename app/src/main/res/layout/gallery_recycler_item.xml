@@ -22,15 +22,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
         <ImageView
             android:id="@+id/gallery_image"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            app:imageUrl="@{data.imgSrcUrl}"
-            tools:src="@drawable/ic_launcher_foreground"
             android:contentDescription="@string/gallery_photos"
-            />
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:imageUrl="@{data.imgSrcUrl}"
+            tools:src="@tools:sample/backgrounds/scenic" />
     </com.google.android.material.card.MaterialCardView>
 </layout>

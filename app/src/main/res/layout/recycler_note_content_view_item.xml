@@ -11,13 +11,16 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingBottom="8dp">
         <TextView
             android:id="@+id/note_edit_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="Note"
             android:padding="16dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:noteTextVisibility="@{data}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,6 +37,8 @@
             app:layout_constraintTop_toBottomOf="@+id/note_edit_view"
             tools:src="@tools:sample/backgrounds/scenic"
             android:adjustViewBounds="true"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:imageUrl="@{data.photoPath}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
