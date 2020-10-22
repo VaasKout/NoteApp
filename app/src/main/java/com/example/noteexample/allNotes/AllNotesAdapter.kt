@@ -18,8 +18,8 @@ class NoteAdapter:
      * [isActive] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]
      * to set clickListeners for recycler items
      */
-    private val _isActive = MutableLiveData<NoteViewHolder>()
-    val isActive: LiveData<NoteViewHolder> = _isActive
+    private val _holder = MutableLiveData<NoteViewHolder>()
+    val holder: LiveData<NoteViewHolder> = _holder
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         holder.bind(getItem(position))
@@ -41,7 +41,7 @@ class NoteAdapter:
           * Checked state of card depends on [Note.isChecked] state
           */
          fun bind(note: Note){
-             _isActive.value = this
+             _holder.value = this
             binding.note = note
             binding.materialCard.isChecked = note.isChecked
             binding.executePendingBindings()

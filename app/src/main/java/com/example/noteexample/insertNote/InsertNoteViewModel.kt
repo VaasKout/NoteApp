@@ -12,7 +12,6 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     //Flags
     private var noteInserted = false
-    var noteContentIsEmpty = true
     var backPressed = false
 
     //Repository
@@ -52,7 +51,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      */
 
     fun updateNoteContent(noteContent: List<NoteContent>){
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO){
             repository.updateNoteContentList(noteContent)
         }
     }

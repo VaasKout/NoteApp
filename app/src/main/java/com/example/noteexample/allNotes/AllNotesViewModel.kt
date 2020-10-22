@@ -62,8 +62,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     /**
      * LiveData
      */
-    private val _navigateToEditNoteFragment = MutableLiveData<Boolean>()
-    val navigateToEditNoteFragment: LiveData<Boolean> = _navigateToEditNoteFragment
+    private val _navigateToInsertFragment = MutableLiveData<Boolean>()
+    val navigateToInsertFragment: LiveData<Boolean> = _navigateToInsertFragment
 
     private val _navigateToUpdateNoteFragment = MutableLiveData<Int?>()
     val navigateToUpdateNoteFragment: LiveData<Int?> = _navigateToUpdateNoteFragment
@@ -77,11 +77,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * Navigating methods
      */
     fun onStartNavigating() {
-        _navigateToEditNoteFragment.value = true
+        _navigateToInsertFragment.value = true
     }
 
     fun onDoneEditNavigating() {
-        _navigateToEditNoteFragment.value = false
+        _navigateToInsertFragment.value = false
     }
 
     fun onNoteClicked(id: Int) {

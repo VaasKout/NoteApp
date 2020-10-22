@@ -10,15 +10,15 @@
         android:label="AllNotes"
         tools:layout="@layout/fragment_note">
         <action
-            android:id="@+id/action_noteFragment_to_editNoteFragment"
-            app:destination="@id/editNoteFragment" />
+            android:id="@+id/action_noteFragment_to_insertNoteFragment"
+            app:destination="@id/insertNoteFragment" />
         <action
             android:id="@+id/action_allNotesFragment_to_oneNoteFragment"
             app:destination="@id/oneNoteFragment" />
 
     </fragment>
     <fragment
-        android:id="@+id/editNoteFragment"
+        android:id="@+id/insertNoteFragment"
         android:name="com.example.noteexample.insertNote.InsertNoteFragment"
         android:label="Add"
         tools:layout="@layout/fragment_insert_note">

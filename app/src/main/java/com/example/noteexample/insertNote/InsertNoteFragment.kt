@@ -38,11 +38,15 @@ class InsertNoteFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_insert_note, container, false)
 
         /**
-         * initialize viewModel for [InsertNoteViewModel]
+         * Initialize viewModel for [InsertNoteViewModel]
          */
         val viewModel =
             ViewModelProvider(this).get(InsertNoteViewModel::class.java)
         binding.viewModel = viewModel
+
+        /**
+         * Initialize [OneNoteEditAdapter] for [FragmentInsertNoteBinding.insertRecycler]
+         */
         val noteAdapter = OneNoteEditAdapter()
         binding.insertRecycler.apply {
             adapter = noteAdapter
@@ -65,7 +69,7 @@ class InsertNoteFragment : Fragment() {
                 //TODO Make else
             }
         /**
-         * [InsertNoteViewModel.getLastNote] initializes current note, if(it == null)
+         * [InsertNoteViewModel.updateCurrentNote] initializes current note, if(it == null)
          * and updates it data
          */
         viewModel.currentNote.observe(viewLifecycleOwner, {
@@ -79,10 +83,11 @@ class InsertNoteFragment : Fragment() {
         })
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            val list = it.filter { list -> list.noteId == noteId }
-            viewModel.noteContentIsEmpty = list.isEmpty()
-            Log.e("photoList", list.toString())
-            noteAdapter.submitList(list)
+            if (it != null){
+                val list = it.filter { list -> list.noteId == noteId }
+                Log.e("photoList", list.toString())
+                noteAdapter.submitList(list)
+            }
         })
 
 
@@ -105,7 +110,7 @@ class InsertNoteFragment : Fragment() {
                     viewModel.updateNoteContent(noteContentList)
                 }
                 when {
-                    viewModel.noteContentIsEmpty &&
+                    noteContentList.isEmpty() &&
                             binding.titleEditInsert.text.toString().isEmpty() -> {
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.deleteUnused()
@@ -124,10 +129,8 @@ class InsertNoteFragment : Fragment() {
                                 this@InsertNoteFragment.findNavController().popBackStack()
                                 viewModel.onDoneNavigating()
                             }.show()
-
                     }
                     !viewModel.backPressed -> {
-                        //TODO update note
                         viewModel.updateCurrentNote(binding.titleEditInsert.text.toString())
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.onDoneNavigating()

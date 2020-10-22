@@ -9,8 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
@@ -116,7 +114,7 @@ class AllNotesFragment : Fragment() {
             checkAndDestroyActionMode()
         })
         /**
-         * Need another list to observe it in [NoteAdapter.isActive] LiveData
+         * Need another list to observe it in [NoteAdapter.holder] LiveData
          * You can't observe one LiveData in another
          */
         var list = emptyList<NoteContent>()
@@ -124,7 +122,7 @@ class AllNotesFragment : Fragment() {
             list = it
         })
 
-        noteAdapter.isActive.observe(viewLifecycleOwner, { adapter ->
+        noteAdapter.holder.observe(viewLifecycleOwner, { adapter ->
             Log.e("visibility", "${adapter.binding.photoMain.visibility}")
             val item = noteAdapter.currentList[adapter.adapterPosition]
             val card = adapter.binding.materialCard
@@ -155,12 +153,13 @@ class AllNotesFragment : Fragment() {
         /**
          * listen to fab click
          */
-        viewModel.navigateToEditNoteFragment.observe(viewLifecycleOwner, {
+
+        viewModel.navigateToInsertFragment.observe(viewLifecycleOwner, {
             if (it == true && viewModel.actionMode == null) {
                 this.findNavController()
                     .navigate(
                         AllNotesFragmentDirections
-                            .actionNoteFragmentToEditNoteFragment()
+                            .actionNoteFragmentToInsertNoteFragment()
                     )
                 viewModel.onDoneEditNavigating()
             }

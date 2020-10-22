@@ -44,7 +44,6 @@
             android:text="@string/update"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -63,7 +62,7 @@
                 android:layout_height="match_parent">
 
                 <EditText
-                    android:id="@+id/title_edit_update"
+                    android:id="@+id/title_update"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="@string/title"
@@ -78,13 +77,13 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/update_recycler"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="0dp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/title_edit_update"
+                    app:layout_constraintTop_toBottomOf="@+id/title_update"
                     tools:listitem="@layout/recycler_note_content_edit_item" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

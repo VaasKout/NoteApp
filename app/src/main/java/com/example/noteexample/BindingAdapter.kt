@@ -1,6 +1,7 @@
 package com.example.noteexample
 
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
@@ -39,6 +40,14 @@ class GlideAppModule : AppGlideModule()
         if(it.note.isNotEmpty()){
             text = it.note
             visibility = View.VISIBLE
+        }
+    }
+}
+@BindingAdapter("editNoteText")
+    fun EditText.setEditText(data: NoteContent?){
+    data?.let {
+        if (it.note.isNotEmpty()){
+            setText(it.note)
         }
     }
 }
