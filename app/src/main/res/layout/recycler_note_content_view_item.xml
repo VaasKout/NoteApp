@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="data"
             type="com.example.noteexample.database.NoteContent" />
@@ -11,35 +12,38 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingBottom="8dp">
+
         <TextView
-            android:id="@+id/note_edit_view"
-            android:layout_width="match_parent"
+            android:id="@+id/photo_note_one_note"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            tools:text="Note"
             android:padding="16dp"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:noteTextVisibility="@{data}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/photo_one_note"
+            app:photoNoteText="@{data}"
+            tools:text="Note"
+            tools:visibility="visible" />
+
         <ImageView
             android:id="@+id/photo_one_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/photo"
             android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:imageUrl="@{data.photoPath}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/note_edit_view"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic"
-            android:adjustViewBounds="true"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:imageUrl="@{data.photoPath}"/>
+            tools:visibility="visible" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.noteexample.GlideApp
 import com.example.noteexample.OneNoteEditAdapter
 import com.example.noteexample.R
 import com.example.noteexample.database.NoteContent
@@ -26,7 +27,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class InsertNoteFragment : Fragment() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-    var noteId = -1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,9 +62,9 @@ class InsertNoteFragment : Fragment() {
                         .navigate(
                             InsertNoteFragmentDirections
                                 .actionEditNoteFragmentToGalleryFragment
-                                    (noteId)
+                                    (viewModel.noteID)
                         )
-                    Log.e("requestId", "$noteId")
+                    Log.e("requestId", "${viewModel.noteID}")
                 }
                 //TODO Make else
             }
@@ -74,9 +74,8 @@ class InsertNoteFragment : Fragment() {
          */
         viewModel.currentNote.observe(viewLifecycleOwner, {
             if (it != null) {
-                noteId = it.id
-                Log.e("title", it.title)
-                Log.e("noteID_observe", "$noteId")
+                viewModel.noteID = it.id
+                Log.e("noteID_observe", "${viewModel.noteID}")
             } else {
                 viewModel.updateCurrentNote()
             }
@@ -84,7 +83,7 @@ class InsertNoteFragment : Fragment() {
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
             if (it != null){
-                val list = it.filter { list -> list.noteId == noteId }
+                val list = it.filter { list -> list.noteId == viewModel.noteID }
                 Log.e("photoList", list.toString())
                 noteAdapter.submitList(list)
             }
@@ -106,6 +105,8 @@ class InsertNoteFragment : Fragment() {
          */
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
+                val title = binding.titleEditInsert.text.toString()
+                val firstNote = binding.noteEditFirstInsert.text.toString()
                 if (noteContentList.isNotEmpty()){
                     viewModel.updateNoteContent(noteContentList)
                 }
@@ -125,13 +126,13 @@ class InsertNoteFragment : Fragment() {
                                 viewModel.onDoneNavigating()
                             }
                             .setPositiveButton("Да") { _, _ ->
-                                viewModel.updateCurrentNote(binding.titleEditInsert.text.toString())
+                                viewModel.updateCurrentNote(title, firstNote)
                                 this@InsertNoteFragment.findNavController().popBackStack()
                                 viewModel.onDoneNavigating()
                             }.show()
                     }
                     !viewModel.backPressed -> {
-                        viewModel.updateCurrentNote(binding.titleEditInsert.text.toString())
+                        viewModel.updateCurrentNote(title, firstNote)
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.onDoneNavigating()
                     }
@@ -162,6 +163,8 @@ class InsertNoteFragment : Fragment() {
                             when (index) {
                                 0 -> {
                                     camera.dispatchTakePictureIntent(binding.saveButton)
+                                    viewModel.insertPhoto(camera.currentPhotoPath)
+                                    Log.e("currentPhotoPath", camera.currentPhotoPath)
                                 }
                                 1 -> {
                                     if (ContextCompat.checkSelfPermission(
@@ -169,14 +172,13 @@ class InsertNoteFragment : Fragment() {
                                             Manifest.permission.READ_EXTERNAL_STORAGE
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        if (noteId != -1) {
+                                        if (viewModel.noteID != -1) {
                                             this@InsertNoteFragment.findNavController()
                                                 .navigate(
                                                     InsertNoteFragmentDirections
                                                         .actionEditNoteFragmentToGalleryFragment
-                                                            (noteId)
+                                                            (viewModel.noteID)
                                                 )
-                                            Log.e("permissionAccessID", "$noteId")
                                         }
                                     } else {
                                         requestPermissionLauncher.launch(

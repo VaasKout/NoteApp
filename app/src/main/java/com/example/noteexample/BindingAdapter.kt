@@ -26,16 +26,25 @@ import com.example.noteexample.database.NoteContent
 @GlideModule
 class GlideAppModule : AppGlideModule()
 
-@BindingAdapter("titleTextVisibility")
-    fun TextView.setTitleVisibility(note: Note?){
+//TODO work with visibility of EditText
+@BindingAdapter("titleText")
+    fun TextView.titleText(note: Note?){
     note?.let {
         if (it.title.isEmpty()) visibility = View.GONE
         else text = it.title
     }
 }
 
-@BindingAdapter("noteTextVisibility")
-    fun TextView.setNoteVisibility(data: NoteContent?){
+@BindingAdapter("firstNoteText")
+fun TextView.firstNoteText(note: Note?){
+    note?.let {
+        if (it.firstNote.isEmpty()) visibility = View.GONE
+        else text = it.firstNote
+    }
+}
+
+@BindingAdapter("photoNoteText")
+    fun TextView.photoNoteText(data: NoteContent?){
     data?.let {
         if(it.note.isNotEmpty()){
             text = it.note
@@ -43,21 +52,12 @@ class GlideAppModule : AppGlideModule()
         }
     }
 }
-@BindingAdapter("editNoteText")
-    fun EditText.setEditText(data: NoteContent?){
-    data?.let {
-        if (it.note.isNotEmpty()){
-            setText(it.note)
-        }
-    }
-}
 
 @BindingAdapter("imageUrl")
 fun ImageView.bindImage(imgUrl: String?){
         if (!imgUrl.isNullOrEmpty()){
-            val imgUri = imgUrl.toUri().buildUpon().scheme("content").build()
             GlideApp.with(this.context)
-                .load(imgUri)
+                .load(imgUrl)
                 .into(this)
             visibility = View.VISIBLE
         }

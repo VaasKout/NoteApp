@@ -1,6 +1,7 @@
 package com.example.noteexample.allNotes
 
-import android.view.*
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +10,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
-import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 
 class NoteAdapter:

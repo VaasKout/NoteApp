@@ -23,25 +23,25 @@
             android:hint="@string/note"
             android:inputType="textMultiLine|text"
             android:padding="16dp"
-            app:editNoteText="@{data}"
+            app:photoNoteText="@{data}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/photo" />
 
         <ImageView
             android:id="@+id/photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/photo"
             android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:imageUrl="@{data.photoPath}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/note_editText_first"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic"
-            android:adjustViewBounds="true"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:imageUrl="@{data.photoPath}"/>
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

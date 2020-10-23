@@ -1,10 +1,8 @@
 package com.example.noteexample.utils
 
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -12,11 +10,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
 import com.example.noteexample.database.GalleryData
@@ -73,13 +67,13 @@ class Camera(private val activity: Activity) {
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(activity, takePictureIntent, REQUEST_TAKE_PHOTO, null)
                 }
-                val file = File(currentPhotoPath)
-                MediaScannerConnection.scanFile(
-                    activity, arrayOf(file.toString()),
-                    arrayOf(file.name), null
-                )
             }
         }
+        val file = File(currentPhotoPath)
+        MediaScannerConnection.scanFile(
+            activity, arrayOf(file.toString()),
+            arrayOf(file.name), null
+        )
     }
 
 

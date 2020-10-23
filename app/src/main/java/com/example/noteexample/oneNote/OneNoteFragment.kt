@@ -38,7 +38,7 @@ class OneNoteFragment : Fragment() {
         })
 
         viewModel.currentNote.observe(viewLifecycleOwner, {
-            binding.titleView.text = it.title
+            binding.note = it
         })
 
         /**

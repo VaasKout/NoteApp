@@ -1,6 +1,7 @@
 package com.example.noteexample.insertNote
 
 import android.app.Application
+import android.icu.text.CaseMap
 import androidx.lifecycle.*
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
@@ -10,6 +11,7 @@ import kotlinx.coroutines.*
 
 class InsertNoteViewModel(application: Application) : AndroidViewModel(application) {
 
+    var noteID = -1
     //Flags
     private var noteInserted = false
     var backPressed = false
@@ -56,15 +58,26 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-     fun updateCurrentNote(text: String = "") {
+    fun insertPhoto(path: String){
+        viewModelScope.launch (Dispatchers.IO) {
+            val noteContent = NoteContent(
+                noteId = noteID,
+                photoPath = path
+            )
+            repository.insertNoteContent(noteContent)
+        }
+    }
+
+     fun updateCurrentNote(title: String = "", firstNote: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
             if (!noteInserted){
                 repository.insertNote(Note())
                 noteInserted = true
             }
             val note = repository.getLastNote()
-            if (text.isNotEmpty()){
-                note.title = text
+            if (title.isNotEmpty() || firstNote.isNotEmpty()){
+                note.title = title
+                note.firstNote = firstNote
                 repository.updateNote(note)
             }
             _currentNote.postValue(note)

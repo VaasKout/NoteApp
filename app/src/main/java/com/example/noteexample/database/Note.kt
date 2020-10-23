@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "title") var title: String = "",
+    @ColumnInfo(name = "firstNote") var firstNote: String = "",
     @ColumnInfo(name = "isChecked") var isChecked: Boolean = false,
 )
 

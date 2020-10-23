@@ -16,9 +16,6 @@ import com.example.noteexample.databinding.RecyclerNoteContentViewItemBinding
 class OneNoteViewAdapter :
     ListAdapter<NoteContent, OneNoteViewAdapter.NoteContentViewHolder>(NoteDiffCallBack()) {
 
-    private val _holder = MutableLiveData<NoteContentViewHolder>()
-    val holder: LiveData<NoteContentViewHolder> = _holder
-
     override fun onBindViewHolder(holder: NoteContentViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
@@ -35,7 +32,6 @@ class OneNoteViewAdapter :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(noteContent: NoteContent) {
-            _holder.value = this
             binding.data = noteContent
         }
     }

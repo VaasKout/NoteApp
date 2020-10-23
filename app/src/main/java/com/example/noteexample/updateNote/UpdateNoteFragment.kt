@@ -27,7 +27,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class UpdateNoteFragment : Fragment() {
 
-    lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val args by navArgs<UpdateNoteFragmentArgs>()
 
     override fun onCreateView(
@@ -71,11 +71,23 @@ class UpdateNoteFragment : Fragment() {
             if (it != null){
                 val list = it.filter { list -> list.noteId == args.noteId }
                 Log.e("photoList", list.toString())
-                    //TODO Figure out the problem
-                if (!viewModel.listInit){
-                    viewModel.startNoteContentList = list
+                /**
+                 * Here, I have to do new objects for each [UpdateNoteViewModel.startNoteContentList]
+                 * because if it equals to this list, [NoteContent.note] and [NoteContent.photoPath] will
+                 * reflect changes in [UpdateNoteViewModel.startNoteContentList],
+                 * it's caused by var fields in [NoteContent]
+                 */
+                if (viewModel.startNoteContentList.isEmpty()){
+                    list.forEach { element ->
+                        val noteContent = NoteContent(
+                            id = element.id,
+                            noteId = element.noteId,
+                            note = element.note,
+                            photoPath = element.photoPath,
+                        )
+                        viewModel.startNoteContentList.add(noteContent)
+                    }
                     Log.e("note", viewModel.startNoteContentList[0].note)
-                    viewModel.listInit = true
                 }
                 noteAdapter.submitList(list)
             }
@@ -92,9 +104,10 @@ class UpdateNoteFragment : Fragment() {
             }
         })
 
-        //TODO Rewrite in BindingAdapter
+        //TODO Add firstNote in viewModel
         viewModel.currentNote.observe(viewLifecycleOwner, {
-            binding.titleUpdate.setText(it.title)
+            binding.note = it
+            viewModel.titleText = it.title
         })
 
         binding.toolbarNoteUpdate.setOnMenuItemClickListener {
@@ -107,9 +120,7 @@ class UpdateNoteFragment : Fragment() {
                             when (index) {
                                 0 -> {
                                     camera.dispatchTakePictureIntent(binding.editButton)
-//                                     GlideApp.with(this)
-//                                         .load(camera.currentPhotoPath)
-//                                         .into(binding.image)
+                                    viewModel.insertPhoto(camera.currentPhotoPath)
                                 }
                                 1 -> {
                                     if (ContextCompat.checkSelfPermission(
@@ -141,23 +152,25 @@ class UpdateNoteFragment : Fragment() {
 
         viewModel.navigateToOneNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
-
                 val title = binding.titleUpdate.text.toString()
                 if (viewModel.startNoteContentList.size == noteContentList.size){
                     noteContentList.forEachIndexed { index, noteContent ->
                         Log.e("currentListNote", noteContent.note)
                         Log.e("startListNote", viewModel.startNoteContentList[index].note)
-                        if (noteContent.note != viewModel.startNoteContentList[index].note){
+                        if (noteContent != viewModel.startNoteContentList[index]){
                             viewModel.textChanged = true
                         }
                     }
-                } else{
+                } else {
                     viewModel.sizeChanged = true
                 }
 
                 when {
                     viewModel.backPressed -> {
-                        if (viewModel.sizeChanged || viewModel.textChanged){
+                        if (viewModel.sizeChanged ||
+                            viewModel.textChanged ||
+                            viewModel.titleText != binding.titleUpdate.text.toString()){
+
                             MaterialAlertDialogBuilder(requireContext())
                                 .setMessage("Сохранить изменения?")
                                 .setNegativeButton("Нет") { _, _ ->

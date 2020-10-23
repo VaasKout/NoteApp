@@ -12,16 +12,20 @@ import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.*
 
 class UpdateNoteViewModel(
-    noteId: Int = 0,
+    private val noteID: Int = 0,
     application: Application
 ) : AndroidViewModel(application) {
 
     //Flags
     var backPressed = false
-    var listInit = false
     var textChanged = false
     var sizeChanged = false
-    var startNoteContentList = listOf<NoteContent>()
+
+    /**
+     * This list is needed to reflect changes in [UpdateNoteFragment]
+     */
+    var titleText = ""
+    var startNoteContentList = mutableListOf<NoteContent>()
 
     //Repository
     private val repository: NoteRepository
@@ -35,7 +39,7 @@ class UpdateNoteViewModel(
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-        currentNote = repository.selectNote(noteId)
+        currentNote = repository.selectNote(noteID)
         allNoteContent = repository.allNoteContent
     }
 
@@ -47,6 +51,15 @@ class UpdateNoteViewModel(
         _navigateToOneNoteFragment.value = false
     }
 
+    fun insertPhoto(path: String){
+        viewModelScope.launch (Dispatchers.IO) {
+            val noteContent = NoteContent(
+                noteId = noteID,
+                photoPath = path
+            )
+            repository.insertNoteContent(noteContent)
+        }
+    }
 
     fun updateCurrentNote(title: String){
         viewModelScope.launch(Dispatchers.IO) {
@@ -57,6 +70,7 @@ class UpdateNoteViewModel(
             }
         }
     }
+
 
     fun updateNoteContent(noteContent: List<NoteContent>){
         viewModelScope.launch (Dispatchers.IO){

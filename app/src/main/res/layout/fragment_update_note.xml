@@ -7,6 +7,9 @@
         <variable
             name="viewModel"
             type="com.example.noteexample.updateNote.UpdateNoteViewModel" />
+        <variable
+            name="note"
+            type="com.example.noteexample.database.Note" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -68,12 +71,25 @@
                     android:autofillHints="@string/title"
                     android:background="@android:color/transparent"
                     android:hint="@string/title"
+                    app:titleText="@{note}"
                     android:inputType="text"
                     android:padding="16dp"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <EditText
+                    android:id="@+id/note_edit_first_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="@string/note"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/note"
+                    app:firstNoteText="@{note}"
+                    android:inputType="textMultiLine|text"
+                    android:padding="16dp"
+                    app:layout_constraintTop_toBottomOf="@+id/title_update" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/update_recycler"
@@ -83,7 +99,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/title_update"
+                    app:layout_constraintTop_toBottomOf="@+id/note_edit_first_update"
                     tools:listitem="@layout/recycler_note_content_edit_item" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
