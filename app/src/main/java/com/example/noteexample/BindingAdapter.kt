@@ -1,10 +1,8 @@
 package com.example.noteexample
 
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule

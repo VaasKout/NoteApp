@@ -16,7 +16,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.noteexample.GlideApp
 import com.example.noteexample.OneNoteEditAdapter
 import com.example.noteexample.R
 import com.example.noteexample.database.NoteContent
@@ -103,42 +102,42 @@ class InsertNoteFragment : Fragment() {
         /**
          *  insert data in database and navigate back to NoteFragment
          */
-        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
-            if (it == true) {
-                val title = binding.titleEditInsert.text.toString()
-                val firstNote = binding.noteEditFirstInsert.text.toString()
-                if (noteContentList.isNotEmpty()){
-                    viewModel.updateNoteContent(noteContentList)
-                }
-                when {
-                    noteContentList.isEmpty() &&
-                            binding.titleEditInsert.text.toString().isEmpty() -> {
-                        this@InsertNoteFragment.findNavController().popBackStack()
-                        viewModel.deleteUnused()
-                        viewModel.onDoneNavigating()
-                    }
-                    viewModel.backPressed -> {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setMessage("Сохранить изменения?")
-                            .setNegativeButton("Нет") { _, _ ->
-                                viewModel.deleteUnused()
-                                this@InsertNoteFragment.findNavController().popBackStack()
-                                viewModel.onDoneNavigating()
-                            }
-                            .setPositiveButton("Да") { _, _ ->
-                                viewModel.updateCurrentNote(title, firstNote)
-                                this@InsertNoteFragment.findNavController().popBackStack()
-                                viewModel.onDoneNavigating()
-                            }.show()
-                    }
-                    !viewModel.backPressed -> {
-                        viewModel.updateCurrentNote(title, firstNote)
-                        this@InsertNoteFragment.findNavController().popBackStack()
-                        viewModel.onDoneNavigating()
-                    }
-                }
-            }
-        })
+//        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
+//            if (it == true) {
+//                val title = binding.titleEditInsert.text.toString()
+//                val firstNote = binding.noteEditFirstInsert.text.toString()
+//                if (noteContentList.isNotEmpty()){
+//                    viewModel.updateNoteContent(noteContentList)
+//                }
+//                when {
+//                    noteContentList.isEmpty() &&
+//                            binding.titleEditInsert.text.toString().isEmpty() -> {
+//                        this@InsertNoteFragment.findNavController().popBackStack()
+//                        viewModel.deleteUnused()
+//                        viewModel.onDoneNavigating()
+//                    }
+//                    viewModel.backPressed -> {
+//                        MaterialAlertDialogBuilder(requireContext())
+//                            .setMessage("Сохранить изменения?")
+//                            .setNegativeButton("Нет") { _, _ ->
+//                                viewModel.deleteUnused()
+//                                this@InsertNoteFragment.findNavController().popBackStack()
+//                                viewModel.onDoneNavigating()
+//                            }
+//                            .setPositiveButton("Да") { _, _ ->
+//                                viewModel.updateCurrentNote(title, firstNote)
+//                                this@InsertNoteFragment.findNavController().popBackStack()
+//                                viewModel.onDoneNavigating()
+//                            }.show()
+//                    }
+//                    !viewModel.backPressed -> {
+//                        viewModel.updateCurrentNote(title, firstNote)
+//                        this@InsertNoteFragment.findNavController().popBackStack()
+//                        viewModel.onDoneNavigating()
+//                    }
+//                }
+//            }
+//        })
 
         /**
          * Back button clickListener with dialog window, it is called if note wasn't empty,

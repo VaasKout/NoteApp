@@ -41,7 +41,7 @@ class OneNoteEditAdapter :
 
 class NoteDiffCallBack : DiffUtil.ItemCallback<NoteContent>() {
     override fun areItemsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {
-        return oldItem == newItem
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {

@@ -15,7 +15,7 @@ import com.example.noteexample.databinding.RecyclerMainItemBinding
 class NoteAdapter:
     ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()){
     /**
-     * [isActive] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]
+     * [holder] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]
      * to set clickListeners for recycler items
      */
     private val _holder = MutableLiveData<NoteViewHolder>()

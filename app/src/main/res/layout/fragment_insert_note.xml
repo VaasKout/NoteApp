@@ -22,56 +22,13 @@
             app:menu="@menu/note_edit_menu"/>
         </com.google.android.material.appbar.AppBarLayout>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/noteContentConstraint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".allNotes.NoteContent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nestedScrollView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:fillViewport="true"
-            app:layout_constraintBottom_toTopOf="@+id/save_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp">
-
-                <EditText
-                    android:id="@+id/title_edit_insert"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text|textMultiLine"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:hint="@string/title"
-                    android:autofillHints="@string/title"
-                    android:background="@android:color/transparent"
-                    android:padding="16dp"/>
-
-                <EditText
-                    android:id="@+id/note_edit_first_insert"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:autofillHints="@string/note"
-                    android:background="@android:color/transparent"
-                    android:hint="@string/note"
-                    android:inputType="textMultiLine|text"
-                    android:padding="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/title_edit_insert" />
-
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:padding="8dp">
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/insert_recycler"
                     android:layout_width="0dp"
@@ -80,10 +37,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/note_edit_first_insert"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:listitem="@layout/recycler_note_content_edit_item" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.core.widget.NestedScrollView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/save_button"
@@ -98,7 +53,7 @@
             android:textColor="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

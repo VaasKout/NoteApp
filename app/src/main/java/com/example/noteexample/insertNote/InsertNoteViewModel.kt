@@ -1,13 +1,16 @@
 package com.example.noteexample.insertNote
 
 import android.app.Application
-import android.icu.text.CaseMap
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class InsertNoteViewModel(application: Application) : AndroidViewModel(application) {
 

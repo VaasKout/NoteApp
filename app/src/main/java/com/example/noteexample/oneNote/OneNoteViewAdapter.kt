@@ -3,8 +3,6 @@ package com.example.noteexample.oneNote
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +29,7 @@ class OneNoteViewAdapter :
     inner class NoteContentViewHolder(val binding: RecyclerNoteContentViewItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(noteContent: NoteContent) {
+        fun bind(noteContent: NoteContent?) {
             binding.data = noteContent
         }
     }
@@ -39,7 +37,7 @@ class OneNoteViewAdapter :
 
 class NoteDiffCallBack : DiffUtil.ItemCallback<NoteContent>() {
     override fun areItemsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {
-        return oldItem == newItem
+       return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {

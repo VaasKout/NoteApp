@@ -106,7 +106,6 @@ class UpdateNoteFragment : Fragment() {
 
         //TODO Add firstNote in viewModel
         viewModel.currentNote.observe(viewLifecycleOwner, {
-            binding.note = it
             viewModel.titleText = it.title
         })
 
@@ -150,57 +149,57 @@ class UpdateNoteFragment : Fragment() {
             }
         }
 
-        viewModel.navigateToOneNoteFragment.observe(viewLifecycleOwner, {
-            if (it == true) {
-                val title = binding.titleUpdate.text.toString()
-                if (viewModel.startNoteContentList.size == noteContentList.size){
-                    noteContentList.forEachIndexed { index, noteContent ->
-                        Log.e("currentListNote", noteContent.note)
-                        Log.e("startListNote", viewModel.startNoteContentList[index].note)
-                        if (noteContent != viewModel.startNoteContentList[index]){
-                            viewModel.textChanged = true
-                        }
-                    }
-                } else {
-                    viewModel.sizeChanged = true
-                }
-
-                when {
-                    viewModel.backPressed -> {
-                        if (viewModel.sizeChanged ||
-                            viewModel.textChanged ||
-                            viewModel.titleText != binding.titleUpdate.text.toString()){
-
-                            MaterialAlertDialogBuilder(requireContext())
-                                .setMessage("Сохранить изменения?")
-                                .setNegativeButton("Нет") { _, _ ->
-                                    this.findNavController().popBackStack()
-                                    viewModel.onDoneNavigating()
-                                }
-                                .setPositiveButton("Да") { _, _ ->
-                                    if (noteContentList.isNotEmpty()){
-                                        viewModel.updateNoteContent(noteContentList)
-                                        viewModel.updateCurrentNote(binding.titleUpdate.text.toString())
-                                    } else if (noteContentList.isEmpty() && title.isEmpty()){
-                                        viewModel.deleteUnused()
-                                    }
-                                    this.findNavController().popBackStack()
-                                    viewModel.onDoneNavigating()
-                                }.show()
-                        } else {
-                            this.findNavController().popBackStack()
-                            viewModel.onDoneNavigating()
-                        }
-                    }
-                    !viewModel.backPressed -> {
-                        viewModel.updateNoteContent(noteContentList)
-                        viewModel.updateCurrentNote(binding.titleUpdate.text.toString())
-                        this.findNavController().popBackStack()
-                        viewModel.onDoneNavigating()
-                    }
-                }
-            }
-        })
+//        viewModel.navigateToOneNoteFragment.observe(viewLifecycleOwner, {
+//            if (it == true) {
+//                val title = binding.titleUpdate.text.toString()
+//                if (viewModel.startNoteContentList.size == noteContentList.size){
+//                    noteContentList.forEachIndexed { index, noteContent ->
+//                        Log.e("currentListNote", noteContent.note)
+//                        Log.e("startListNote", viewModel.startNoteContentList[index].note)
+//                        if (noteContent != viewModel.startNoteContentList[index]){
+//                            viewModel.textChanged = true
+//                        }
+//                    }
+//                } else {
+//                    viewModel.sizeChanged = true
+//                }
+//
+//                when {
+//                    viewModel.backPressed -> {
+//                        if (viewModel.sizeChanged ||
+//                            viewModel.textChanged ||
+//                            viewModel.titleText != binding.titleUpdate.text.toString()){
+//
+//                            MaterialAlertDialogBuilder(requireContext())
+//                                .setMessage("Сохранить изменения?")
+//                                .setNegativeButton("Нет") { _, _ ->
+//                                    this.findNavController().popBackStack()
+//                                    viewModel.onDoneNavigating()
+//                                }
+//                                .setPositiveButton("Да") { _, _ ->
+//                                    if (noteContentList.isNotEmpty()){
+//                                        viewModel.updateNoteContent(noteContentList)
+//                                        viewModel.updateCurrentNote(binding.titleUpdate.text.toString())
+//                                    } else if (noteContentList.isEmpty() && title.isEmpty()){
+//                                        viewModel.deleteUnused()
+//                                    }
+//                                    this.findNavController().popBackStack()
+//                                    viewModel.onDoneNavigating()
+//                                }.show()
+//                        } else {
+//                            this.findNavController().popBackStack()
+//                            viewModel.onDoneNavigating()
+//                        }
+//                    }
+//                    !viewModel.backPressed -> {
+//                        viewModel.updateNoteContent(noteContentList)
+//                        viewModel.updateCurrentNote(binding.titleUpdate.text.toString())
+//                        this.findNavController().popBackStack()
+//                        viewModel.onDoneNavigating()
+//                    }
+//                }
+//            }
+//        })
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             viewModel.backPressed = true

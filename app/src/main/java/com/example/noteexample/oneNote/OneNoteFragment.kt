@@ -37,8 +37,9 @@ class OneNoteFragment : Fragment() {
             oneNoteAdapter.submitList(list)
         })
 
+        //TODO Add firstNote in viewModel
         viewModel.currentNote.observe(viewLifecycleOwner, {
-            binding.note = it
+
         })
 
         /**
