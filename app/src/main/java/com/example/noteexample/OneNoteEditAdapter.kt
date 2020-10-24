@@ -8,43 +8,117 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
+import com.example.noteexample.databinding.HeaderEditBinding
 import com.example.noteexample.databinding.RecyclerNoteContentEditItemBinding
+import com.example.noteexample.utils.DataItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+private const val ITEM_VIEW_TYPE_HEADER = 0
+private const val ITEM_VIEW_TYPE_ITEM = 1
 
 class OneNoteEditAdapter :
-    ListAdapter<NoteContent, OneNoteEditAdapter.NoteContentEditHolder>(NoteDiffCallBack()) {
+    ListAdapter<DataItem, RecyclerView.ViewHolder>(NoteDiffCallBack()) {
 
-    private val _holder = MutableLiveData<NoteContentEditHolder>()
-    val holder: LiveData<NoteContentEditHolder> = _holder
+    private val _noteHolder = MutableLiveData<NoteEditHolder>()
+    val noteHolder: LiveData<NoteEditHolder> = _noteHolder
 
-    override fun onBindViewHolder(holder: NoteContentEditHolder, position: Int) {
-        holder.bind(getItem(position))
+    private val _noteContentHolder = MutableLiveData<NoteContentEditHolder>()
+    val noteContentHolder: LiveData<NoteContentEditHolder> = _noteContentHolder
+
+    private val adapterScope = CoroutineScope(Dispatchers.Default)
+
+    fun addHeaderAndSubmitList(note: Note?, noteContent: List<NoteContent>){
+        adapterScope.launch {
+            val list = mutableListOf<DataItem>()
+            list.add(0, DataItem(note = note))
+            noteContent.forEach {
+                list.add(DataItem(noteContent = it))
+            }
+            withContext(Dispatchers.Main){
+                if (list.isNotEmpty()){
+                    submitList(list)
+                }
+            }
+        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteContentEditHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding: RecyclerNoteContentEditItemBinding =
-            DataBindingUtil
-                .inflate(layoutInflater, R.layout.recycler_note_content_edit_item, parent, false)
-        return NoteContentEditHolder(binding)
+    override fun getItemViewType(position: Int): Int {
+        return if (getItem(position).noteContent == null && getItem(position).note != null) {
+            ITEM_VIEW_TYPE_HEADER
+        } else {
+            ITEM_VIEW_TYPE_ITEM
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is NoteEditHolder -> {
+                holder.bind(getItem(position).note)
+            }
+            is NoteContentEditHolder -> {
+                holder.bind(getItem(position).noteContent)
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        when (viewType) {
+            ITEM_VIEW_TYPE_HEADER -> {
+                val binding: HeaderEditBinding =
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.context),
+                        R.layout.header_edit,
+                        parent,
+                        false
+                    )
+                return NoteEditHolder(binding)
+            }
+            ITEM_VIEW_TYPE_ITEM -> {
+                val binding: RecyclerNoteContentEditItemBinding =
+                    DataBindingUtil
+                        .inflate(
+                            LayoutInflater.from(parent.context),
+                            R.layout.recycler_note_content_edit_item,
+                            parent,
+                            false
+                        )
+                return NoteContentEditHolder(binding)
+            }
+            else -> throw ClassCastException("Unknown viewType $viewType")
+        }
     }
 
     inner class NoteContentEditHolder(val binding: RecyclerNoteContentEditItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(noteContent: NoteContent) {
-            _holder.value = this
+        fun bind(noteContent: NoteContent?) {
+            _noteContentHolder.value = this
             binding.data = noteContent
         }
     }
+
+    inner class NoteEditHolder(val binding: HeaderEditBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(note: Note?) {
+            _noteHolder.value = this
+        }
+    }
+
+
 }
 
-class NoteDiffCallBack : DiffUtil.ItemCallback<NoteContent>() {
-    override fun areItemsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {
-        return oldItem.id == newItem.id
-    }
-
-    override fun areContentsTheSame(oldItem: NoteContent, newItem: NoteContent): Boolean {
+class NoteDiffCallBack : DiffUtil.ItemCallback<DataItem>() {
+    override fun areItemsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
         return oldItem == newItem
     }
+
+    override fun areContentsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
+        return oldItem == newItem
+    }
+
 }

@@ -7,11 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.OneNoteEditAdapter
 import com.example.noteexample.R
+import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.FragmentUpdateNoteBinding
 import com.example.noteexample.insertNote.InsertNoteFragmentDirections
@@ -67,6 +66,12 @@ class UpdateNoteFragment : Fragment() {
                 }
             }
 
+
+        viewModel.currentNote.observe(viewLifecycleOwner, {
+            viewModel.note = it
+            viewModel.titleText = it.title
+        })
+
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
             if (it != null){
                 val list = it.filter { list -> list.noteId == args.noteId }
@@ -89,25 +94,24 @@ class UpdateNoteFragment : Fragment() {
                     }
                     Log.e("note", viewModel.startNoteContentList[0].note)
                 }
-                noteAdapter.submitList(list)
+                Log.e("currentNote", "${viewModel.currentNote.value?.id}")
+                noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
             }
         })
 
-        val noteContentList = mutableListOf<NoteContent>()
-        noteAdapter.holder.observe(viewLifecycleOwner, {adapter ->
-            val item = noteAdapter.currentList[adapter.adapterPosition]
-            noteContentList.add(item)
-            adapter.binding.noteEditTextFirst.addTextChangedListener {
-                item.note = it.toString()
-                noteContentList[adapter.adapterPosition].note = item.note
-                Log.e("noteInNav", viewModel.startNoteContentList[0].note)
-            }
-        })
+//        val noteContentList = mutableListOf<NoteContent>()
+//        noteAdapter.holder.observe(viewLifecycleOwner, {adapter ->
+//            val item = noteAdapter.currentList[adapter.adapterPosition]
+//            noteContentList.add(item)
+//            adapter.binding.noteEditTextFirst.addTextChangedListener {
+//                item.note = it.toString()
+//                noteContentList[adapter.adapterPosition].note = item.note
+//                Log.e("noteInNav", viewModel.startNoteContentList[0].note)
+//            }
+//        })
 
         //TODO Add firstNote in viewModel
-        viewModel.currentNote.observe(viewLifecycleOwner, {
-            viewModel.titleText = it.title
-        })
+
 
         binding.toolbarNoteUpdate.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -201,10 +205,10 @@ class UpdateNoteFragment : Fragment() {
 //            }
 //        })
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            viewModel.backPressed = true
-            viewModel.onStartNavigating()
-        }
+//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+//            viewModel.backPressed = true
+//            viewModel.onStartNavigating()
+//        }
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = this

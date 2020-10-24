@@ -26,6 +26,7 @@ class UpdateNoteViewModel(
      */
     var titleText = ""
     var startNoteContentList = mutableListOf<NoteContent>()
+    var note: Note? = null
 
     //Repository
     private val repository: NoteRepository

@@ -14,13 +14,15 @@ import kotlinx.coroutines.launch
 
 class InsertNoteViewModel(application: Application) : AndroidViewModel(application) {
 
-    var noteID = -1
     //Flags
     private var noteInserted = false
     var backPressed = false
 
     //Repository
     private val repository: NoteRepository
+    //Variables
+    var noteID = -1
+    var note: Note? = null
 
     //Live Data
     private val _navigateToNoteFragment = MutableLiveData<Boolean>()
