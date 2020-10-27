@@ -26,8 +26,8 @@ class NoteRepository (private val noteDao: NoteDao){
     }
     suspend fun getLastNote() = noteDao.getLastNote()
 
-    fun selectNote(key: Int) : LiveData<Note>{
-        return noteDao.selectNote(key)
+    suspend fun getNote(key: Int) : Note{
+        return noteDao.getNote(key)
     }
 
     val allNoteContent: LiveData<List<NoteContent>> = noteDao.getAllNoteContent()

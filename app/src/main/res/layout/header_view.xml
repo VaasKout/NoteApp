@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="note"
+            type="com.example.noteexample.database.Note" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +22,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/title" />
+            tools:text="@string/title"
+            app:titleText="@{note}"/>
 
         <TextView
             android:id="@+id/first_note_view"
@@ -31,7 +34,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title_view"
-            tools:text="Заметка" />
+            tools:text="Заметка"
+            app:firstNoteText="@{note}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

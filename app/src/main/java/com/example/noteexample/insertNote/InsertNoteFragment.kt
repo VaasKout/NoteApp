@@ -7,14 +7,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.noteexample.OneNoteEditAdapter
+import com.example.noteexample.utils.OneNoteEditAdapter
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentInsertNoteBinding
 import com.example.noteexample.utils.Camera
@@ -54,13 +56,15 @@ class InsertNoteFragment : Fragment() {
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
-                    this.findNavController()
-                        .navigate(
-                            InsertNoteFragmentDirections
-                                .actionEditNoteFragmentToGalleryFragment
-                                    (viewModel.noteID)
-                        )
-                    Log.e("requestId", "${viewModel.noteID}")
+                    viewModel.note?.let {
+                        this.findNavController()
+                            .navigate(
+                                InsertNoteFragmentDirections
+                                    .actionEditNoteFragmentToGalleryFragment
+                                        (it.id)
+                            )
+                    }
+                    Log.e("requestId", "${viewModel.note?.id}")
                 }
                 //TODO Make else
             }
@@ -69,83 +73,85 @@ class InsertNoteFragment : Fragment() {
          * and updates it data
          */
 
-        viewModel.currentNote.observe(viewLifecycleOwner, {
-            if (it != null) {
-                viewModel.noteID = it.id
-                viewModel.note = it
-                Log.e("noteID_observe", "${viewModel.noteID}")
-            } else {
-                viewModel.updateCurrentNote()
-            }
-        })
-
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            if (it != null){
-                val list = it.filter { list -> list.noteId == viewModel.noteID }
+            if (it != null) {
+                Log.e("noteID", "${viewModel.note?.id}")
+                val list = it.filter { list -> list.noteId == viewModel.note?.id }
                 Log.e("photoList", list.toString())
                 noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
             }
         })
 
 
-//        val noteContentList = mutableListOf<NoteContent>()
-//        noteAdapter.holder.observe(viewLifecycleOwner, {adapter ->
-//            val item = noteAdapter.currentList[adapter.adapterPosition]
-//            noteContentList.add(item)
-//            adapter.binding.noteEditTextFirst.addTextChangedListener {
-//                item.note = it.toString()
-//                noteContentList[adapter.adapterPosition] = item
-//            }
-//        })
+        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
+            val item = noteAdapter.currentList[holder.adapterPosition].noteContent
+            item?.let {
+                viewModel.noteContentList.add(it)
+                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
+                        it.note = editable.toString()
+                        viewModel.noteContentList[holder.adapterPosition - 1].note = it.note
+                }
+            }
+        })
+
+        var title = ""
+        var firstNote = ""
+        noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
+            holder.binding.titleEdit.addTextChangedListener {
+                title = it.toString()
+            }
+            holder.binding.firstNoteEdit.addTextChangedListener {
+                firstNote = it.toString()
+            }
+        })
 
         /**
          *  insert data in database and navigate back to NoteFragment
          */
-//        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
-//            if (it == true) {
-//                val title = binding.titleEditInsert.text.toString()
-//                val firstNote = binding.noteEditFirstInsert.text.toString()
-//                if (noteContentList.isNotEmpty()){
-//                    viewModel.updateNoteContent(noteContentList)
-//                }
-//                when {
-//                    noteContentList.isEmpty() &&
-//                            binding.titleEditInsert.text.toString().isEmpty() -> {
-//                        this@InsertNoteFragment.findNavController().popBackStack()
-//                        viewModel.deleteUnused()
-//                        viewModel.onDoneNavigating()
-//                    }
-//                    viewModel.backPressed -> {
-//                        MaterialAlertDialogBuilder(requireContext())
-//                            .setMessage("Сохранить изменения?")
-//                            .setNegativeButton("Нет") { _, _ ->
-//                                viewModel.deleteUnused()
-//                                this@InsertNoteFragment.findNavController().popBackStack()
-//                                viewModel.onDoneNavigating()
-//                            }
-//                            .setPositiveButton("Да") { _, _ ->
-//                                viewModel.updateCurrentNote(title, firstNote)
-//                                this@InsertNoteFragment.findNavController().popBackStack()
-//                                viewModel.onDoneNavigating()
-//                            }.show()
-//                    }
-//                    !viewModel.backPressed -> {
-//                        viewModel.updateCurrentNote(title, firstNote)
-//                        this@InsertNoteFragment.findNavController().popBackStack()
-//                        viewModel.onDoneNavigating()
-//                    }
-//                }
-//            }
-//        })
+        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
+            if (it == true) {
+                if (viewModel.noteContentList.isNotEmpty()) {
+                    viewModel.updateNoteContent(viewModel.noteContentList)
+                }
+                when {
+                    viewModel.noteContentList.isEmpty() &&
+                            title.isEmpty() &&
+                            firstNote.isEmpty() -> {
+                        this@InsertNoteFragment.findNavController().popBackStack()
+                        viewModel.deleteUnused()
+                        viewModel.onDoneNavigating()
+                    }
+                    viewModel.backPressed -> {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setMessage("Сохранить изменения?")
+                            .setNegativeButton("Нет") { _, _ ->
+                                viewModel.deleteUnused()
+                                this@InsertNoteFragment.findNavController().popBackStack()
+                                viewModel.onDoneNavigating()
+                            }
+                            .setPositiveButton("Да") { _, _ ->
+                                viewModel.updateCurrentNote(title, firstNote)
+                                this@InsertNoteFragment.findNavController().popBackStack()
+                                viewModel.onDoneNavigating()
+                            }.show()
+                    }
+                    !viewModel.backPressed -> {
+                        viewModel.updateCurrentNote(title, firstNote)
+                        this@InsertNoteFragment.findNavController().popBackStack()
+                        viewModel.onDoneNavigating()
+                    }
+                }
+            }
+        })
 
         /**
          * Back button clickListener with dialog window, it is called if note wasn't empty,
          * to prevent accidentally remove data
          */
-//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-//            viewModel.backPressed = true
-//            viewModel.onStartNavigating()
-//        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            viewModel.backPressed = true
+            viewModel.onStartNavigating()
+        }
 
         /**
          * toolbar clickListener
@@ -170,14 +176,15 @@ class InsertNoteFragment : Fragment() {
                                             Manifest.permission.READ_EXTERNAL_STORAGE
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        if (viewModel.noteID != -1) {
+                                        viewModel.note?.let { note ->
                                             this@InsertNoteFragment.findNavController()
                                                 .navigate(
                                                     InsertNoteFragmentDirections
                                                         .actionEditNoteFragmentToGalleryFragment
-                                                            (viewModel.noteID)
+                                                            (note.id)
                                                 )
                                         }
+
                                     } else {
                                         requestPermissionLauncher.launch(
                                             Manifest.permission.READ_EXTERNAL_STORAGE

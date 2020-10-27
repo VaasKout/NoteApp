@@ -1,6 +1,7 @@
 package com.example.noteexample.oneNote
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +26,9 @@ class OneNoteFragment : Fragment() {
         val viewModelFactory = OneNoteViewModelFactory(application, args.noteId)
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
+        if (viewModel.viewModelInit){
+            viewModel.getNote()
+        }
 
         val oneNoteAdapter = OneNoteViewAdapter()
         binding.recyclerOneNote.apply {
@@ -32,14 +36,12 @@ class OneNoteFragment : Fragment() {
             setHasFixedSize(true)
         }
 
-        viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            val list = it.filter { list -> list.noteId == args.noteId }
-            oneNoteAdapter.submitList(list)
-        })
-
-        //TODO Add firstNote in viewModel
-        viewModel.currentNote.observe(viewLifecycleOwner, {
-
+        viewModel.allNoteContent.observe(viewLifecycleOwner, {allContent ->
+            val list = allContent.filter { list -> list.noteId == args.noteId }
+            viewModel.currentNote?.let {note ->
+                Log.e("oneNoteID", "${note.id}")
+                oneNoteAdapter.addHeaderAndSubmitList(note, list)
+            }
         })
 
         /**

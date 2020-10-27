@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="note"
+            type="com.example.noteexample.database.Note" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,7 +24,8 @@
             android:hint="@string/title"
             android:autofillHints="@string/title"
             android:background="@android:color/transparent"
-            android:padding="16dp" />
+            android:padding="16dp"
+            app:titleText="@{note}"/>
 
         <EditText
             android:id="@+id/first_note_edit"
@@ -35,7 +38,8 @@
             android:padding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title_edit" />
+            app:layout_constraintTop_toBottomOf="@+id/title_edit"
+            app:firstNoteText="@{note}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

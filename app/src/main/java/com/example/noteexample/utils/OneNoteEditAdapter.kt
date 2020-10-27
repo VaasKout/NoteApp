@@ -1,4 +1,4 @@
-package com.example.noteexample
+package com.example.noteexample.utils
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,11 +8,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.HeaderEditBinding
 import com.example.noteexample.databinding.RecyclerNoteContentEditItemBinding
-import com.example.noteexample.utils.DataItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -106,10 +106,9 @@ class OneNoteEditAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(note: Note?) {
             _noteHolder.value = this
+            binding.note = note
         }
     }
-
-
 }
 
 class NoteDiffCallBack : DiffUtil.ItemCallback<DataItem>() {
@@ -120,5 +119,4 @@ class NoteDiffCallBack : DiffUtil.ItemCallback<DataItem>() {
     override fun areContentsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
         return oldItem == newItem
     }
-
 }

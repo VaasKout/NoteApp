@@ -20,18 +20,15 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     //Repository
     private val repository: NoteRepository
+
     //Variables
-    var noteID = -1
     var note: Note? = null
+    val noteContentList = mutableListOf<NoteContent>()
 
     //Live Data
     private val _navigateToNoteFragment = MutableLiveData<Boolean>()
     val navigateToNoteFragment: LiveData<Boolean> = _navigateToNoteFragment
-
     val allNoteContent: LiveData<List<NoteContent>>
-
-    private val _currentNote = MutableLiveData<Note>()
-    val currentNote: LiveData<Note> = _currentNote
 
 
     init {
@@ -65,33 +62,40 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     fun insertPhoto(path: String){
         viewModelScope.launch (Dispatchers.IO) {
-            val noteContent = NoteContent(
-                noteId = noteID,
-                photoPath = path
-            )
-            repository.insertNoteContent(noteContent)
+            note?.let {
+                val noteContent = NoteContent(
+                    noteId = it.id,
+                    photoPath = path
+                )
+                repository.insertNoteContent(noteContent)
+            }
         }
     }
 
      fun updateCurrentNote(title: String = "", firstNote: String = "") {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch (Dispatchers.IO) {
             if (!noteInserted){
-                repository.insertNote(Note())
+                note = Note()
+                note?.let {
+                    repository.insertNote(it)
+                }
                 noteInserted = true
             }
-            val note = repository.getLastNote()
-            if (title.isNotEmpty() || firstNote.isNotEmpty()){
-                note.title = title
-                note.firstNote = firstNote
-                repository.updateNote(note)
+
+            note?.let {
+                note = repository.getLastNote()
+                if (title.isNotEmpty() || firstNote.isNotEmpty()){
+                    it.title = title
+                    it.firstNote = firstNote
+                    repository.updateNote(it)
+                }
             }
-            _currentNote.postValue(note)
         }
     }
 
     fun deleteUnused() {
         viewModelScope.launch(Dispatchers.IO) {
-            _currentNote.value?.let { repository.deleteOneNote(it) }
+            note?.let { repository.deleteOneNote(it) }
         }
     }
 }

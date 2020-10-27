@@ -71,8 +71,6 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     private val _checkedState = MutableLiveData<Boolean>()
     val checkedState: LiveData<Boolean> = _checkedState
 
-    private lateinit var currentNote: LiveData<Note>
-
     /**
      * Navigating methods
      */
@@ -92,16 +90,13 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         _navigateToUpdateNoteFragment.value = null
     }
 
-
-    fun onInitCheckList(isChecked: Boolean, noteId: Int) {
-        currentNote = repository.selectNote(noteId)
-        currentNote.value?.isChecked = isChecked
-        _checkedState.value = true
-    }
-
     /**
      * Action mode lifecycle functions
      */
+
+    fun onPrepareActionMode() {
+        _checkedState.value = true
+    }
 
     fun onStartActionMode(activity: FragmentActivity) {
         actionMode = activity.startActionMode(actionModeController)
@@ -122,6 +117,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     /**
      * Coroutine functions
      */
+
 
     fun onDeleteSelected() {
         viewModelScope.launch {

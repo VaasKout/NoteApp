@@ -135,7 +135,7 @@ class AllNotesFragment : Fragment() {
             card.setOnLongClickListener {
                 card.isChecked = !card.isChecked
                 item.isChecked = card.isChecked
-                viewModel.onInitCheckList(item.isChecked, item.id)
+                viewModel.onPrepareActionMode()
                 true
             }
             card.setOnClickListener {

@@ -25,12 +25,13 @@ class UpdateNoteViewModel(
      * This list is needed to reflect changes in [UpdateNoteFragment]
      */
     var titleText = ""
+    var firstNote = ""
     var startNoteContentList = mutableListOf<NoteContent>()
-    var note: Note? = null
+    val noteContentList = mutableListOf<NoteContent>()
 
     //Repository
     private val repository: NoteRepository
-    val currentNote: LiveData<Note>
+    var currentNote: Note? = null
 
     //LiveData
     val allNoteContent: LiveData<List<NoteContent>>
@@ -40,8 +41,8 @@ class UpdateNoteViewModel(
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-        currentNote = repository.selectNote(noteID)
         allNoteContent = repository.allNoteContent
+        getNote()
     }
 
     fun onStartNavigating() {
@@ -62,11 +63,21 @@ class UpdateNoteViewModel(
         }
     }
 
-    fun updateCurrentNote(title: String){
+    private fun getNote(){
         viewModelScope.launch(Dispatchers.IO) {
-            val note = currentNote.value
-            note?.let {
+            currentNote = repository.getNote(noteID)
+            currentNote?.let {
+                titleText = it.title
+                firstNote = it.firstNote
+            }
+        }
+    }
+
+    fun updateCurrentNote(title: String, firstNote: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            currentNote?.let {
                 it.title = title
+                it.firstNote = firstNote
                 repository.updateNote(it)
             }
         }
@@ -81,7 +92,7 @@ class UpdateNoteViewModel(
 
     fun deleteUnused() {
         viewModelScope.launch(Dispatchers.IO) {
-            currentNote.value?.let { repository.deleteOneNote(it) }
+            currentNote?.let { repository.deleteOneNote(it) }
         }
     }
 }

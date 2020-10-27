@@ -16,7 +16,7 @@ interface NoteDao {
     @Delete
     suspend fun deleteOneNote(note: Note)
     @Query("SELECT * from note_table WHERE id = :key")
-    fun selectNote(key: Int) : LiveData<Note>
+    suspend fun getNote(key: Int) : Note
     @Query("SELECT * FROM note_table ORDER BY id DESC LIMIT 1")
     suspend fun getLastNote(): Note
     @Update(onConflict = OnConflictStrategy.IGNORE)
