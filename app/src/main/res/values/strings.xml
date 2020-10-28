@@ -17,4 +17,6 @@
     <string name="camera_request_failed">Необходим доступ к хранилищу, чтобы отобразить фотографии</string>
     <string name="edit">Edit</string>
     <string name="photo_main">Photo main</string>
+    <string name="circle">Circle</string>
+    <string name="clear">Clear</string>
 </resources>

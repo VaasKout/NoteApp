@@ -9,22 +9,9 @@ import com.bumptech.glide.Glide
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 
-/**
- * BindingAdapter handle with redundant space in MaterialCardView if one of views is empty
- *
- * android:id="@+id/titleRecyclerItem"
- * app:titleTextVisibility="@{note}"
- *
- * android:id="@+id/noteRecyclerItem"
- * app:noteTextVisibility="@{note}"
- *
- * note is instance of Note from database
- */
-
 //@GlideModule
 //class GlideAppModule : AppGlideModule()
 
-//TODO work with visibility of EditText
 @BindingAdapter("titleText")
 fun TextView.titleText(note: Note?) {
     if (this is EditText) {
@@ -63,13 +50,19 @@ fun TextView.photoNoteText(data: NoteContent?) {
     }
 }
 
-@BindingAdapter("imageUrl")
-fun ImageView.bindImage(imgUrl: String?) {
-    if (!imgUrl.isNullOrEmpty()) {
-        Glide.with(this.context)
-            .load(imgUrl)
-            .into(this)
-        visibility = View.VISIBLE
+@BindingAdapter(value = ["imageUrl", "load"], requireAll = true)
+fun ImageView.bindImage(imgUrl: String?, load: Boolean) {
+    visibility = if (!imgUrl.isNullOrEmpty()) {
+        if (load){
+            Glide.with(this.context)
+                .load(imgUrl)
+                .into(this)
+            View.VISIBLE
+        } else{
+            View.VISIBLE
+        }
+    } else{
+        View.GONE
     }
 }
 

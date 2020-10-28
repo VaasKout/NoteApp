@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:strokeWidth="1dp"
-        app:strokeColor="@color/grey"
+        app:strokeColor="@color/grey_material"
         android:padding="2dp"
         android:checkable="true"
         android:clickable="true"
@@ -33,6 +33,7 @@
             android:visibility="gone"
             tools:visibility="visible"
             app:imageUrl="@{data.imgSrcUrl}"
+            app:load="@{true}"
             tools:src="@tools:sample/backgrounds/scenic" />
     </com.google.android.material.card.MaterialCardView>
 </layout>

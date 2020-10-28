@@ -82,20 +82,33 @@ class InsertNoteFragment : Fragment() {
             }
         })
 
-
+        var title = ""
+        var firstNote = ""
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             val item = noteAdapter.currentList[holder.adapterPosition].noteContent
             item?.let {
                 viewModel.noteContentList.add(it)
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                        it.note = editable.toString()
-                        viewModel.noteContentList[holder.adapterPosition - 1].note = it.note
+                    it.note = editable.toString()
+                    viewModel.noteContentList[holder.adapterPosition - 1].note = it.note
+                    if (it.note.isEmpty() && it.photoPath.isEmpty()){
+                        viewModel.deleteNoteContent(it)
+                    }
+                }
+            }
+
+            holder.binding.deleteCircle.setOnClickListener {
+                item?.let { current ->
+                    current.photoPath = ""
+                    if (current.note.isEmpty()) {
+                        viewModel.deleteNoteContent(current)
+                    }
+                    noteAdapter.notifyDataSetChanged()
                 }
             }
         })
 
-        var title = ""
-        var firstNote = ""
+
         noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
             holder.binding.titleEdit.addTextChangedListener {
                 title = it.toString()

@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOneNoteBinding
+import com.example.noteexample.updateNote.UpdateNoteFragment
 
 class OneNoteFragment : Fragment() {
     override fun onCreateView(
@@ -26,7 +27,12 @@ class OneNoteFragment : Fragment() {
         val viewModelFactory = OneNoteViewModelFactory(application, args.noteId)
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
-        if (viewModel.viewModelInit){
+
+        /**
+         * While loop is called to be sure,
+         * that [OneNoteViewModel.currentNote] is initialized
+         */
+        while (viewModel.currentNote == null){
             viewModel.getNote()
         }
 

@@ -35,11 +35,17 @@ class NoteRepository (private val noteDao: NoteDao){
     suspend fun insertNoteContent(noteContent: NoteContent){
         noteDao.insertNoteContent(noteContent)
     }
+    suspend fun insertNoteContentList(noteContentList: List<NoteContent>){
+        noteDao.insertNoteContentList(noteContentList)
+    }
     suspend fun deleteAllNoteContent(){
         noteDao.deleteAllNoteContent()
     }
-    suspend fun deleteNoteContent(noteContentList: List<NoteContent>){
-        noteDao.deleteNoteContent(noteContentList)
+    suspend fun deleteNoteContentList(noteContentList: List<NoteContent>){
+        noteDao.deleteNoteContentList(noteContentList)
+    }
+    suspend fun deleteNoteContent(noteContent: NoteContent){
+        noteDao.deleteNoteContent(noteContent)
     }
     suspend fun updateNoteContent(noteContent: NoteContent){
         noteDao.updateNoteContent(noteContent)

@@ -69,10 +69,13 @@ class AllNotesFragment : Fragment() {
 
         viewModel.allNotes.observe(viewLifecycleOwner, {
             it?.let {
-                //TODO Filter list for RecyclerView
                 noteAdapter.submitList(it)
-//                noteAdapter.notes = it
+                viewModel.noteList = it
             }
+        })
+
+        viewModel.allNoteContent.observe(viewLifecycleOwner, {
+            viewModel.noteContentList = it
         })
 
         viewModel.navigateToUpdateNoteFragment.observe(viewLifecycleOwner, { noteId ->
@@ -87,7 +90,7 @@ class AllNotesFragment : Fragment() {
         })
         /**
          * Inside function, checks if any notes are checked,
-        * if not, destroys action mode
+         * if not, destroys action mode
          *
          */
         fun checkAndDestroyActionMode() {
@@ -113,25 +116,29 @@ class AllNotesFragment : Fragment() {
             }
             checkAndDestroyActionMode()
         })
+
         /**
          * Need another list to observe it in [NoteAdapter.holder] LiveData
          * You can't observe one LiveData in another
          */
-        var list = emptyList<NoteContent>()
-        viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            list = it
-        })
 
         noteAdapter.holder.observe(viewLifecycleOwner, { adapter ->
             Log.e("visibility", "${adapter.binding.photoMain.visibility}")
-            val item = noteAdapter.currentList[adapter.adapterPosition]
             val card = adapter.binding.materialCard
-            val contentList = list.filter { it.noteId == item.id }
-            if (contentList.isNotEmpty()){
+            val item = noteAdapter.currentList[adapter.adapterPosition]
+            val contentList = viewModel.noteContentList.filter { it.noteId == item.id }
+            if (contentList.isNotEmpty()) {
                 adapter.binding.data = contentList[0]
                 Log.e("dataID", "${contentList[0].noteId}")
                 Log.e("noteID", "${item.id}")
             }
+
+            if (item.title.isEmpty() &&
+                item.firstNote.isEmpty() &&
+                contentList.isEmpty()) {
+                viewModel.deleteUnused(item, contentList)
+            }
+
             card.setOnLongClickListener {
                 card.isChecked = !card.isChecked
                 item.isChecked = card.isChecked

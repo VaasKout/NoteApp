@@ -98,4 +98,10 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
             note?.let { repository.deleteOneNote(it) }
         }
     }
+
+    fun deleteNoteContent(noteContent: NoteContent){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteNoteContent(noteContent)
+        }
+    }
 }

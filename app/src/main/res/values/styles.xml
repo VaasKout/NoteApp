@@ -14,7 +14,7 @@
     <style name="Widget.App.ActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="titleTextStyle">?attr/textAppearanceHeadline6</item>
         <item name="subtitleTextStyle">?attr/textAppearanceSubtitle1</item>
-        <item name="background">@color/grey</item>
+        <item name="background">@color/grey_material</item>
     </style>
 
     <style name="ModalBottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">

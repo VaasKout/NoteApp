@@ -75,7 +75,8 @@
                 android:contentDescription="@string/photo_main"
                 android:visibility="gone"
                 tools:visibility="visible"
-                app:imageUrl="@{data.photoPath}" />
+                app:imageUrl="@{data.photoPath}"
+                app:load="@{true}"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

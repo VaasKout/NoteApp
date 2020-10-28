@@ -19,6 +19,9 @@ import kotlinx.coroutines.*
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
+    var noteContentList = listOf<NoteContent>()
+    var noteList = listOf<Note>()
+
     private val repository: NoteRepository
     var allNotes: LiveData<List<Note>>
     val allNoteContent: LiveData<List<NoteContent>>
@@ -137,11 +140,18 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                     }
                     if (deleteNoteContentList.isNotEmpty()) {
                         Log.e("NoteContent deleted", deleteNoteContentList.toString())
-                        repository.deleteNoteContent(deleteNoteContentList)
+                        repository.deleteNoteContentList(deleteNoteContentList)
                     }
                 }
                 repository.deleteNotes(deleteNoteList)
             }
+        }
+    }
+
+    fun deleteUnused(note: Note, noteContent: List<NoteContent>){
+        viewModelScope.launch (Dispatchers.IO) {
+            repository.deleteOneNote(note)
+            repository.deleteNoteContentList(noteContent)
         }
     }
 

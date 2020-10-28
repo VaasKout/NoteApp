@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 class OneNoteViewModel(
     application: Application,
     private val noteID: Int = 0): AndroidViewModel(application){
-    var viewModelInit = false
 
     private val repository: NoteRepository
     val allNoteContent: LiveData<List<NoteContent>>
@@ -24,11 +23,6 @@ class OneNoteViewModel(
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
-        if (!viewModelInit){
-            getNote()
-            viewModelInit = true
-        }
-
     }
 
     fun getNote(){

@@ -20,6 +20,7 @@ class UpdateNoteViewModel(
     var backPressed = false
     var textChanged = false
     var sizeChanged = false
+    var startListInit = false
 
     /**
      * This list is needed to reflect changes in [UpdateNoteFragment]
@@ -42,7 +43,9 @@ class UpdateNoteViewModel(
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
-        getNote()
+        while (currentNote == null){
+            getNote()
+        }
     }
 
     fun onStartNavigating() {
@@ -51,6 +54,18 @@ class UpdateNoteViewModel(
 
     fun onDoneNavigating() {
         _navigateToOneNoteFragment.value = false
+    }
+
+    //DataBase functions
+
+    private fun getNote(){
+        viewModelScope.launch(Dispatchers.IO) {
+            currentNote = repository.getNote(noteID)
+            currentNote?.let {
+                titleText = it.title
+                firstNote = it.firstNote
+            }
+        }
     }
 
     fun insertPhoto(path: String){
@@ -63,13 +78,9 @@ class UpdateNoteViewModel(
         }
     }
 
-    private fun getNote(){
+    fun insertNoteContent(noteContent: List<NoteContent>){
         viewModelScope.launch(Dispatchers.IO) {
-            currentNote = repository.getNote(noteID)
-            currentNote?.let {
-                titleText = it.title
-                firstNote = it.firstNote
-            }
+            repository.insertNoteContentList(noteContent)
         }
     }
 
@@ -93,6 +104,18 @@ class UpdateNoteViewModel(
     fun deleteUnused() {
         viewModelScope.launch(Dispatchers.IO) {
             currentNote?.let { repository.deleteOneNote(it) }
+        }
+    }
+
+    fun deleteNoteContent(noteContent: NoteContent){
+        viewModelScope.launch(Dispatchers.IO) {
+           repository.deleteNoteContent(noteContent)
+        }
+    }
+
+    fun deleteNoteContentList(noteContent: List<NoteContent>){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteNoteContentList(noteContentList)
         }
     }
 }
