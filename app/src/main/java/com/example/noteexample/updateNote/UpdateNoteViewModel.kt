@@ -25,8 +25,10 @@ class UpdateNoteViewModel(
     /**
      * This list is needed to reflect changes in [UpdateNoteFragment]
      */
-    var titleText = ""
+    var title = ""
     var firstNote = ""
+    var newTitle = ""
+    var newFirstNote = ""
     var startNoteContentList = mutableListOf<NoteContent>()
     val noteContentList = mutableListOf<NoteContent>()
 
@@ -43,9 +45,7 @@ class UpdateNoteViewModel(
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
-        while (currentNote == null){
-            getNote()
-        }
+        getNote()
     }
 
     fun onStartNavigating() {
@@ -56,14 +56,17 @@ class UpdateNoteViewModel(
         _navigateToOneNoteFragment.value = false
     }
 
-    //DataBase functions
-
+    //Dao functions
     private fun getNote(){
         viewModelScope.launch(Dispatchers.IO) {
-            currentNote = repository.getNote(noteID)
+            while (currentNote == null){
+                currentNote = repository.getNote(noteID)
+            }
             currentNote?.let {
-                titleText = it.title
+                title = it.title
                 firstNote = it.firstNote
+                newTitle = it.title
+                newFirstNote = it.firstNote
             }
         }
     }
@@ -95,9 +98,15 @@ class UpdateNoteViewModel(
     }
 
 
-    fun updateNoteContent(noteContent: List<NoteContent>){
+    fun updateNoteContentList(noteContent: List<NoteContent>){
         viewModelScope.launch (Dispatchers.IO){
             repository.updateNoteContentList(noteContent)
+        }
+    }
+
+    fun updateNoteContent(noteContent: NoteContent){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNoteContent(noteContent)
         }
     }
 

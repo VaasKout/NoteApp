@@ -58,7 +58,7 @@ class OneNoteEditAdapter :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is NoteEditHolder -> {
-                holder.bind(getItem(position).note)
+                holder.bind()
             }
             is NoteContentEditHolder -> {
                 holder.bind(getItem(position).noteContent)
@@ -104,9 +104,8 @@ class OneNoteEditAdapter :
 
     inner class NoteEditHolder(val binding: HeaderEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(note: Note?) {
+        fun bind() {
             _noteHolder.value = this
-            binding.note = note
         }
     }
 }

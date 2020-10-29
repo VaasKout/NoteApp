@@ -25,6 +25,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class InsertNoteFragment : Fragment() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    val viewModel by lazy {
+        ViewModelProvider(this).get(InsertNoteViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,8 +41,7 @@ class InsertNoteFragment : Fragment() {
         /**
          * Initialize viewModel for [InsertNoteViewModel]
          */
-        val viewModel =
-            ViewModelProvider(this).get(InsertNoteViewModel::class.java)
+
         binding.viewModel = viewModel
 
         /**
@@ -82,16 +84,14 @@ class InsertNoteFragment : Fragment() {
             }
         })
 
-        var title = ""
-        var firstNote = ""
+
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             val item = noteAdapter.currentList[holder.adapterPosition].noteContent
             item?.let {
                 viewModel.noteContentList.add(it)
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
                     it.note = editable.toString()
-                    viewModel.noteContentList[holder.adapterPosition - 1].note = it.note
-                    if (it.note.isEmpty() && it.photoPath.isEmpty()){
+                    if (it.note.isEmpty() && it.photoPath.isEmpty()) {
                         viewModel.deleteNoteContent(it)
                     }
                 }
@@ -100,8 +100,11 @@ class InsertNoteFragment : Fragment() {
             holder.binding.deleteCircle.setOnClickListener {
                 item?.let { current ->
                     current.photoPath = ""
+                    viewModel.updateNoteContent(current)
                     if (current.note.isEmpty()) {
                         viewModel.deleteNoteContent(current)
+                    } else {
+                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     }
                     noteAdapter.notifyDataSetChanged()
                 }
@@ -110,11 +113,37 @@ class InsertNoteFragment : Fragment() {
 
 
         noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
+            noteAdapter.currentList.forEach {
+                it.noteContent?.let { current ->
+                    if (current.note.isNotEmpty() && current.photoPath.isEmpty()) {
+                        viewModel.secondNote = current.note
+                        viewModel.noteContentToDelete = current
+                        viewModel.secondNoteInit = true
+                        return@forEach
+                    }
+                }
+            }
+            /**
+             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
+             * after [OneNoteEditAdapter.notifyDataSetChanged] method
+             */
+            holder.binding.titleEdit.setText(viewModel.title)
+            holder.binding.firstNoteEdit.setText(viewModel.firstNote)
+
             holder.binding.titleEdit.addTextChangedListener {
-                title = it.toString()
+                viewModel.title = it.toString()
             }
             holder.binding.firstNoteEdit.addTextChangedListener {
-                firstNote = it.toString()
+                viewModel.firstNote = it.toString()
+                if (it.toString().isEmpty() && viewModel.secondNoteInit) {
+                    holder.binding.firstNoteEdit.setText(viewModel.secondNote)
+                    viewModel.firstNote = viewModel.secondNote
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                    viewModel.noteContentToDelete?.let { delete ->
+                        viewModel.deleteNoteContent(delete)
+                    }
+                    viewModel.secondNoteInit = false
+                }
             }
         })
 
@@ -124,12 +153,12 @@ class InsertNoteFragment : Fragment() {
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
                 if (viewModel.noteContentList.isNotEmpty()) {
-                    viewModel.updateNoteContent(viewModel.noteContentList)
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
                 }
                 when {
                     viewModel.noteContentList.isEmpty() &&
-                            title.isEmpty() &&
-                            firstNote.isEmpty() -> {
+                            viewModel.title.isEmpty() &&
+                            viewModel.firstNote.isEmpty() -> {
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.deleteUnused()
                         viewModel.onDoneNavigating()
@@ -143,13 +172,13 @@ class InsertNoteFragment : Fragment() {
                                 viewModel.onDoneNavigating()
                             }
                             .setPositiveButton("Да") { _, _ ->
-                                viewModel.updateCurrentNote(title, firstNote)
+                                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                                 this@InsertNoteFragment.findNavController().popBackStack()
                                 viewModel.onDoneNavigating()
                             }.show()
                     }
                     !viewModel.backPressed -> {
-                        viewModel.updateCurrentNote(title, firstNote)
+                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.onDoneNavigating()
                     }
@@ -173,6 +202,7 @@ class InsertNoteFragment : Fragment() {
         binding.toolbarNoteInsert.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
                     val camera = Camera(requireActivity())
                     val items = camera.dialogList
                     MaterialAlertDialogBuilder(requireContext())

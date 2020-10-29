@@ -30,7 +30,10 @@ class UpdateNoteFragment : Fragment() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val args by navArgs<UpdateNoteFragmentArgs>()
-
+    private lateinit var updateViewModelFactory: UpdateNoteViewModelFactory
+    val viewModel by lazy {
+        ViewModelProvider(this, updateViewModelFactory).get(UpdateNoteViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,14 +42,12 @@ class UpdateNoteFragment : Fragment() {
         val binding: FragmentUpdateNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_update_note, container, false)
         val application: Application = requireNotNull(this.activity).application
-        val updateViewModelFactory = UpdateNoteViewModelFactory(args.noteId, application)
-        val viewModel =
-            ViewModelProvider(this, updateViewModelFactory)
-                .get(UpdateNoteViewModel::class.java)
+        updateViewModelFactory = UpdateNoteViewModelFactory(args.noteId, application)
 
         /**
          * Initialize [OneNoteEditAdapter] for [FragmentUpdateNoteBinding.updateRecycler]
          */
+
         val noteAdapter = OneNoteEditAdapter()
         binding.updateRecycler.apply {
             adapter = noteAdapter
@@ -143,7 +144,7 @@ class UpdateNoteFragment : Fragment() {
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
                     it.note = editable.toString()
                     viewModel.noteContentList[holder.adapterPosition - 1].note = item.note
-                    if (it.note.isEmpty() && it.photoPath.isEmpty()){
+                    if (it.note.isEmpty() && it.photoPath.isEmpty()) {
                         viewModel.deleteNoteContent(it)
                     }
                     Log.e("noteInNav", viewModel.startNoteContentList[0].note)
@@ -152,38 +153,49 @@ class UpdateNoteFragment : Fragment() {
             holder.binding.deleteCircle.setOnClickListener {
                 item?.let { current ->
                     current.photoPath = ""
-                    if (current.note.isEmpty()){
+                    viewModel.updateNoteContent(current)
+                    if (current.note.isEmpty()) {
                         viewModel.deleteNoteContent(current)
+                    } else {
+                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     }
                     noteAdapter.notifyDataSetChanged()
                 }
             }
         })
 
-        var newTitle = ""
-        var newFirstNote = ""
+
         noteAdapter.noteHolder.observe(viewLifecycleOwner) { holder ->
+            /**
+             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
+             * after [OneNoteEditAdapter.notifyDataSetChanged] method
+             */
+            holder.binding.titleEdit.setText(viewModel.newTitle)
+            holder.binding.firstNoteEdit.setText(viewModel.newFirstNote)
+
             holder.binding.titleEdit.addTextChangedListener {
-                newTitle = it.toString()
+                viewModel.newTitle = it.toString()
             }
             holder.binding.firstNoteEdit.addTextChangedListener {
-                newFirstNote = it.toString()
+                viewModel.newFirstNote = it.toString()
             }
         }
 
-        fun checkEmpty(){
-            viewModel.updateCurrentNote(newTitle, newFirstNote)
+        fun checkEmpty() {
+            viewModel.updateCurrentNote(viewModel.newTitle, viewModel.newFirstNote)
             if (viewModel.noteContentList.isNotEmpty()) {
-                viewModel.updateNoteContent(viewModel.noteContentList)
+                viewModel.updateNoteContentList(viewModel.noteContentList)
             } else if (viewModel.noteContentList.isEmpty() &&
-                newTitle.isEmpty() &&
-                newFirstNote.isEmpty()
+                viewModel.newTitle.isEmpty() &&
+                viewModel.newFirstNote.isEmpty()
             ) {
                 viewModel.deleteUnused()
             }
             this.findNavController()
-                .navigate(UpdateNoteFragmentDirections
-                    .actionUpdateNoteFragmentToAllNotesFragment())
+                .navigate(
+                    UpdateNoteFragmentDirections
+                        .actionUpdateNoteFragmentToAllNotesFragment()
+                )
             viewModel.onDoneNavigating()
         }
 
@@ -207,8 +219,8 @@ class UpdateNoteFragment : Fragment() {
                     viewModel.backPressed -> {
                         if (viewModel.sizeChanged ||
                             viewModel.textChanged ||
-                            viewModel.titleText != newTitle ||
-                            viewModel.firstNote != newFirstNote
+                            viewModel.title != viewModel.newTitle ||
+                            viewModel.firstNote != viewModel.newFirstNote
                         ) {
                             MaterialAlertDialogBuilder(requireContext())
                                 .setMessage("Сохранить изменения?")

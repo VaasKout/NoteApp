@@ -17,12 +17,17 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     //Flags
     private var noteInserted = false
     var backPressed = false
+    var secondNoteInit = false
 
     //Repository
     private val repository: NoteRepository
 
     //Variables
+    var title = ""
+    var firstNote = ""
+    var secondNote = ""
     var note: Note? = null
+    var noteContentToDelete: NoteContent? = null
     val noteContentList = mutableListOf<NoteContent>()
 
     //Live Data
@@ -54,9 +59,15 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      * Coroutine methods
      */
 
-    fun updateNoteContent(noteContent: List<NoteContent>){
+    fun updateNoteContentList(noteContent: List<NoteContent>){
         viewModelScope.launch (Dispatchers.IO){
             repository.updateNoteContentList(noteContent)
+        }
+    }
+
+    fun updateNoteContent(noteContent: NoteContent){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNoteContent(noteContent)
         }
     }
 
@@ -83,7 +94,11 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             note?.let {
-                note = repository.getLastNote()
+                var newNote: Note? = null
+                while (newNote == null){
+                    newNote = repository.getLastNote()
+                    note = newNote
+                }
                 if (title.isNotEmpty() || firstNote.isNotEmpty()){
                     it.title = title
                     it.firstNote = firstNote
