@@ -89,21 +89,18 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
                 note = Note()
                 note?.let {
                     repository.insertNote(it)
+                    var newNote: Note? = null
+                    while (newNote == null){
+                        newNote = repository.getLastNote()
+                        note = newNote
+                    }
                 }
                 noteInserted = true
             }
-
             note?.let {
-                var newNote: Note? = null
-                while (newNote == null){
-                    newNote = repository.getLastNote()
-                    note = newNote
-                }
-                if (title.isNotEmpty() || firstNote.isNotEmpty()){
                     it.title = title
                     it.firstNote = firstNote
                     repository.updateNote(it)
-                }
             }
         }
     }

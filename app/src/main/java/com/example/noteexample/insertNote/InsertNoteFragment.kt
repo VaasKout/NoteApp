@@ -25,6 +25,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class InsertNoteFragment : Fragment() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+
+    /**
+     * Initialize viewModel for [InsertNoteViewModel]
+     */
+
     val viewModel by lazy {
         ViewModelProvider(this).get(InsertNoteViewModel::class.java)
     }
@@ -37,12 +42,8 @@ class InsertNoteFragment : Fragment() {
         //binding for EditNoteFragment
         val binding: FragmentInsertNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_insert_note, container, false)
-
-        /**
-         * Initialize viewModel for [InsertNoteViewModel]
-         */
-
         binding.viewModel = viewModel
+
 
         /**
          * Initialize [OneNoteEditAdapter] for [FragmentInsertNoteBinding.insertRecycler]
@@ -87,25 +88,28 @@ class InsertNoteFragment : Fragment() {
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             val item = noteAdapter.currentList[holder.adapterPosition].noteContent
-            item?.let {
-                viewModel.noteContentList.add(it)
+            item?.let { current ->
+                viewModel.noteContentList.add(current)
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                    it.note = editable.toString()
-                    if (it.note.isEmpty() && it.photoPath.isEmpty()) {
-                        viewModel.deleteNoteContent(it)
+                    current.note = editable.toString()
+                    if (current.note.isEmpty() && current.photoPath.isEmpty()) {
+                        viewModel.noteContentList.remove(current)
+                        viewModel.deleteNoteContent(current)
                     }
                 }
-            }
-
-            holder.binding.deleteCircle.setOnClickListener {
-                item?.let { current ->
+                holder.binding.deleteCircle.setOnClickListener {
                     current.photoPath = ""
-                    viewModel.updateNoteContent(current)
+
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     if (current.note.isEmpty()) {
+                        viewModel.noteContentList.remove(current)
                         viewModel.deleteNoteContent(current)
-                    } else {
-                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     }
+                    if (viewModel.noteContentList.isNotEmpty()){
+                        viewModel.updateNoteContentList(viewModel.noteContentList)
+                    }
+                    holder.binding.noteEditTextFirst.text.clearSpans()
+                    holder.binding.noteEditTextFirst.setText(current.note)
                     noteAdapter.notifyDataSetChanged()
                 }
             }
@@ -113,6 +117,17 @@ class InsertNoteFragment : Fragment() {
 
 
         noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
+
+            /**
+             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
+             * after [OneNoteEditAdapter.notifyDataSetChanged] method
+             */
+            holder.binding.titleEdit.text.clearSpans()
+            holder.binding.firstNoteEdit.text.clearSpans()
+            holder.binding.titleEdit.setText(viewModel.title)
+            holder.binding.firstNoteEdit.setText(viewModel.firstNote)
+            viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+
             noteAdapter.currentList.forEach {
                 it.noteContent?.let { current ->
                     if (current.note.isNotEmpty() && current.photoPath.isEmpty()) {
@@ -123,27 +138,35 @@ class InsertNoteFragment : Fragment() {
                     }
                 }
             }
-            /**
-             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
-             * after [OneNoteEditAdapter.notifyDataSetChanged] method
-             */
-            holder.binding.titleEdit.setText(viewModel.title)
-            holder.binding.firstNoteEdit.setText(viewModel.firstNote)
 
             holder.binding.titleEdit.addTextChangedListener {
                 viewModel.title = it.toString()
             }
             holder.binding.firstNoteEdit.addTextChangedListener {
                 viewModel.firstNote = it.toString()
-                if (it.toString().isEmpty() && viewModel.secondNoteInit) {
-                    holder.binding.firstNoteEdit.setText(viewModel.secondNote)
-                    viewModel.firstNote = viewModel.secondNote
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                if (holder.binding.firstNoteEdit.text.isEmpty() &&
+                    viewModel.secondNoteInit &&
+                    viewModel.noteContentList.isNotEmpty()
+                ) {
                     viewModel.noteContentToDelete?.let { delete ->
                         viewModel.deleteNoteContent(delete)
                     }
+                    viewModel.firstNote = viewModel.secondNote
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                    holder.binding.firstNoteEdit.setText(viewModel.secondNote)
                     viewModel.secondNoteInit = false
                 }
+            }
+            if (holder.binding.firstNoteEdit.text.isEmpty() &&
+                viewModel.secondNoteInit &&
+                viewModel.noteContentList.isNotEmpty()){
+                holder.binding.firstNoteEdit.setText(viewModel.secondNote)
+                viewModel.firstNote = viewModel.secondNote
+                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                viewModel.noteContentToDelete?.let { delete ->
+                    viewModel.deleteNoteContent(delete)
+                }
+                viewModel.secondNoteInit = false
             }
         })
 
@@ -203,6 +226,7 @@ class InsertNoteFragment : Fragment() {
             when (it.itemId) {
                 R.id.insert_photo -> {
                     viewModel.updateNoteContentList(viewModel.noteContentList)
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     val camera = Camera(requireActivity())
                     val items = camera.dialogList
                     MaterialAlertDialogBuilder(requireContext())
