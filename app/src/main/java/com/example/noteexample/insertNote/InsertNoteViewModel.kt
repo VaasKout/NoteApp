@@ -28,7 +28,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     var secondNote = ""
     var note: Note? = null
     var noteContentToDelete: NoteContent? = null
-    val noteContentList = mutableListOf<NoteContent>()
+    var noteContentList = listOf<NoteContent>()
 
     //Live Data
     private val _navigateToNoteFragment = MutableLiveData<Boolean>()
@@ -40,7 +40,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
-        updateCurrentNote()
+        insertNote()
     }
 
     /**
@@ -59,20 +59,20 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      * Coroutine methods
      */
 
-    fun updateNoteContentList(noteContent: List<NoteContent>){
-        viewModelScope.launch (Dispatchers.IO){
+    fun updateNoteContentList(noteContent: List<NoteContent>) {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updateNoteContentList(noteContent)
         }
     }
 
-    fun updateNoteContent(noteContent: NoteContent){
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateNoteContent(noteContent)
-        }
-    }
+//    fun updateNoteContent(noteContent: NoteContent) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.updateNoteContent(noteContent)
+//        }
+//    }
 
-    fun insertPhoto(path: String){
-        viewModelScope.launch (Dispatchers.IO) {
+    fun insertPhoto(path: String) {
+        viewModelScope.launch(Dispatchers.IO) {
             note?.let {
                 val noteContent = NoteContent(
                     noteId = it.id,
@@ -83,24 +83,29 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-     fun updateCurrentNote(title: String = "", firstNote: String = "") {
-        viewModelScope.launch (Dispatchers.IO) {
-            if (!noteInserted){
+    fun insertNote(){
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!noteInserted) {
                 note = Note()
                 note?.let {
                     repository.insertNote(it)
-                    var newNote: Note? = null
-                    while (newNote == null){
-                        newNote = repository.getLastNote()
-                        note = newNote
-                    }
+                }
+                var newNote: Note? = null
+                while (newNote == null) {
+                    newNote = repository.getLastNote()
+                    note = newNote
                 }
                 noteInserted = true
             }
+        }
+    }
+
+    fun updateCurrentNote(title: String = "", firstNote: String = "") {
+        viewModelScope.launch(Dispatchers.IO) {
             note?.let {
-                    it.title = title
-                    it.firstNote = firstNote
-                    repository.updateNote(it)
+                it.title = title
+                it.firstNote = firstNote
+                repository.updateNote(it)
             }
         }
     }
@@ -111,7 +116,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun deleteNoteContent(noteContent: NoteContent){
+    fun deleteNoteContent(noteContent: NoteContent) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteNoteContent(noteContent)
         }

@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,6 +49,7 @@ class InsertNoteFragment : Fragment() {
         /**
          * Initialize [OneNoteEditAdapter] for [FragmentInsertNoteBinding.insertRecycler]
          */
+
         val noteAdapter = OneNoteEditAdapter()
         binding.insertRecycler.apply {
             adapter = noteAdapter
@@ -71,152 +73,6 @@ class InsertNoteFragment : Fragment() {
                 }
                 //TODO Make else
             }
-        /**
-         * [InsertNoteViewModel.updateCurrentNote] initializes current note, if(it == null)
-         * and updates it data
-         */
-
-        viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            if (it != null) {
-                Log.e("noteID", "${viewModel.note?.id}")
-                val list = it.filter { list -> list.noteId == viewModel.note?.id }
-                Log.e("photoList", list.toString())
-                noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
-            }
-        })
-
-
-        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            val item = noteAdapter.currentList[holder.adapterPosition].noteContent
-            item?.let { current ->
-                viewModel.noteContentList.add(current)
-                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                    current.note = editable.toString()
-                    if (current.note.isEmpty() && current.photoPath.isEmpty()) {
-                        viewModel.noteContentList.remove(current)
-                        viewModel.deleteNoteContent(current)
-                    }
-                }
-                holder.binding.deleteCircle.setOnClickListener {
-                    current.photoPath = ""
-
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                    if (current.note.isEmpty()) {
-                        viewModel.noteContentList.remove(current)
-                        viewModel.deleteNoteContent(current)
-                    }
-                    if (viewModel.noteContentList.isNotEmpty()){
-                        viewModel.updateNoteContentList(viewModel.noteContentList)
-                    }
-                    holder.binding.noteEditTextFirst.text.clearSpans()
-                    holder.binding.noteEditTextFirst.setText(current.note)
-                    noteAdapter.notifyDataSetChanged()
-                }
-            }
-        })
-
-
-        noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
-
-            /**
-             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
-             * after [OneNoteEditAdapter.notifyDataSetChanged] method
-             */
-            holder.binding.titleEdit.text.clearSpans()
-            holder.binding.firstNoteEdit.text.clearSpans()
-            holder.binding.titleEdit.setText(viewModel.title)
-            holder.binding.firstNoteEdit.setText(viewModel.firstNote)
-            viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-
-            noteAdapter.currentList.forEach {
-                it.noteContent?.let { current ->
-                    if (current.note.isNotEmpty() && current.photoPath.isEmpty()) {
-                        viewModel.secondNote = current.note
-                        viewModel.noteContentToDelete = current
-                        viewModel.secondNoteInit = true
-                        return@forEach
-                    }
-                }
-            }
-
-            holder.binding.titleEdit.addTextChangedListener {
-                viewModel.title = it.toString()
-            }
-            holder.binding.firstNoteEdit.addTextChangedListener {
-                viewModel.firstNote = it.toString()
-                if (holder.binding.firstNoteEdit.text.isEmpty() &&
-                    viewModel.secondNoteInit &&
-                    viewModel.noteContentList.isNotEmpty()
-                ) {
-                    viewModel.noteContentToDelete?.let { delete ->
-                        viewModel.deleteNoteContent(delete)
-                    }
-                    viewModel.firstNote = viewModel.secondNote
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                    holder.binding.firstNoteEdit.setText(viewModel.secondNote)
-                    viewModel.secondNoteInit = false
-                }
-            }
-            if (holder.binding.firstNoteEdit.text.isEmpty() &&
-                viewModel.secondNoteInit &&
-                viewModel.noteContentList.isNotEmpty()){
-                holder.binding.firstNoteEdit.setText(viewModel.secondNote)
-                viewModel.firstNote = viewModel.secondNote
-                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                viewModel.noteContentToDelete?.let { delete ->
-                    viewModel.deleteNoteContent(delete)
-                }
-                viewModel.secondNoteInit = false
-            }
-        })
-
-        /**
-         *  insert data in database and navigate back to NoteFragment
-         */
-        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
-            if (it == true) {
-                if (viewModel.noteContentList.isNotEmpty()) {
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
-                }
-                when {
-                    viewModel.noteContentList.isEmpty() &&
-                            viewModel.title.isEmpty() &&
-                            viewModel.firstNote.isEmpty() -> {
-                        this@InsertNoteFragment.findNavController().popBackStack()
-                        viewModel.deleteUnused()
-                        viewModel.onDoneNavigating()
-                    }
-                    viewModel.backPressed -> {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setMessage("Сохранить изменения?")
-                            .setNegativeButton("Нет") { _, _ ->
-                                viewModel.deleteUnused()
-                                this@InsertNoteFragment.findNavController().popBackStack()
-                                viewModel.onDoneNavigating()
-                            }
-                            .setPositiveButton("Да") { _, _ ->
-                                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                                this@InsertNoteFragment.findNavController().popBackStack()
-                                viewModel.onDoneNavigating()
-                            }.show()
-                    }
-                    !viewModel.backPressed -> {
-                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                        this@InsertNoteFragment.findNavController().popBackStack()
-                        viewModel.onDoneNavigating()
-                    }
-                }
-            }
-        })
-
-        /**
-         * Back button clickListener with dialog window, it is called if note wasn't empty,
-         * to prevent accidentally remove data
-         */
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            viewModel.backPressed = true
-            viewModel.onStartNavigating()
-        }
 
         /**
          * toolbar clickListener
@@ -265,6 +121,143 @@ class InsertNoteFragment : Fragment() {
                 else -> false
             }
         }
+
+        /**
+         * [InsertNoteViewModel.updateCurrentNote] initializes current note, if(it == null)
+         * and updates it data
+         */
+
+        viewModel.allNoteContent.observe(viewLifecycleOwner, {
+            if (it != null) {
+                val list = it.filter { list -> list.noteId == viewModel.note?.id }
+                viewModel.noteContentList = list
+                Log.e("noteID", "${viewModel.note?.id}")
+                Log.e("photoList", list.toString())
+                noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
+            }
+        })
+
+        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
+            val item = noteAdapter.currentList[holder.adapterPosition].noteContent
+            item?.let { current ->
+                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
+                    current.note = editable.toString()
+                    if (current.note.isEmpty() && current.photoPath.isEmpty()) {
+                        Log.e("photoListSize", "${viewModel.noteContentList.size}")
+                        viewModel.deleteNoteContent(current)
+                    }
+                }
+                holder.binding.deleteCircle.setOnClickListener {
+                    current.photoPath = ""
+
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
+
+                    holder.binding.noteEditTextFirst.setText(current.note)
+                    noteAdapter.notifyDataSetChanged()
+                }
+            }
+        })
+
+        /**
+         * LiveData for holders
+         */
+
+        fun checkText(editText: EditText){
+            if (editText.text.isEmpty() &&
+                viewModel.secondNoteInit &&
+                viewModel.noteContentList.isNotEmpty()){
+                editText.setText(viewModel.secondNote)
+                viewModel.firstNote = viewModel.secondNote
+                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                viewModel.noteContentToDelete?.let { delete ->
+                    viewModel.deleteNoteContent(delete)
+                }
+                viewModel.secondNoteInit = false
+            }
+        }
+
+        noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
+
+            /**
+             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
+             * after [OneNoteEditAdapter.notifyDataSetChanged] method
+             */
+            holder.binding.titleEdit.setText(viewModel.title)
+            holder.binding.firstNoteEdit.setText(viewModel.firstNote)
+            viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+
+            noteAdapter.currentList.forEach {
+                it.noteContent?.let { current ->
+                    if (current.note.isNotEmpty() && current.photoPath.isEmpty()) {
+                        viewModel.secondNote = current.note
+                        viewModel.noteContentToDelete = current
+                        viewModel.secondNoteInit = true
+                        return@forEach
+                    }
+                }
+            }
+
+            holder.binding.titleEdit.addTextChangedListener {
+                viewModel.title = it.toString()
+            }
+            holder.binding.firstNoteEdit.addTextChangedListener {
+                viewModel.firstNote = it.toString()
+                checkText(holder.binding.firstNoteEdit)
+            }
+            checkText(holder.binding.firstNoteEdit)
+        })
+
+        /**
+         * Back button clickListener with dialog window, it is called if note wasn't empty,
+         * to prevent accidentally remove data
+         */
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            viewModel.backPressed = true
+            viewModel.onStartNavigating()
+        }
+
+        /**
+         *  insert data in database and navigate back to NoteFragment
+         */
+
+        viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
+            if (it == true) {
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
+                Log.e("photoListSize", "${viewModel.noteContentList.size}")
+                when {
+                    viewModel.noteContentList.isEmpty() &&
+                            viewModel.title.isEmpty() &&
+                            viewModel.firstNote.isEmpty() -> {
+                        this@InsertNoteFragment.findNavController().popBackStack()
+                        viewModel.deleteUnused()
+                        viewModel.onDoneNavigating()
+                    }
+                    viewModel.backPressed -> {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setMessage("Сохранить изменения?")
+                            .setNegativeButton("Нет") { _, _ ->
+                                viewModel.deleteUnused()
+                                this@InsertNoteFragment.findNavController().popBackStack()
+                                viewModel.onDoneNavigating()
+                            }
+                            .setPositiveButton("Да") { _, _ ->
+                                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                                this@InsertNoteFragment.findNavController().popBackStack()
+                                viewModel.onDoneNavigating()
+                            }.show()
+                        viewModel.onDoneNavigating()
+                    }
+                    !viewModel.backPressed -> {
+                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                        this@InsertNoteFragment.findNavController().popBackStack()
+                        viewModel.onDoneNavigating()
+                    }
+                }
+            }
+        })
 
         binding.lifecycleOwner = this
         return binding.root
