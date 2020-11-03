@@ -1,6 +1,5 @@
 package com.example.noteexample.utils
 
-
 import android.app.Activity
 import android.content.Intent
 import android.database.Cursor
@@ -10,7 +9,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
 import com.example.noteexample.database.GalleryData
@@ -19,8 +17,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-
-const val REQUEST_TAKE_PHOTO = 1
 
 class Camera(private val activity: Activity) {
     lateinit var currentPhotoPath: String
@@ -42,8 +38,8 @@ class Camera(private val activity: Activity) {
         }
     }
 
-    fun dispatchTakePictureIntent(barView: View) {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+    fun dispatchTakePictureIntent(barView: View): Intent {
+        return Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(activity.packageManager)?.also {
                 // Create the File where the photo should go
@@ -65,15 +61,14 @@ class Camera(private val activity: Activity) {
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    startActivityForResult(activity, takePictureIntent, REQUEST_TAKE_PHOTO, null)
                 }
             }
+            val file = File(currentPhotoPath)
+            MediaScannerConnection.scanFile(
+                activity, arrayOf(file.toString()),
+                arrayOf(file.name), null
+            )
         }
-        val file = File(currentPhotoPath)
-        MediaScannerConnection.scanFile(
-            activity, arrayOf(file.toString()),
-            arrayOf(file.name), null
-        )
     }
 
 
@@ -85,8 +80,7 @@ class Camera(private val activity: Activity) {
         val listOfAllImages: MutableList<GalleryData> = mutableListOf()
         val projection = arrayOf(MediaStore.Images.Media._ID)
         var imageId: Long
-        cursor =
-            activity.contentResolver.query(uriExternal, projection, null, null, null)
+        cursor = activity.contentResolver.query(uriExternal, projection, null, null, null)
         if (cursor != null) {
             columnIndexID = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             while (cursor.moveToNext()) {

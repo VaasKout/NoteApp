@@ -12,12 +12,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
-import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.FragmentNoteBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AllNotesFragment : Fragment() {
-    private var actionModeNotStarted: Boolean = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -71,15 +69,19 @@ class AllNotesFragment : Fragment() {
             it?.let {
                 noteAdapter.submitList(it)
                 viewModel.noteList = it
+                if (viewModel.noteList.any { item -> item.isChecked}){
+                    viewModel.onStartActionMode(requireActivity())
+                }
             }
         })
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
             viewModel.noteContentList = it
+            noteAdapter.notifyDataSetChanged()
         })
 
         viewModel.navigateToUpdateNoteFragment.observe(viewLifecycleOwner, { noteId ->
-            if (viewModel.actionMode == null && noteId != null) {
+            if ( noteId > -1) {
                 this.findNavController()
                     .navigate(
                         AllNotesFragmentDirections
@@ -88,32 +90,32 @@ class AllNotesFragment : Fragment() {
                 viewModel.onDoneUpdateNavigating()
             }
         })
+
         /**
          * Inside function, checks if any notes are checked,
-         * if not, destroys action mode
-         *
+         * if not, destroy action mode
          */
+
         fun checkAndDestroyActionMode() {
             if (viewModel.allNotes.value?.filter { it.isChecked }?.size == 0) {
-                viewModel.onDoneActionMode()
                 binding.materialButton.visibility = View.VISIBLE
-                actionModeNotStarted = true
-                noteAdapter.notifyDataSetChanged()
+                viewModel.actionModeStarted = false
+                viewModel.onDestroyActionMode()
             }
         }
         /**
-         * [AllNotesViewModel.checkedState] checks if action mode is activated
-         * [actionModeNotStarted] checks if action mode needs to be start again
+         *
+         * [AllNotesViewModel.actionModeStarted] checks if action mode needs to be start again
          */
-        viewModel.checkedState.observe(viewLifecycleOwner, { state ->
+        viewModel.actionMode.observe(viewLifecycleOwner, { actionMode ->
 
-            if (state == true && actionModeNotStarted) {
+            if (actionMode != null && !viewModel.actionModeStarted) {
                 binding.materialButton.visibility = View.GONE
-                viewModel.onStartActionMode(requireActivity())
-                actionModeNotStarted = false
-            } else if (state == true && !actionModeNotStarted) {
+                viewModel.actionModeStarted = true
+            } else if (actionMode != null && viewModel.actionModeStarted) {
                 viewModel.onResumeActionMode()
             }
+
             checkAndDestroyActionMode()
         })
 
@@ -122,13 +124,12 @@ class AllNotesFragment : Fragment() {
          * You can't observe one LiveData in another
          */
 
-        noteAdapter.holder.observe(viewLifecycleOwner, { adapter ->
-            Log.e("visibility", "${adapter.binding.photoMain.visibility}")
-            val card = adapter.binding.materialCard
-            val item = noteAdapter.currentList[adapter.adapterPosition]
+        noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
+            val card = holder.binding.materialCard
+            val item = noteAdapter.currentList[holder.adapterPosition]
             val contentList = viewModel.noteContentList.filter { it.noteId == item.id }
             if (contentList.isNotEmpty()) {
-                adapter.binding.data = contentList[0]
+                holder.binding.data = contentList[0]
                 Log.e("dataID", "${contentList[0].noteId}")
                 Log.e("noteID", "${item.id}")
             }
@@ -140,18 +141,22 @@ class AllNotesFragment : Fragment() {
             }
 
             card.setOnLongClickListener {
-                card.isChecked = !card.isChecked
-                item.isChecked = card.isChecked
-                viewModel.onPrepareActionMode()
+                item.isChecked = !item.isChecked
+                if (!viewModel.actionModeStarted){
+                    viewModel.onStartActionMode(requireActivity())
+                } else{
+                    viewModel.onResumeActionMode()
+                    checkAndDestroyActionMode()
+                }
                 true
             }
             card.setOnClickListener {
-                if (viewModel.actionMode != null) {
-                    card.isChecked = !card.isChecked
-                    item.isChecked = card.isChecked
+                if (viewModel.actionModeStarted) {
+                    item.isChecked = !item.isChecked
+                    noteAdapter.notifyItemChanged(holder.adapterPosition)
                     viewModel.onResumeActionMode()
                     checkAndDestroyActionMode()
-                } else if (viewModel.actionMode == null) {
+                } else if (!viewModel.actionModeStarted) {
                     viewModel.onNoteClicked(item.id)
                 }
             }
@@ -162,7 +167,7 @@ class AllNotesFragment : Fragment() {
          */
 
         viewModel.navigateToInsertFragment.observe(viewLifecycleOwner, {
-            if (it == true && viewModel.actionMode == null) {
+            if (it == true && !viewModel.actionModeStarted) {
                 this.findNavController()
                     .navigate(
                         AllNotesFragmentDirections

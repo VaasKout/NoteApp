@@ -19,6 +19,9 @@ import kotlinx.coroutines.*
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
+    //Flags
+    var actionModeStarted: Boolean = false
+
     var noteContentList = listOf<NoteContent>()
     var noteList = listOf<Note>()
 
@@ -33,8 +36,9 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         allNoteContent = repository.allNoteContent
     }
 
+    private val _actionMode = MutableLiveData<ActionMode?>()
+    var actionMode: LiveData<ActionMode?> = _actionMode
 
-    var actionMode: ActionMode? = null
     private val actionModeController = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu, menu)
@@ -57,8 +61,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             if (allNotes.value?.any { it.isChecked } == true) {
                 allNotes.value?.map { it.isChecked = false }
             }
-            actionMode = null
-            _checkedState.value = false
+            _actionMode.value = null
         }
     }
 
@@ -68,11 +71,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     private val _navigateToInsertFragment = MutableLiveData<Boolean>()
     val navigateToInsertFragment: LiveData<Boolean> = _navigateToInsertFragment
 
-    private val _navigateToUpdateNoteFragment = MutableLiveData<Int?>()
-    val navigateToUpdateNoteFragment: LiveData<Int?> = _navigateToUpdateNoteFragment
-
-    private val _checkedState = MutableLiveData<Boolean>()
-    val checkedState: LiveData<Boolean> = _checkedState
+    private val _navigateToUpdateNoteFragment = MutableLiveData<Int>()
+    val navigateToUpdateNoteFragment: LiveData<Int> = _navigateToUpdateNoteFragment
 
     /**
      * Navigating methods
@@ -90,37 +90,32 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun onDoneUpdateNavigating() {
-        _navigateToUpdateNoteFragment.value = null
+        _navigateToUpdateNoteFragment.value = -1
     }
 
     /**
      * Action mode lifecycle functions
      */
 
-    fun onPrepareActionMode() {
-        _checkedState.value = true
-    }
-
     fun onStartActionMode(activity: FragmentActivity) {
-        actionMode = activity.startActionMode(actionModeController)
-        actionMode?.title =
+        _actionMode.value = activity.startActionMode(actionModeController)
+        _actionMode.value?.title =
             "${allNotes.value?.filter { it.isChecked }?.size}"
 
     }
 
     fun onResumeActionMode() {
-        actionMode?.title =
+        _actionMode.value?.title =
             "${allNotes.value?.filter { it.isChecked }?.size}"
     }
 
-    fun onDoneActionMode() {
-        actionMode?.finish()
+    fun onDestroyActionMode() {
+        _actionMode.value?.finish()
     }
 
     /**
      * Coroutine functions
      */
-
 
     fun onDeleteSelected() {
         viewModelScope.launch {
@@ -138,10 +133,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                                 deleteNoteContentList.add(it)
                             }
                     }
-                    if (deleteNoteContentList.isNotEmpty()) {
-                        Log.e("NoteContent deleted", deleteNoteContentList.toString())
                         repository.deleteNoteContentList(deleteNoteContentList)
-                    }
                 }
                 repository.deleteNotes(deleteNoteList)
             }

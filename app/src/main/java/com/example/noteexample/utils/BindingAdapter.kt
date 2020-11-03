@@ -14,26 +14,24 @@ import com.example.noteexample.database.NoteContent
 
 @BindingAdapter("titleText")
 fun TextView.titleText(note: Note?) {
-    if (this is EditText) {
-        note?.let {
+
+    note?.let {
+        if (this is EditText) {
             setText(it.title)
-        }
-    } else {
-        note?.let {
+        } else {
             if (it.title.isEmpty()) visibility = View.GONE
             else text = it.title
         }
     }
 }
 
+
 @BindingAdapter("firstNoteText")
 fun TextView.firstNoteText(note: Note?) {
-    if (this is EditText) {
-        note?.let {
+    note?.let {
+        if (this is EditText) {
             setText(it.firstNote)
-        }
-    } else {
-        note?.let {
+        } else {
             if (it.firstNote.isEmpty()) visibility = View.GONE
             else text = it.firstNote
         }
@@ -43,7 +41,9 @@ fun TextView.firstNoteText(note: Note?) {
 @BindingAdapter("photoNoteText")
 fun TextView.photoNoteText(data: NoteContent?) {
     data?.let {
-        if (it.note.isNotEmpty()) {
+        if (this is EditText) {
+            setText(it.note)
+        } else {
             text = it.note
             visibility = View.VISIBLE
         }
@@ -53,15 +53,15 @@ fun TextView.photoNoteText(data: NoteContent?) {
 @BindingAdapter(value = ["imageUrl", "load"], requireAll = true)
 fun ImageView.bindImage(imgUrl: String?, load: Boolean) {
     visibility = if (!imgUrl.isNullOrEmpty()) {
-        if (load){
+        if (load) {
             Glide.with(this.context)
                 .load(imgUrl)
                 .into(this)
             View.VISIBLE
-        } else{
+        } else {
             View.VISIBLE
         }
-    } else{
+    } else {
         View.GONE
     }
 }

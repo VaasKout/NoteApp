@@ -15,19 +15,19 @@ import kotlinx.coroutines.launch
 class InsertNoteViewModel(application: Application) : AndroidViewModel(application) {
 
     //Flags
-    private var noteInserted = false
     var backPressed = false
-    var secondNoteInit = false
+//    var secondNoteInit = false
 
     //Repository
     private val repository: NoteRepository
 
     //Variables
+//    var secondNote = ""
+//    var noteContentToDelete: NoteContent? = null
     var title = ""
     var firstNote = ""
-    var secondNote = ""
     var note: Note? = null
-    var noteContentToDelete: NoteContent? = null
+
     var noteContentList = listOf<NoteContent>()
 
     //Live Data
@@ -59,17 +59,11 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      * Coroutine methods
      */
 
-    fun updateNoteContentList(noteContent: List<NoteContent>) {
+    fun updateNoteContent(noteContent: NoteContent) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateNoteContentList(noteContent)
+            repository.updateNoteContent(noteContent)
         }
     }
-
-//    fun updateNoteContent(noteContent: NoteContent) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            repository.updateNoteContent(noteContent)
-//        }
-//    }
 
     fun insertPhoto(path: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -84,21 +78,21 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun insertNote(){
-        viewModelScope.launch(Dispatchers.IO) {
-            if (!noteInserted) {
+        viewModelScope.launch{
                 note = Note()
                 note?.let {
                     repository.insertNote(it)
                 }
-                var newNote: Note? = null
-                while (newNote == null) {
-                    newNote = repository.getLastNote()
-                    note = newNote
-                }
-                noteInserted = true
-            }
+                note = repository.getLastNote()
         }
     }
+
+    fun updateNoteContentList(noteContent: List<NoteContent>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNoteContentList(noteContent)
+        }
+    }
+
 
     fun updateCurrentNote(title: String = "", firstNote: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
