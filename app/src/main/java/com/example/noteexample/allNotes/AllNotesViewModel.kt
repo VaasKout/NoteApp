@@ -58,9 +58,10 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            if (allNotes.value?.any { it.isChecked } == true) {
-                allNotes.value?.map { it.isChecked = false }
+            if (noteList.any { it.isChecked }) {
+                noteList.map { it.isChecked = false }
             }
+            actionModeStarted = false
             _actionMode.value = null
         }
     }
@@ -101,6 +102,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         _actionMode.value = activity.startActionMode(actionModeController)
         _actionMode.value?.title =
             "${allNotes.value?.filter { it.isChecked }?.size}"
+        actionModeStarted = true
 
     }
 
@@ -119,24 +121,18 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     fun onDeleteSelected() {
         viewModelScope.launch {
-            allNotes.value?.let { noteList ->
+            val deleteNoteContentList = mutableListOf<NoteContent>()
                 val deleteNoteList =
                     noteList.filter { it.isChecked }
-
-                allNoteContent.value?.let { content ->
-                    Log.e("allContent", allNoteContent.toString())
-                    val deleteNoteContentList = mutableListOf<NoteContent>()
                     deleteNoteList.forEach { note ->
-                        content
+                        noteContentList
                             .filter { it.noteId == note.id }
                             .forEach {
                                 deleteNoteContentList.add(it)
                             }
                     }
-                        repository.deleteNoteContentList(deleteNoteContentList)
-                }
-                repository.deleteNotes(deleteNoteList)
-            }
+            repository.deleteNoteContentList(deleteNoteContentList)
+            repository.deleteNotes(deleteNoteList)
         }
     }
 

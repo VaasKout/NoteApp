@@ -44,7 +44,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/materialButton"
+            android:id="@+id/fab_to_insert"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save"

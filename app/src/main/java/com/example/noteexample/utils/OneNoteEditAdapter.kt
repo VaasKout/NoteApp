@@ -1,6 +1,7 @@
 package com.example.noteexample.utils
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -99,6 +100,12 @@ class OneNoteEditAdapter :
         fun bind(noteContent: NoteContent?) {
             _noteContentHolder.value = this
             binding.data = noteContent
+            noteContent?.let {
+                if (it.photoPath.isEmpty()) {
+                    binding.deleteCircle.visibility = View.GONE
+                    binding.deleteCircleIcon.visibility = View.GONE
+                }
+            }
         }
     }
 

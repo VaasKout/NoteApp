@@ -186,7 +186,6 @@ class InsertNoteFragment : Fragment() {
                 }
                 holder.binding.deleteCircle.setOnClickListener {
                     current.photoPath = ""
-//                    noteAdapter.notifyItemChanged(holder.adapterPosition)
                     noteAdapter.notifyDataSetChanged()
                     viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     viewModel.updateNoteContentList(viewModel.noteContentList)

@@ -37,7 +37,6 @@
             android:scaleType="centerCrop"
             android:visibility="gone"
             app:imageUrl="@{data.photoPath}"
-            app:load="@{true}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -53,9 +52,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:contentDescription="@string/circle"
-            android:src="@drawable/circle"
-            app:imageUrl="@{data.photoPath}"
-            app:load="@{false}"/>
+            android:src="@drawable/circle"/>
 
         <ImageView
             android:id="@+id/delete_circle_icon"
@@ -64,9 +61,7 @@
             app:layout_constraintEnd_toEndOf="@+id/delete_circle"
             app:layout_constraintTop_toTopOf="@id/delete_circle"
             android:contentDescription="@string/clear"
-            android:src="@drawable/ic_clear"
-            app:imageUrl="@{data.photoPath}"
-            app:load="@{false}"/>
+            android:src="@drawable/ic_clear" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

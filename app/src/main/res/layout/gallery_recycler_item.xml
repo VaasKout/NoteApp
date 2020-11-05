@@ -33,7 +33,6 @@
             android:visibility="gone"
             tools:visibility="visible"
             app:imageUrl="@{data.imgSrcUrl}"
-            app:load="@{true}"
             tools:src="@tools:sample/backgrounds/scenic" />
     </com.google.android.material.card.MaterialCardView>
 </layout>
