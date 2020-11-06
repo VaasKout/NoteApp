@@ -30,9 +30,7 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/gallery_photos"
             android:scaleType="centerCrop"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:imageUrl="@{data.imgSrcUrl}"
+            imageUrl="@{data.imgSrcUrl}"
             tools:src="@tools:sample/backgrounds/scenic" />
     </com.google.android.material.card.MaterialCardView>
 </layout>

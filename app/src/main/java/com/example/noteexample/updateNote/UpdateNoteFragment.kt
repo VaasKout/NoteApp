@@ -1,7 +1,9 @@
 package com.example.noteexample.updateNote
 
 import android.Manifest
+import android.app.Activity
 import android.app.Application
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -29,20 +31,27 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class UpdateNoteFragment : Fragment() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<UpdateNoteFragmentArgs>()
-    private lateinit var updateViewModelFactory: UpdateNoteViewModelFactory
-    val viewModel by lazy {
-        ViewModelProvider(this, updateViewModelFactory).get(UpdateNoteViewModel::class.java)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val camera = Camera(requireActivity())
+
+        val application: Application = requireNotNull(this.activity).application
+        val updateViewModelFactory = UpdateNoteViewModelFactory(args.noteId, application)
+        val viewModel by lazy {
+            ViewModelProvider(this, updateViewModelFactory).get(UpdateNoteViewModel::class.java)
+        }
+
         val binding: FragmentUpdateNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_update_note, container, false)
-        val application: Application = requireNotNull(this.activity).application
-        updateViewModelFactory = UpdateNoteViewModelFactory(args.noteId, application)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+
+
 
         /**
          * Initialize [OneNoteEditAdapter] for [FragmentUpdateNoteBinding.updateRecycler]
@@ -69,17 +78,30 @@ class UpdateNoteFragment : Fragment() {
                 }
             }
 
+        //Launcher for camera itself
+        startCamera =
+            registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) {
+                if (it.resultCode == Activity.RESULT_OK) {
+                    viewModel.insertPhoto(camera.currentPhotoPath)
+                }
+            }
+
         binding.toolbarNoteUpdate.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
-                    val camera = Camera(requireActivity())
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     val items = camera.dialogList
                     MaterialAlertDialogBuilder(requireContext())
                         .setItems(items) { _, index ->
                             when (index) {
                                 0 -> {
-                                    camera.dispatchTakePictureIntent(binding.editButton)
-                                    viewModel.insertPhoto(camera.currentPhotoPath)
+                                    startCamera.launch(
+                                        camera.dispatchTakePictureIntent(binding.editButton)
+                                    )
+                                    Log.e("currentPhotoPath", camera.currentPhotoPath)
                                 }
                                 1 -> {
                                     if (ContextCompat.checkSelfPermission(
@@ -87,13 +109,15 @@ class UpdateNoteFragment : Fragment() {
                                             Manifest.permission.READ_EXTERNAL_STORAGE
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        this.findNavController()
-                                            .navigate(
-                                                UpdateNoteFragmentDirections
-                                                    .actionUpdateNoteFragmentToGalleryFragment
-                                                        (args.noteId)
-                                            )
-                                        Log.e("permittionAccessID", "$args")
+                                        viewModel.currentNote?.let { note ->
+                                            this@UpdateNoteFragment.findNavController()
+                                                .navigate(
+                                                    InsertNoteFragmentDirections
+                                                        .actionEditNoteFragmentToGalleryFragment
+                                                            (note.id)
+                                                )
+                                        }
+
                                     } else {
                                         requestPermissionLauncher.launch(
                                             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -102,7 +126,6 @@ class UpdateNoteFragment : Fragment() {
                                 }
                             }
                         }.show()
-
                     true
                 }
                 else -> false
@@ -139,11 +162,11 @@ class UpdateNoteFragment : Fragment() {
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             val item = noteAdapter.currentList[holder.adapterPosition].noteContent
 
-            item?.let {
+            noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
                 viewModel.noteContentList.add(it)
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
                     it.note = editable.toString()
-                    viewModel.noteContentList[holder.adapterPosition - 1].note = item.note
+                    viewModel.noteContentList[holder.adapterPosition - 1].note = it.note
                     if (it.note.isEmpty() && it.photoPath.isEmpty()) {
                         viewModel.deleteNoteContent(it)
                     }
@@ -170,8 +193,8 @@ class UpdateNoteFragment : Fragment() {
              * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
              * after [OneNoteEditAdapter.notifyDataSetChanged] method
              */
-            holder.binding.titleEdit.setText(viewModel.newTitle)
-            holder.binding.firstNoteEdit.setText(viewModel.newFirstNote)
+//            holder.binding.titleEdit.setText(viewModel.newTitle)
+//            holder.binding.firstNoteEdit.setText(viewModel.newFirstNote)
 
             holder.binding.titleEdit.addTextChangedListener {
                 viewModel.newTitle = it.toString()
@@ -250,8 +273,7 @@ class UpdateNoteFragment : Fragment() {
             viewModel.onStartNavigating()
         }
 
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
+
         return binding.root
     }
 }

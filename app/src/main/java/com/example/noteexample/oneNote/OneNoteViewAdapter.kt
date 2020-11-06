@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
@@ -13,6 +12,7 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.HeaderViewBinding
 import com.example.noteexample.databinding.RecyclerNoteContentViewItemBinding
+import com.example.noteexample.utils.DataDiffCallBack
 import com.example.noteexample.utils.DataItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +23,7 @@ private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
 
 class OneNoteViewAdapter :
-    ListAdapter<DataItem, RecyclerView.ViewHolder>(NoteDiffCallBack()) {
+    ListAdapter<DataItem, RecyclerView.ViewHolder>(DataDiffCallBack()) {
 
     private val _noteHolder = MutableLiveData<NoteViewHolder>()
     val noteHolder: LiveData<NoteViewHolder> = _noteHolder
@@ -110,17 +110,6 @@ class OneNoteViewAdapter :
             binding.note = note
         }
     }
-}
-
-class NoteDiffCallBack : DiffUtil.ItemCallback<DataItem>() {
-    override fun areItemsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
-        return oldItem == newItem
-    }
-
 }
 
 //class NoteAdapter(private val clickListener: NoteListener)

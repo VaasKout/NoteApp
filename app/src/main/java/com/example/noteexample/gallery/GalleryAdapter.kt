@@ -15,7 +15,7 @@ import com.example.noteexample.databinding.GalleryRecyclerItemBinding
 
 class GalleryAdapter :
     ListAdapter<GalleryData, GalleryAdapter.GalleryViewHolder>(
-        NoteDiffCallBack()
+        GalleryDiffCallBack()
     ) {
 
     private val _holder = MutableLiveData<GalleryViewHolder>()
@@ -37,7 +37,8 @@ class GalleryAdapter :
                 layoutInflater,
                 R.layout.gallery_recycler_item,
                 parent,
-                false)
+                false
+            )
 
         return GalleryViewHolder(binding)
     }
@@ -56,7 +57,7 @@ class GalleryAdapter :
     }
 }
 
-class NoteDiffCallBack : DiffUtil.ItemCallback<GalleryData>() {
+class GalleryDiffCallBack : DiffUtil.ItemCallback<GalleryData>() {
     override fun areItemsTheSame(oldItem: GalleryData, newItem: GalleryData): Boolean {
         return oldItem == newItem
     }

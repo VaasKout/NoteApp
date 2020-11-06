@@ -1,5 +1,6 @@
 package com.example.noteexample.utils
 
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
@@ -15,12 +16,14 @@ import com.example.noteexample.database.NoteContent
 @BindingAdapter("titleText")
 fun TextView.titleText(note: Note?) {
     note?.let {
-        if (this is EditText) {
-            setText(it.title)
-        } else {
-            if (it.title.isEmpty()) {
+        when {
+            this is EditText -> {
+                setText(it.title)
+            }
+            it.title.isEmpty() -> {
                 visibility = View.GONE
-            } else {
+            }
+            else -> {
                 visibility = View.VISIBLE
                 text = it.title
             }
@@ -32,39 +35,49 @@ fun TextView.titleText(note: Note?) {
 @BindingAdapter("firstNoteText")
 fun TextView.firstNoteText(note: Note?) {
     note?.let {
-        if (this is EditText) {
-            setText(it.firstNote)
-        } else {
-            if (it.firstNote.isEmpty()) {
+        when {
+            this is EditText -> {
+                setText(it.firstNote)
+            }
+            it.firstNote.isEmpty() -> {
                 visibility = View.GONE
-            } else {
+            }
+            else -> {
                 visibility = View.VISIBLE
                 text = it.firstNote
             }
         }
+
     }
 }
 
 @BindingAdapter("photoNoteText")
 fun TextView.photoNoteText(data: NoteContent?) {
     data?.let {
-        if (this is EditText) {
-            setText(it.note)
-        } else {
-            visibility = View.VISIBLE
-            text = it.note
+        when {
+            this is EditText -> {
+                setText(it.note)
+            }
+            it.note.isEmpty() -> {
+                visibility = View.GONE
+            }
+            else -> {
+                visibility = View.VISIBLE
+                text = it.note
+            }
         }
     }
 }
 
 @BindingAdapter("imageUrl")
 fun ImageView.bindImage(imgUrl: String?) {
-    visibility = View.GONE
-    if (!imgUrl.isNullOrEmpty()) {
-            Glide.with(this.context)
-                .load(imgUrl)
-                .into(this)
-            visibility = View.VISIBLE
+    visibility = if (imgUrl.isNullOrEmpty()) {
+        View.GONE
+    } else {
+        Glide.with(this.context)
+            .load(imgUrl)
+            .into(this)
+        View.VISIBLE
     }
 }
 

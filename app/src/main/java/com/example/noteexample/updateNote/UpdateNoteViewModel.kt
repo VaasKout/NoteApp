@@ -58,10 +58,8 @@ class UpdateNoteViewModel(
 
     //Dao functions
     private fun getNote(){
-        viewModelScope.launch(Dispatchers.IO) {
-            while (currentNote == null){
-                currentNote = repository.getNote(noteID)
-            }
+        viewModelScope.launch {
+            currentNote = repository.getNote(noteID)
             currentNote?.let {
                 title = it.title
                 firstNote = it.firstNote

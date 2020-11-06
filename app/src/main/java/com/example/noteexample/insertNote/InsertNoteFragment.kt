@@ -47,6 +47,7 @@ class InsertNoteFragment : Fragment() {
         val binding: FragmentInsertNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_insert_note, container, false)
         binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
         /**
          * Initialize [OneNoteEditAdapter] for [FragmentInsertNoteBinding.insertRecycler]
@@ -174,24 +175,6 @@ class InsertNoteFragment : Fragment() {
 //            }
 //        }
 
-        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
-                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                    current.note = editable.toString()
-                    if (current.note.isEmpty() &&
-                        current.photoPath.isEmpty()
-                    ) {
-                        viewModel.deleteNoteContent(current)
-                    }
-                }
-                holder.binding.deleteCircle.setOnClickListener {
-                    current.photoPath = ""
-                    noteAdapter.notifyDataSetChanged()
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
-                }
-            }
-        })
 
         noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
 
@@ -229,6 +212,26 @@ class InsertNoteFragment : Fragment() {
                 }
             }
         })
+
+        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
+            noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
+                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
+                    current.note = editable.toString()
+                    if (current.note.isEmpty() &&
+                        current.photoPath.isEmpty()
+                    ) {
+                        viewModel.deleteNoteContent(current)
+                    }
+                }
+                holder.binding.deleteCircle.setOnClickListener {
+                    current.photoPath = ""
+                    noteAdapter.notifyDataSetChanged()
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
+                }
+            }
+        })
+
 
         /**
          * Back button clickListener with dialog window, it is called if note wasn't empty,
@@ -281,7 +284,7 @@ class InsertNoteFragment : Fragment() {
             }
         })
 
-        binding.lifecycleOwner = this
+
         return binding.root
     }
 

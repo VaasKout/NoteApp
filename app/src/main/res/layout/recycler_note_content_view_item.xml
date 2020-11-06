@@ -21,13 +21,11 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/photo_one_note"
             app:photoNoteText="@{data}"
-            tools:text="Note"
-            tools:visibility="visible" />
+            tools:text="Note"/>
 
         <ImageView
             android:id="@+id/photo_one_note"

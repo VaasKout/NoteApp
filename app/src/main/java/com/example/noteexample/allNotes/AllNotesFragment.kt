@@ -7,11 +7,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteBinding
+import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AllNotesFragment : Fragment() {
@@ -78,9 +80,11 @@ class AllNotesFragment : Fragment() {
             }
         })
 
-        viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            viewModel.noteContentList = it
-            noteAdapter.notifyDataSetChanged()
+        viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
+            list?.let {
+                viewModel.noteContentList = it
+                noteAdapter.notifyDataSetChanged()
+            }
         })
 
         /**
@@ -89,7 +93,6 @@ class AllNotesFragment : Fragment() {
         viewModel.actionMode.observe(viewLifecycleOwner, { actionMode ->
             if (actionMode != null) {
                 binding.fabToInsert.visibility = View.GONE
-                noteAdapter.notifyDataSetChanged()
             } else {
                 binding.fabToInsert.visibility = View.VISIBLE
                 noteAdapter.notifyDataSetChanged()
@@ -113,34 +116,32 @@ class AllNotesFragment : Fragment() {
          */
 
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
-            val card = holder.binding.materialCard
-            val item = noteAdapter.currentList[holder.adapterPosition]
-            val contentList = viewModel.noteContentList.filter { it.noteId == item.id }
+            val card = holder.binding.mainCard
+            val contentList = viewModel.noteContentList.filter {
+                it.noteId == noteAdapter.currentList[holder.adapterPosition].id
+            }
+            /**
+             * Set [View.GONE] visibility for [RecyclerMainItemBinding.photoMain] to prevent
+             * bug in [ListAdapter]
+             *
+             */
             holder.binding.photoMain.visibility = View.GONE
             //TODO Logic for empty photoPath and not empty note
             if (contentList.isNotEmpty()) {
                 contentList.forEach {
                     if (it.photoPath.isNotEmpty()) {
                         holder.binding.data = it
-                        Glide.with(this)
-                            .load(it.photoPath)
-                            .into(holder.binding.photoMain)
-                        holder.binding.photoMain.visibility = View.VISIBLE
                         return@forEach
                     }
                 }
                 Log.e("dataID", "${contentList[0].noteId}")
-                Log.e("noteID", "${item.id}")
+                Log.e("noteID", "${noteAdapter.currentList[holder.adapterPosition].id}")
             }
 
             card.setOnLongClickListener {
                 card.isChecked = !card.isChecked
-                /**
-                 * Using *noteAdapter.current[holder.adapterPosition]* to prevent bug appeared
-                 * after note's been deleted and [AllNotesViewModel.actionMode] title equals 0
-                 */
                 noteAdapter.currentList[holder.adapterPosition].isChecked =
-                card.isChecked
+                    card.isChecked
                 if (!viewModel.actionModeStarted) {
                     viewModel.onStartActionMode(requireActivity())
                 } else {
@@ -154,14 +155,14 @@ class AllNotesFragment : Fragment() {
             card.setOnClickListener {
                 if (viewModel.actionModeStarted) {
                     card.isChecked = !card.isChecked
-                    item.isChecked = card.isChecked
-                    Log.e("itemState", item.toString())
+                    noteAdapter.currentList[holder.adapterPosition].isChecked =
+                        card.isChecked
                     viewModel.onResumeActionMode()
                     if (viewModel.noteList.none { it.isChecked }) {
                         viewModel.onDestroyActionMode()
                     }
                 } else if (!viewModel.actionModeStarted) {
-                    viewModel.onNoteClicked(item.id)
+                    viewModel.onNoteClicked(noteAdapter.currentList[holder.adapterPosition].id)
                 }
             }
         })

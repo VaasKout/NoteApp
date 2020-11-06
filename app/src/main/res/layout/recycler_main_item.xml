@@ -5,16 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="note"
             type="com.example.noteexample.database.Note" />
-       <variable
-           name="data"
-           type="com.example.noteexample.database.NoteContent" />
+
+        <variable
+            name="data"
+            type="com.example.noteexample.database.NoteContent" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCard"
+        android:id="@+id/main_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
@@ -35,45 +37,48 @@
                 android:id="@+id/title_main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="10"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
-                android:paddingBottom="8dp"
                 android:paddingEnd="16dp"
-                android:layout_marginEnd="16dp"
+                android:paddingBottom="8dp"
+                android:singleLine="false"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 app:titleText="@{note}"
-                android:singleLine="false"
-                tools:text="Title"
-                android:ellipsize="end"
-                android:maxLines="10" />
+                tools:text="Title" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/colorPrimary"
                 android:visibility="gone"
-                tools:visibility="visible"
                 app:dataIsEmpty="@{data}"
-                app:titleIsEmpty="@{note}"/>
+                app:titleIsEmpty="@{note}"
+                tools:visibility="visible" />
+
             <TextView
                 android:id="@+id/note_main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="Note"
-                app:firstNoteText="@{note}"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="8dp"/>
+                android:paddingBottom="8dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                app:firstNoteText="@{note}"
+                tools:text="Note" />
+
             <ImageView
                 android:id="@+id/photo_main"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                tools:src="@tools:sample/backgrounds/scenic"
+                android:layout_height="@dimen/small_img_height"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/photo_main"
-                />
+                android:scaleType="centerCrop"
+                imageUrl="@{data.photoPath}"
+                tools:src="@tools:sample/backgrounds/scenic" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

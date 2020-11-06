@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.RecyclerMainItemBinding
+import com.example.noteexample.utils.NoteDiffCallBack
 
 class NoteAdapter:
     ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()){
@@ -43,20 +44,10 @@ class NoteAdapter:
          fun bind(note: Note){
              _holder.value = this
             binding.note = note
-            binding.materialCard.isChecked = note.isChecked
+            binding.mainCard.isChecked = note.isChecked
             binding.executePendingBindings()
         }
      }
-}
-
-class NoteDiffCallBack : DiffUtil.ItemCallback<Note>(){
-    override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem == newItem
-    }
 }
     /**
      * Classic RecyclerView.Adapter, do not delete, use it to handle problems with database
