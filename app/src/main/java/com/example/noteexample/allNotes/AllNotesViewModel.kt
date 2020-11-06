@@ -101,14 +101,15 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     fun onStartActionMode(activity: FragmentActivity) {
         _actionMode.value = activity.startActionMode(actionModeController)
         _actionMode.value?.title =
-            "${allNotes.value?.filter { it.isChecked }?.size}"
+            "${noteList.filter { it.isChecked }.size}"
+        Log.e("title", "${noteList.filter { it.isChecked }.size}")
         actionModeStarted = true
 
     }
 
     fun onResumeActionMode() {
         _actionMode.value?.title =
-            "${allNotes.value?.filter { it.isChecked }?.size}"
+            "${noteList.filter { it.isChecked }.size}"
     }
 
     fun onDestroyActionMode() {

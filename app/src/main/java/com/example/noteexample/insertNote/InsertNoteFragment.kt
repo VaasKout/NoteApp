@@ -287,8 +287,13 @@ class InsertNoteFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.updateNoteContentList(viewModel.noteContentList)
-        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+        if (viewModel.noteContentList.isEmpty() &&
+                viewModel.title.isEmpty() &&
+                viewModel.firstNote.isEmpty()){
+            viewModel.deleteUnused()
+        } else{
+            viewModel.updateNoteContentList(viewModel.noteContentList)
+            viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+        }
     }
-
 }

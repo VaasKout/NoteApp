@@ -108,17 +108,6 @@ class AllNotesFragment : Fragment() {
         })
 
         /**
-         * Inside function, checks if any notes are checked,
-         * if not, destroy action mode
-         */
-
-        fun checkAndDestroyActionMode() {
-            if (viewModel.noteList.none { it.isChecked }) {
-                viewModel.onDestroyActionMode()
-            }
-        }
-
-        /**
          * Need another list to observe it in [NoteAdapter.holder] LiveData
          * You can't observe one LiveData in another
          */
@@ -140,27 +129,25 @@ class AllNotesFragment : Fragment() {
                         return@forEach
                     }
                 }
-
                 Log.e("dataID", "${contentList[0].noteId}")
                 Log.e("noteID", "${item.id}")
             }
 
-            if (item.title.isEmpty() &&
-                item.firstNote.isEmpty() &&
-                contentList.isEmpty()
-            ) {
-                viewModel.deleteUnused(item, contentList)
-            }
-
             card.setOnLongClickListener {
                 card.isChecked = !card.isChecked
-                item.isChecked = card.isChecked
-                Log.e("itemState", item.toString())
+                /**
+                 * Using *noteAdapter.current[holder.adapterPosition]* to prevent bug appeared
+                 * after note's been deleted and [AllNotesViewModel.actionMode] title equals 0
+                 */
+                noteAdapter.currentList[holder.adapterPosition].isChecked =
+                card.isChecked
                 if (!viewModel.actionModeStarted) {
                     viewModel.onStartActionMode(requireActivity())
                 } else {
                     viewModel.onResumeActionMode()
-                    checkAndDestroyActionMode()
+                    if (viewModel.noteList.none { it.isChecked }) {
+                        viewModel.onDestroyActionMode()
+                    }
                 }
                 true
             }
@@ -170,7 +157,9 @@ class AllNotesFragment : Fragment() {
                     item.isChecked = card.isChecked
                     Log.e("itemState", item.toString())
                     viewModel.onResumeActionMode()
-                    checkAndDestroyActionMode()
+                    if (viewModel.noteList.none { it.isChecked }) {
+                        viewModel.onDestroyActionMode()
+                    }
                 } else if (!viewModel.actionModeStarted) {
                     viewModel.onNoteClicked(item.id)
                 }
