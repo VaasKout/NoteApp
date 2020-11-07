@@ -84,6 +84,7 @@ class AllNotesFragment : Fragment() {
             list?.let {
                 viewModel.noteContentList = it
                 noteAdapter.notifyDataSetChanged()
+                viewModel.deleteUnused()
             }
         })
 
@@ -121,11 +122,12 @@ class AllNotesFragment : Fragment() {
                  * Set [View.GONE] visibility for [RecyclerMainItemBinding.photoMain] to prevent
                  * bug in [ListAdapter]
                  */
-                holder.binding.photoMain.visibility = View.GONE
                 //TODO Logic for empty photoPath and not empty note
+                holder.binding.photoMain.visibility = View.GONE
                 if (contentList.isNotEmpty()) {
                     contentList.forEach {
                         if (it.photoPath.isNotEmpty()) {
+                            holder.binding.photoMain.visibility = View.VISIBLE
                             holder.binding.data = it
                             return@forEach
                         }
@@ -133,13 +135,6 @@ class AllNotesFragment : Fragment() {
                     Log.e("dataID", "${contentList[0].noteId}")
                     Log.e("noteID", "${current.id}")
                 }
-                if (current.title.isEmpty() &&
-                    current.firstNote.isEmpty() &&
-                    contentList.isEmpty()
-                ) {
-                    viewModel.deleteUnused(current, contentList)
-                }
-
             }
 
             card.setOnLongClickListener {
@@ -169,7 +164,6 @@ class AllNotesFragment : Fragment() {
                     viewModel.onNoteClicked(noteAdapter.currentList[holder.adapterPosition].id)
                 }
             }
-
         })
 
         /**

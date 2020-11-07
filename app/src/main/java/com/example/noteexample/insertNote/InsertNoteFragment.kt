@@ -100,7 +100,7 @@ class InsertNoteFragment : Fragment() {
             when (it.itemId) {
                 R.id.insert_photo -> {
                     viewModel.updateNoteContentList(viewModel.noteContentList)
-//                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     val items = camera.dialogList
                     MaterialAlertDialogBuilder(requireContext())
                         .setItems(items) { _, index ->
@@ -216,11 +216,6 @@ class InsertNoteFragment : Fragment() {
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
-                if (current.hidden) {
-                    holder.binding.photo.visibility = View.GONE
-                } else {
-                    holder.binding.photo.visibility = View.VISIBLE
-                }
 
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
                     current.note = editable.toString()
@@ -232,14 +227,21 @@ class InsertNoteFragment : Fragment() {
                 }
                 holder.binding.deleteCircle.setOnClickListener {
                     current.hidden = true
+                    holder.binding.photo.visibility = View.GONE
                     holder.binding.restoreButton.visibility = View.VISIBLE
+                    holder.binding.deleteCircleIcon.visibility = View.GONE
+                    holder.binding.deleteCircle.visibility = View.GONE
                     noteAdapter.notifyDataSetChanged()
-//                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-//                    viewModel.updateNoteContentList(viewModel.noteContentList)
+                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
                 }
                 holder.binding.restoreButton.setOnClickListener {
                     current.hidden = false
+                    holder.binding.photo.visibility = View.VISIBLE
                     holder.binding.restoreButton.visibility = View.GONE
+                    holder.binding.deleteCircleIcon.visibility = View.VISIBLE
+                    holder.binding.deleteCircle.visibility = View.VISIBLE
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
                     noteAdapter.notifyItemChanged(holder.adapterPosition)
                 }
             }
@@ -262,13 +264,19 @@ class InsertNoteFragment : Fragment() {
 
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
+                Log.e("contentList", viewModel.noteContentList.toString())
+                if (viewModel.noteContentList.none { item -> item.hidden }){
+                    viewModel.allHidden = false
+                }
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
                 Log.e("photoListSize", "${viewModel.noteContentList.size}")
                 when {
-                    viewModel.noteContentList.isEmpty() &&
+                    (viewModel.noteContentList.isEmpty() ||
+                            viewModel.allHidden )&&
                             viewModel.title.isEmpty() &&
-                            viewModel.firstNote.isEmpty() -> {
+                            viewModel.firstNote.isEmpty()
+                             -> {
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.deleteUnused()
                         viewModel.onDoneNavigating()

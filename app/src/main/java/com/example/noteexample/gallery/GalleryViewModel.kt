@@ -2,15 +2,12 @@ package com.example.noteexample.gallery
 
 
 import android.app.Application
-import android.util.Log
-import android.widget.TextView
 import androidx.lifecycle.*
 import com.example.noteexample.database.GalleryData
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
@@ -22,6 +19,8 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     var actionModeStarted = false
     var galleryListInit = false
 
+    //LiveData
+    val allNoteContent: LiveData<List<NoteContent>>
     private val _actionMode = MutableLiveData<Boolean>()
     val actionMode: LiveData<Boolean> = _actionMode
 
@@ -30,12 +29,12 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
+        allNoteContent = repository.allNoteContent
     }
 
     fun getData(camera: Camera) {
         galleryList = camera.loadImagesFromStorage()
     }
-
 
     fun clearSelected() {
         galleryList.forEach {
@@ -45,14 +44,22 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
 
     fun insertImages(noteId: Int) {
         viewModelScope.launch {
+            val photoList = mutableListOf<GalleryData>()
             val photos = galleryList.filter { list -> list.isChecked }
-            photos.forEach { photo ->
-                val noteContentList = NoteContent(
+            photoList.addAll(photos)
+                allNoteContent.value?.forEach {
+                    if (it.hidden){
+                        it.photoPath = photoList[0].imgSrcUrl
+                        repository.updateNoteContent(it)
+                        photoList.removeAt(0)
+                    }
+                }
+            photoList.forEach { photo ->
+                val noteContent = NoteContent(
                     noteId = noteId,
                     photoPath = photo.imgSrcUrl
                 )
-                Log.e("noteIDGal", "$noteId")
-                repository.insertNoteContent(noteContentList)
+                repository.insertNoteContent(noteContent)
             }
         }
     }

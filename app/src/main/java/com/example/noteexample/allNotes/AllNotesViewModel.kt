@@ -122,25 +122,36 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     fun onDeleteSelected() {
         viewModelScope.launch {
-            val deleteNoteContentList = mutableListOf<NoteContent>()
-                val deleteNoteList =
-                    noteList.filter { it.isChecked }
-                    deleteNoteList.forEach { note ->
-                        noteContentList
-                            .filter { it.noteId == note.id }
-                            .forEach {
-                                deleteNoteContentList.add(it)
-                            }
+            val deleteNoteList =
+                noteList.filter { it.isChecked }
+            deleteNoteList.forEach { note ->
+                repository.deleteOneNote(note)
+                noteContentList
+                    .filter { it.noteId == note.id }
+                    .forEach {
+                        repository.deleteNoteContent(it)
                     }
-            repository.deleteNoteContentList(deleteNoteContentList)
-            repository.deleteNotes(deleteNoteList)
+            }
         }
     }
 
-    fun deleteUnused(note: Note, noteContent: List<NoteContent>){
-        viewModelScope.launch {
-            repository.deleteOneNote(note)
-            repository.deleteNoteContentList(noteContent)
+    fun deleteUnused() {
+        viewModelScope.launch(Dispatchers.IO) {
+            noteList.forEach { note ->
+                val contentList = noteContentList.filter { it.noteId == note.id }
+                if (note.title.isEmpty() &&
+                    note.firstNote.isEmpty() &&
+                    contentList.isEmpty()
+                ) {
+                    repository.deleteOneNote(note)
+                    repository.deleteNoteContentList(contentList)
+                }
+            }
+            noteContentList.forEach {
+                if (it.hidden){
+                    repository.deleteNoteContent(it)
+                }
+            }
         }
     }
 

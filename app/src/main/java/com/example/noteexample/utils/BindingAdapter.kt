@@ -71,13 +71,10 @@ fun TextView.photoNoteText(data: NoteContent?) {
 
 @BindingAdapter("imageUrl")
 fun ImageView.bindImage(imgUrl: String?) {
-    visibility = if (imgUrl.isNullOrEmpty()) {
-        View.GONE
-    } else {
+    if (!imgUrl.isNullOrEmpty()) {
         Glide.with(this.context)
             .load(imgUrl)
             .into(this)
-        View.VISIBLE
     }
 }
 

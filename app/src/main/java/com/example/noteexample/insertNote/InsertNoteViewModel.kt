@@ -16,7 +16,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     //Flags
     var backPressed = false
-    var cancelRestoration = false
+    var allHidden = true
 //    var secondNoteInit = false
 
     //Repository
