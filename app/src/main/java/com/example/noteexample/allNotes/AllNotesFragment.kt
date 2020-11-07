@@ -110,32 +110,36 @@ class AllNotesFragment : Fragment() {
             }
         })
 
-        /**
-         * Need another list to observe it in [NoteAdapter.holder] LiveData
-         * You can't observe one LiveData in another
-         */
-
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             val card = holder.binding.mainCard
-            val contentList = viewModel.noteContentList.filter {
-                it.noteId == noteAdapter.currentList[holder.adapterPosition].id
-            }
-            /**
-             * Set [View.GONE] visibility for [RecyclerMainItemBinding.photoMain] to prevent
-             * bug in [ListAdapter]
-             *
-             */
-            holder.binding.photoMain.visibility = View.GONE
-            //TODO Logic for empty photoPath and not empty note
-            if (contentList.isNotEmpty()) {
-                contentList.forEach {
-                    if (it.photoPath.isNotEmpty()) {
-                        holder.binding.data = it
-                        return@forEach
-                    }
+            noteAdapter.currentList[holder.adapterPosition]?.let { current ->
+                val contentList = viewModel.noteContentList.filter {
+                    it.noteId == current.id
                 }
-                Log.e("dataID", "${contentList[0].noteId}")
-                Log.e("noteID", "${noteAdapter.currentList[holder.adapterPosition].id}")
+
+                /**
+                 * Set [View.GONE] visibility for [RecyclerMainItemBinding.photoMain] to prevent
+                 * bug in [ListAdapter]
+                 */
+                holder.binding.photoMain.visibility = View.GONE
+                //TODO Logic for empty photoPath and not empty note
+                if (contentList.isNotEmpty()) {
+                    contentList.forEach {
+                        if (it.photoPath.isNotEmpty()) {
+                            holder.binding.data = it
+                            return@forEach
+                        }
+                    }
+                    Log.e("dataID", "${contentList[0].noteId}")
+                    Log.e("noteID", "${current.id}")
+                }
+                if (current.title.isEmpty() &&
+                    current.firstNote.isEmpty() &&
+                    contentList.isEmpty()
+                ) {
+                    viewModel.deleteUnused(current, contentList)
+                }
+
             }
 
             card.setOnLongClickListener {
@@ -165,6 +169,7 @@ class AllNotesFragment : Fragment() {
                     viewModel.onNoteClicked(noteAdapter.currentList[holder.adapterPosition].id)
                 }
             }
+
         })
 
         /**

@@ -29,4 +29,5 @@ abstract class NoteRoomDatabase : RoomDatabase(){
             }
         }
     }
+    //TODO Migration
 }

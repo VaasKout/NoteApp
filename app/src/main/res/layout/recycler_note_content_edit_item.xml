@@ -14,20 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/note_editText_first"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="@string/note"
-            android:background="@android:color/transparent"
-            android:hint="@string/note"
-            android:inputType="textMultiLine|text"
-            android:padding="16dp"
-            app:photoNoteText="@{data}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/photo" />
-
         <ImageView
             android:id="@+id/photo"
             android:layout_width="match_parent"
@@ -62,6 +48,31 @@
             app:layout_constraintTop_toTopOf="@id/delete_circle"
             android:contentDescription="@string/clear"
             android:src="@drawable/ic_clear" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/restore_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/restore"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photo"
+            tools:visibility="visible" />
+
+        <EditText
+            android:id="@+id/note_editText_first"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="@string/note"
+            android:background="@android:color/transparent"
+            android:hint="@string/note"
+            android:inputType="textMultiLine|text"
+            android:padding="16dp"
+            app:photoNoteText="@{data}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/restore_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

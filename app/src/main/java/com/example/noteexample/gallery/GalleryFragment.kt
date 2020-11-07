@@ -29,50 +29,70 @@ class GalleryFragment : BottomSheetDialogFragment() {
         val galleryAdapter = GalleryAdapter()
         val camera = Camera(requireActivity())
 
+        if (!viewModel.galleryListInit){
+            viewModel.getData(camera)
+            viewModel.galleryListInit = true
+        }
+
         /**
          * RecyclerView options
          */
         binding.galleryRecyclerView.apply {
+            galleryAdapter.submitList(viewModel.galleryList)
             adapter = galleryAdapter
             setHasFixedSize(true)
         }
-        viewModel.getData(camera)
-        viewModel.galleryData.observe(viewLifecycleOwner, {
-            galleryAdapter.submitList(it)
+
+        if (viewModel.galleryList.any { list -> list.isChecked }) {
+            viewModel.onStartActionMode()
+            binding.numberOfSelected.text =
+                viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
+        }
+
+        viewModel.actionMode.observe(viewLifecycleOwner, {
+            if (it == true) {
+                viewModel.actionModeStarted = true
+                binding.selectPanel.visibility = View.VISIBLE
+                binding.galleryTitle.visibility = View.GONE
+            } else {
+                viewModel.actionModeStarted = false
+                binding.selectPanel.visibility = View.GONE
+                binding.galleryTitle.visibility = View.VISIBLE
+            }
         })
 
-        galleryAdapter.holder.observe(viewLifecycleOwner, { adapter ->
-            val item = galleryAdapter.currentList[adapter.adapterPosition]
+        galleryAdapter.holder.observe(viewLifecycleOwner, { holder ->
+            val card = holder.binding.galleryCard
 
-            adapter.binding.galleryCard.setOnClickListener {
-                item.isChecked = !item.isChecked
-                viewModel.galleryData.value?.let {
-                    binding.numberOfSelected.text =
-                        it.filter { list -> list.isChecked }.size.toString()
+            card.setOnClickListener {
+                card.isChecked = !card.isChecked
+                viewModel.galleryList[holder.adapterPosition].isChecked =
+                    card.isChecked
 
-                    if (it.any { list -> list.isChecked }){
-                        binding.selectPanel.visibility = View.VISIBLE
-                        binding.galleryTitle.visibility = View.GONE
-                    } else {
-                        binding.selectPanel.visibility = View.GONE
-                        binding.galleryTitle.visibility = View.VISIBLE
-                    }
+                if (!viewModel.actionModeStarted) {
+                    viewModel.onStartActionMode()
+                } else if (viewModel.actionModeStarted &&
+                    galleryAdapter.currentList.none { list -> list.isChecked }
+                ) {
+                    viewModel.onDoneActionMode()
                 }
-                galleryAdapter.notifyDataSetChanged()
+                binding.numberOfSelected.text =
+                    viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
             }
+
         })
 
         binding.deleteSelectedPhotos.setOnClickListener {
             viewModel.clearSelected()
             galleryAdapter.notifyDataSetChanged()
-            binding.selectPanel.visibility = View.GONE
-            binding.galleryTitle.visibility = View.VISIBLE
+            viewModel.onDoneActionMode()
         }
 
         binding.acceptSelectedPhotos.setOnClickListener {
             viewModel.insertImages(args.noteId)
             Log.e("argsID", "${args.noteId}")
             this.findNavController().popBackStack()
+            viewModel.onDoneActionMode()
         }
 
         binding.lifecycleOwner = this

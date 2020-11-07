@@ -19,4 +19,5 @@
     <string name="photo_main">Photo main</string>
     <string name="circle">Circle</string>
     <string name="clear">Clear</string>
+    <string name="restore">Восстановить</string>
 </resources>

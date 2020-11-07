@@ -138,7 +138,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun deleteUnused(note: Note, noteContent: List<NoteContent>){
-        viewModelScope.launch (Dispatchers.IO) {
+        viewModelScope.launch {
             repository.deleteOneNote(note)
             repository.deleteNoteContentList(noteContent)
         }

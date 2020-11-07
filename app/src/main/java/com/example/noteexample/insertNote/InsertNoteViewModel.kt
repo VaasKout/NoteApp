@@ -16,6 +16,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     //Flags
     var backPressed = false
+    var cancelRestoration = false
 //    var secondNoteInit = false
 
     //Repository
@@ -59,11 +60,11 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      * Coroutine methods
      */
 
-    fun updateNoteContent(noteContent: NoteContent) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateNoteContent(noteContent)
-        }
-    }
+//    fun updateNoteContent(noteContent: NoteContent) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.updateNoteContent(noteContent)
+//        }
+//    }
 
     fun insertPhoto(path: String) {
         viewModelScope.launch(Dispatchers.IO) {

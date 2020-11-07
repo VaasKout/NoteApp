@@ -100,7 +100,7 @@ class InsertNoteFragment : Fragment() {
             when (it.itemId) {
                 R.id.insert_photo -> {
                     viewModel.updateNoteContentList(viewModel.noteContentList)
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+//                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     val items = camera.dialogList
                     MaterialAlertDialogBuilder(requireContext())
                         .setItems(items) { _, index ->
@@ -149,12 +149,11 @@ class InsertNoteFragment : Fragment() {
             if (it != null) {
                 val list = it.filter { list -> list.noteId == viewModel.note?.id }
                 viewModel.noteContentList = list
+                noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
                 Log.e("noteID", "${viewModel.note?.id}")
                 Log.e("photoList", list.toString())
-                noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
             }
         })
-
 
 
 //        fun checkText(editText: EditText) {
@@ -217,6 +216,12 @@ class InsertNoteFragment : Fragment() {
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
+                if (current.hidden) {
+                    holder.binding.photo.visibility = View.GONE
+                } else {
+                    holder.binding.photo.visibility = View.VISIBLE
+                }
+
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
                     current.note = editable.toString()
                     if (current.note.isEmpty() &&
@@ -226,10 +231,16 @@ class InsertNoteFragment : Fragment() {
                     }
                 }
                 holder.binding.deleteCircle.setOnClickListener {
-                    current.photoPath = ""
+                    current.hidden = true
+                    holder.binding.restoreButton.visibility = View.VISIBLE
                     noteAdapter.notifyDataSetChanged()
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
+//                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+//                    viewModel.updateNoteContentList(viewModel.noteContentList)
+                }
+                holder.binding.restoreButton.setOnClickListener {
+                    current.hidden = false
+                    holder.binding.restoreButton.visibility = View.GONE
+                    noteAdapter.notifyItemChanged(holder.adapterPosition)
                 }
             }
         })
@@ -271,14 +282,12 @@ class InsertNoteFragment : Fragment() {
                                 viewModel.onDoneNavigating()
                             }
                             .setPositiveButton("Да") { _, _ ->
-                                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                                 this@InsertNoteFragment.findNavController().popBackStack()
                                 viewModel.onDoneNavigating()
                             }.show()
                         viewModel.onDoneNavigating()
                     }
                     !viewModel.backPressed -> {
-                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.onDoneNavigating()
                     }
@@ -286,19 +295,12 @@ class InsertNoteFragment : Fragment() {
             }
         })
 
-
         return binding.root
     }
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.noteContentList.isEmpty() &&
-                viewModel.title.isEmpty() &&
-                viewModel.firstNote.isEmpty()){
-            viewModel.deleteUnused()
-        } else{
-            viewModel.updateNoteContentList(viewModel.noteContentList)
-            viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-        }
+        viewModel.updateNoteContentList(viewModel.noteContentList)
+        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
     }
 }

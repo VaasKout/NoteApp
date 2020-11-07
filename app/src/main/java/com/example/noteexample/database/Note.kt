@@ -18,4 +18,5 @@ data class NoteContent(
     @ColumnInfo(name = "note_id") val noteId: Int,
     @ColumnInfo(name = "note") var note: String = "",
     @ColumnInfo(name = "photoPath") var photoPath: String,
+    @ColumnInfo(name = "hidden") var hidden: Boolean = false,
 )
