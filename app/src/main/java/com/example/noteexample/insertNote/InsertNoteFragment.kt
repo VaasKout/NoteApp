@@ -219,31 +219,32 @@ class InsertNoteFragment : Fragment() {
 
                 holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
                     current.note = editable.toString()
-                    if (current.note.isEmpty() &&
-                        current.photoPath.isEmpty()
-                    ) {
-                        viewModel.deleteNoteContent(current)
-                    }
                 }
-                holder.binding.deleteCircle.setOnClickListener {
-                    current.hidden = true
+
+                if (current.hidden){
                     holder.binding.photo.visibility = View.GONE
                     holder.binding.restoreButton.visibility = View.VISIBLE
                     holder.binding.deleteCircleIcon.visibility = View.GONE
                     holder.binding.deleteCircle.visibility = View.GONE
-                    noteAdapter.notifyDataSetChanged()
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
-                }
-                holder.binding.restoreButton.setOnClickListener {
-                    current.hidden = false
+                } else{
                     holder.binding.photo.visibility = View.VISIBLE
                     holder.binding.restoreButton.visibility = View.GONE
                     holder.binding.deleteCircleIcon.visibility = View.VISIBLE
                     holder.binding.deleteCircle.visibility = View.VISIBLE
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
-                    noteAdapter.notifyItemChanged(holder.adapterPosition)
                 }
+            }
+
+            holder.binding.deleteCircle.setOnClickListener {
+                noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = true
+                noteAdapter.notifyDataSetChanged()
+                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                viewModel.updateNoteContentList(viewModel.noteContentList)
+            }
+            holder.binding.restoreButton.setOnClickListener {
+                noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = false
+                noteAdapter.notifyDataSetChanged()
+                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                viewModel.updateNoteContentList(viewModel.noteContentList)
             }
         })
 

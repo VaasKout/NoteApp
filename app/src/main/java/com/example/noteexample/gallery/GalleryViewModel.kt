@@ -50,6 +50,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                 allNoteContent.value?.forEach {
                     if (it.hidden){
                         it.photoPath = photoList[0].imgSrcUrl
+                        it.hidden = false
                         repository.updateNoteContent(it)
                         photoList.removeAt(0)
                     }
