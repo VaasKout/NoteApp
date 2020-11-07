@@ -155,9 +155,7 @@ class InsertNoteFragment : Fragment() {
             }
         })
 
-        /**
-         * LiveData for holders from [OneNoteEditAdapter]
-         */
+
 
 //        fun checkText(editText: EditText) {
 //            if (editText.text.isEmpty() &&
@@ -175,6 +173,10 @@ class InsertNoteFragment : Fragment() {
 //            }
 //        }
 
+
+        /**
+         * LiveData for holders from [OneNoteEditAdapter]
+         */
 
         noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
 

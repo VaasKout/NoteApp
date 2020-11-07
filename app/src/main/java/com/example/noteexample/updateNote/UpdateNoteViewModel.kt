@@ -25,12 +25,13 @@ class UpdateNoteViewModel(
     /**
      * This list is needed to reflect changes in [UpdateNoteFragment]
      */
+
     var title = ""
     var firstNote = ""
     var newTitle = ""
     var newFirstNote = ""
     var startNoteContentList = mutableListOf<NoteContent>()
-    val noteContentList = mutableListOf<NoteContent>()
+    var noteContentList = listOf<NoteContent>()
 
     //Repository
     private val repository: NoteRepository
@@ -79,14 +80,14 @@ class UpdateNoteViewModel(
         }
     }
 
-    fun insertNoteContent(noteContent: List<NoteContent>){
-        viewModelScope.launch(Dispatchers.IO) {
+    fun insertNoteContentList(noteContent: List<NoteContent>){
+        viewModelScope.launch {
             repository.insertNoteContentList(noteContent)
         }
     }
 
     fun updateCurrentNote(title: String, firstNote: String){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             currentNote?.let {
                 it.title = title
                 it.firstNote = firstNote
@@ -95,34 +96,33 @@ class UpdateNoteViewModel(
         }
     }
 
-
     fun updateNoteContentList(noteContent: List<NoteContent>){
-        viewModelScope.launch (Dispatchers.IO){
+        viewModelScope.launch {
             repository.updateNoteContentList(noteContent)
         }
     }
 
-    fun updateNoteContent(noteContent: NoteContent){
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateNoteContent(noteContent)
-        }
-    }
+//    fun updateNoteContent(noteContent: NoteContent){
+//        viewModelScope.launch {
+//            repository.updateNoteContent(noteContent)
+//        }
+//    }
 
     fun deleteUnused() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             currentNote?.let { repository.deleteOneNote(it) }
         }
     }
 
     fun deleteNoteContent(noteContent: NoteContent){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
            repository.deleteNoteContent(noteContent)
         }
     }
 
     fun deleteNoteContentList(noteContent: List<NoteContent>){
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteNoteContentList(noteContentList)
+        viewModelScope.launch {
+            repository.deleteNoteContentList(noteContent)
         }
     }
 }

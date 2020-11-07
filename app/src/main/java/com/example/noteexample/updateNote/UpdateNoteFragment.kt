@@ -52,7 +52,6 @@ class UpdateNoteFragment : Fragment() {
         binding.lifecycleOwner = this
 
 
-
         /**
          * Initialize [OneNoteEditAdapter] for [FragmentUpdateNoteBinding.updateRecycler]
          */
@@ -92,7 +91,6 @@ class UpdateNoteFragment : Fragment() {
             when (it.itemId) {
                 R.id.insert_photo -> {
                     viewModel.updateNoteContentList(viewModel.noteContentList)
-                    viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                     val items = camera.dialogList
                     MaterialAlertDialogBuilder(requireContext())
                         .setItems(items) { _, index ->
@@ -112,8 +110,8 @@ class UpdateNoteFragment : Fragment() {
                                         viewModel.currentNote?.let { note ->
                                             this@UpdateNoteFragment.findNavController()
                                                 .navigate(
-                                                    InsertNoteFragmentDirections
-                                                        .actionEditNoteFragmentToGalleryFragment
+                                                    UpdateNoteFragmentDirections
+                                                        .actionUpdateNoteFragmentToGalleryFragment
                                                             (note.id)
                                                 )
                                         }
@@ -139,63 +137,28 @@ class UpdateNoteFragment : Fragment() {
              * reflect changes in [UpdateNoteViewModel.startNoteContentList],
              * it's caused by var fields in [NoteContent]
              */
-            val list = it.filter { list -> list.noteId == args.noteId }
-            if (!viewModel.startListInit) {
-                list.forEach { element ->
-                    val noteContent = NoteContent(
-                        id = element.id,
-                        noteId = element.noteId,
-                        note = element.note,
-                        photoPath = element.photoPath,
-                    )
-                    viewModel.startNoteContentList.add(noteContent)
-                }
-                viewModel.startListInit = true
-            }
             if (it != null) {
+                val list = it.filter { list -> list.noteId == args.noteId }
+                viewModel.noteContentList = list
+                noteAdapter.addHeaderAndSubmitList(viewModel.currentNote, list)
+                if (!viewModel.startListInit) {
+                    list.forEach { element ->
+                        val noteContent = NoteContent(
+                            id = element.id,
+                            noteId = element.noteId,
+                            note = element.note,
+                            photoPath = element.photoPath,
+                        )
+                        viewModel.startNoteContentList.add(noteContent)
+                    }
+                    viewModel.startListInit = true
+                }
                 Log.e("currentNote", "${viewModel.currentNote?.id}")
                 Log.e("photoList", list.toString())
-                noteAdapter.addHeaderAndSubmitList(viewModel.currentNote, list)
             }
         })
-
-        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            val item = noteAdapter.currentList[holder.adapterPosition].noteContent
-
-            noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
-                viewModel.noteContentList.add(it)
-                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                    it.note = editable.toString()
-                    viewModel.noteContentList[holder.adapterPosition - 1].note = it.note
-                    if (it.note.isEmpty() && it.photoPath.isEmpty()) {
-                        viewModel.deleteNoteContent(it)
-                    }
-                    Log.e("noteInNav", viewModel.startNoteContentList[0].note)
-                }
-            }
-            holder.binding.deleteCircle.setOnClickListener {
-                item?.let { current ->
-                    current.photoPath = ""
-                    viewModel.updateNoteContent(current)
-                    if (current.note.isEmpty()) {
-                        viewModel.deleteNoteContent(current)
-                    } else {
-                        viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-                    }
-                    noteAdapter.notifyDataSetChanged()
-                }
-            }
-        })
-
 
         noteAdapter.noteHolder.observe(viewLifecycleOwner) { holder ->
-            /**
-             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
-             * after [OneNoteEditAdapter.notifyDataSetChanged] method
-             */
-//            holder.binding.titleEdit.setText(viewModel.newTitle)
-//            holder.binding.firstNoteEdit.setText(viewModel.newFirstNote)
-
             holder.binding.titleEdit.addTextChangedListener {
                 viewModel.newTitle = it.toString()
             }
@@ -203,6 +166,23 @@ class UpdateNoteFragment : Fragment() {
                 viewModel.newFirstNote = it.toString()
             }
         }
+
+        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
+            noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
+                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
+                    current.note = editable.toString()
+                    if (current.note.isEmpty() && current.photoPath.isEmpty()) {
+                        viewModel.deleteNoteContent(current)
+                    }
+                }
+                holder.binding.deleteCircle.setOnClickListener {
+                    current.photoPath = ""
+                    noteAdapter.notifyDataSetChanged()
+                    viewModel.updateNoteContentList(viewModel.noteContentList)
+                }
+            }
+        })
+
 
         fun checkEmpty() {
             viewModel.updateCurrentNote(viewModel.newTitle, viewModel.newFirstNote)
@@ -249,7 +229,7 @@ class UpdateNoteFragment : Fragment() {
                                 .setMessage("Сохранить изменения?")
                                 .setNegativeButton("Нет") { _, _ ->
                                     viewModel.deleteNoteContentList(viewModel.noteContentList)
-                                    viewModel.insertNoteContent(viewModel.startNoteContentList)
+                                    viewModel.insertNoteContentList(viewModel.startNoteContentList)
                                     this.findNavController().popBackStack()
                                     viewModel.onDoneNavigating()
                                 }
