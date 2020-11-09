@@ -12,8 +12,8 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.example.noteexample.utils.adapter.NoteDiffCallBack
 
-class NoteAdapter:
-    ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()){
+class NoteAdapter :
+    ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
     /**
      * [holder] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]
      * to set clickListeners for recycler items
@@ -27,6 +27,7 @@ class NoteAdapter:
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
+
         /**
          * Use only DataBindingUtil else layout options crash in recycler_main_item
          */
@@ -35,22 +36,22 @@ class NoteAdapter:
         return NoteViewHolder(binding)
     }
 
-     inner class NoteViewHolder (val binding: RecyclerMainItemBinding):
-        RecyclerView.ViewHolder(binding.root){
-         /**
-          * Checked state of card depends on [Note.isChecked] state
-          */
-         fun bind(note: Note){
-             _holder.value = this
+    inner class NoteViewHolder(val binding: RecyclerMainItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        /**
+         * Checked state of card depends on [Note.isChecked] state
+         */
+        fun bind(note: Note) {
+            _holder.value = this
             binding.note = note
             binding.mainCard.isChecked = note.isChecked
             binding.executePendingBindings()
         }
-     }
+    }
 }
-    /**
-     * Classic RecyclerView.Adapter, do not delete, use it to handle problems with database
-    */
+/**
+ * Classic RecyclerView.Adapter, do not delete, use it to handle problems with database
+ */
 //class NoteAdapter(private val clickListener: NoteListener)
 //        : ListAdapter<Note, NoteAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()){
 //        val checkedList = mutableListOf<Boolean>()

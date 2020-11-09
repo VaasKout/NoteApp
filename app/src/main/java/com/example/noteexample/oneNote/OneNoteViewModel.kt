@@ -23,10 +23,11 @@ class OneNoteViewModel(
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
+        getNote()
     }
 
-    fun getNote(){
-        viewModelScope.launch(Dispatchers.IO) {
+    private fun getNote(){
+        viewModelScope.launch {
             currentNote = repository.getNote(noteID)
         }
     }

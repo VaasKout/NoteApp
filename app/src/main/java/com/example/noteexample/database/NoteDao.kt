@@ -11,16 +11,18 @@ interface NoteDao {
     suspend fun deleteAllNotes()
     @Query("SELECT * from note_table")
     fun getAllNotes() : LiveData<List<Note>>
+//    @Delete
+//    suspend fun deleteNoteList(noteList: List<Note>)
     @Delete
-    suspend fun deleteNotes(noteList: List<Note>)
-    @Delete
-    suspend fun deleteOneNote(note: Note)
+    suspend fun deleteNote(note: Note)
     @Query("SELECT * from note_table WHERE id = :key")
     suspend fun getNote(key: Int) : Note
     @Query("SELECT * FROM note_table ORDER BY id DESC LIMIT 1")
     suspend fun getLastNote(): Note
     @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun updateNote(note: Note)
+    @Update
+    suspend fun updateNoteList(noteList: List<Note>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertNoteContent(noteContent: NoteContent)

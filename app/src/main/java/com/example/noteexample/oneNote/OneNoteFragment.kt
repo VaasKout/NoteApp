@@ -28,14 +28,6 @@ class OneNoteFragment : Fragment() {
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
 
-        /**
-         * While loop is called to be sure,
-         * that [OneNoteViewModel.currentNote] is initialized
-         */
-        while (viewModel.currentNote == null){
-            viewModel.getNote()
-        }
-
         val oneNoteAdapter = OneNoteViewAdapter()
         binding.recyclerOneNote.apply {
             adapter = oneNoteAdapter
@@ -44,7 +36,7 @@ class OneNoteFragment : Fragment() {
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {allContent ->
             val list = allContent.filter { list -> list.noteId == args.noteId }
-            viewModel.currentNote?.let {note ->
+            viewModel.currentNote?.let { note ->
                 Log.e("oneNoteID", "${note.id}")
                 oneNoteAdapter.addHeaderAndSubmitList(note, list)
             }

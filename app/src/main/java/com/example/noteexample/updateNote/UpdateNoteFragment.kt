@@ -116,7 +116,6 @@ class UpdateNoteFragment : Fragment() {
                                                             (note.id)
                                                 )
                                         }
-
                                     } else {
                                         requestPermissionLauncher.launch(
                                             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -169,18 +168,37 @@ class UpdateNoteFragment : Fragment() {
         }
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
-                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                    current.note = editable.toString()
-                    if (current.note.isEmpty() && current.photoPath.isEmpty()) {
-                        viewModel.deleteNoteContent(current)
-                    }
+            noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
+                if (it.hidden) {
+                    holder.binding.photo.visibility = View.GONE
+                    holder.binding.restoreButton.visibility = View.VISIBLE
+                    holder.binding.deleteCircleIcon.visibility = View.GONE
+                    holder.binding.deleteCircle.visibility = View.GONE
+                } else {
+                    holder.binding.photo.visibility = View.VISIBLE
+                    holder.binding.restoreButton.visibility = View.GONE
+                    holder.binding.deleteCircleIcon.visibility = View.VISIBLE
+                    holder.binding.deleteCircle.visibility = View.VISIBLE
                 }
-                holder.binding.deleteCircle.setOnClickListener {
-                    current.photoPath = ""
-                    noteAdapter.notifyDataSetChanged()
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
-                }
+            }
+
+            holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
+                noteAdapter.currentList[holder.adapterPosition].noteContent?.note =
+                    editable.toString()
+            }
+
+            holder.binding.deleteCircle.setOnClickListener {
+                noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = true
+                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                viewModel.updateNoteContentList(viewModel.noteContentList)
+                noteAdapter.notifyDataSetChanged()
+            }
+
+            holder.binding.restoreButton.setOnClickListener {
+                noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = false
+                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+                viewModel.updateNoteContentList(viewModel.noteContentList)
+                noteAdapter.notifyDataSetChanged()
             }
         })
 
@@ -207,6 +225,7 @@ class UpdateNoteFragment : Fragment() {
             if (it == true) {
                 Log.e("startNoteContentList", "${viewModel.startNoteContentList.size}")
                 Log.e("noteContentList", "${viewModel.noteContentList.size}")
+
                 if (viewModel.startNoteContentList.size == viewModel.noteContentList.size) {
                     viewModel.noteContentList.forEachIndexed { index, noteContent ->
                         Log.e("currentListNote", noteContent.note)

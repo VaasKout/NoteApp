@@ -118,11 +118,6 @@ class UpdateNoteViewModel(
         }
     }
 
-//    fun updateNoteContent(noteContent: NoteContent){
-//        viewModelScope.launch {
-//            repository.updateNoteContent(noteContent)
-//        }
-//    }
 
     fun deleteUnused() {
         viewModelScope.launch {
@@ -130,15 +125,22 @@ class UpdateNoteViewModel(
         }
     }
 
-    fun deleteNoteContent(noteContent: NoteContent) {
-        viewModelScope.launch {
-            repository.deleteNoteContent(noteContent)
-        }
-    }
 
     fun deleteNoteContentList(noteContent: List<NoteContent>) {
         viewModelScope.launch {
             repository.deleteNoteContentList(noteContent)
         }
     }
+
+    //    fun deleteNoteContent(noteContent: NoteContent) {
+//        viewModelScope.launch {
+//            repository.deleteNoteContent(noteContent)
+//        }
+//    }
+
+    //    fun updateNoteContent(noteContent: NoteContent){
+//        viewModelScope.launch {
+//            repository.updateNoteContent(noteContent)
+//        }
+//    }
 }

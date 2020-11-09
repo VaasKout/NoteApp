@@ -25,11 +25,11 @@ private const val ITEM_VIEW_TYPE_ITEM = 1
 class OneNoteViewAdapter :
     ListAdapter<DataItem, RecyclerView.ViewHolder>(DataDiffCallBack()) {
 
-    private val _noteHolder = MutableLiveData<NoteViewHolder>()
-    val noteHolder: LiveData<NoteViewHolder> = _noteHolder
-
-    private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
-    val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder
+//    private val _noteHolder = MutableLiveData<NoteViewHolder>()
+//    val noteHolder: LiveData<NoteViewHolder> = _noteHolder
+//
+//    private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
+//    val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -98,7 +98,7 @@ class OneNoteViewAdapter :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(noteContent: NoteContent?) {
-            _noteContentHolder.value = this
+//            _noteContentHolder.value = this
             binding.data = noteContent
         }
     }
@@ -106,7 +106,7 @@ class OneNoteViewAdapter :
     inner class NoteViewHolder(val binding: HeaderViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(note: Note?) {
-            _noteHolder.value = this
+//            _noteHolder.value = this
             binding.note = note
         }
     }

@@ -121,7 +121,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun onDeleteSelected() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val deleteNoteList =
                 noteList.filter { it.isChecked }
             deleteNoteList.forEach { note ->
@@ -134,6 +134,14 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
+
+//    fun deleteNote(note: Note) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val contentList = noteContentList.filter { it.noteId == note.id }
+//            repository.deleteNoteContentList(contentList)
+//            repository.deleteOneNote(note)
+//        }
+//    }
 
     fun deleteUnused() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -165,10 +173,36 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun updateNoteList(noteList: List<Note>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNoteList(noteList)
+        }
+    }
+
     fun onClear() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAllNotes()
             repository.deleteAllNoteContent()
+        }
+    }
+
+    fun swap(from: Int, to: Int) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val tmpID = noteList[from].id
+            noteList[from].id = noteList[to].id
+            noteList[to].id = tmpID
+
+            noteContentList
+                .filter { it.noteId == noteList[from].id }
+                .map { it.noteId = noteList[to].id }
+
+            noteContentList
+                .filter { it.noteId == noteList[to].id }
+                .map { it.noteId = noteList[from].id }
+            withContext(Dispatchers.IO) {
+                repository.updateNoteList(noteList)
+                repository.updateNoteContentList(noteContentList)
+            }
         }
     }
 }

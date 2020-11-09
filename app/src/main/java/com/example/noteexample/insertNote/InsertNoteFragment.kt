@@ -126,7 +126,6 @@ class InsertNoteFragment : Fragment() {
                                                             (note.id)
                                                 )
                                         }
-
                                     } else {
                                         requestPermissionLauncher.launch(
                                             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -179,11 +178,6 @@ class InsertNoteFragment : Fragment() {
          */
 
         noteAdapter.noteHolder.observe(viewLifecycleOwner, { holder ->
-
-            /**
-             * Set text for [R.layout.header_edit] explicitly to prevent to be cleared
-             * after [OneNoteEditAdapter.notifyDataSetChanged] method
-             */
 
             noteAdapter.currentList[holder.adapterPosition].note?.let { _ ->
 

@@ -15,14 +15,17 @@ class NoteRepository (private val noteDao: NoteDao){
     suspend fun deleteAllNotes(){
         noteDao.deleteAllNotes()
     }
-    suspend fun deleteNotes(noteList: List<Note>){
-        noteDao.deleteNotes(noteList)
-    }
+//    suspend fun deleteNotes(noteList: List<Note>){
+//        noteDao.deleteNotes(noteList)
+//    }
     suspend fun deleteOneNote(note: Note){
-        noteDao.deleteOneNote(note)
+        noteDao.deleteNote(note)
     }
     suspend fun updateNote(note: Note){
         noteDao.updateNote(note)
+    }
+    suspend fun updateNoteList(noteList: List<Note>){
+        noteDao.updateNoteList(noteList)
     }
     suspend fun getLastNote() = noteDao.getLastNote()
 

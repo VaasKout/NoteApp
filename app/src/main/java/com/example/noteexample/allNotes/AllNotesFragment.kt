@@ -2,19 +2,20 @@ package com.example.noteexample.allNotes
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.*
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.*
+
 
 class AllNotesFragment : Fragment() {
 
@@ -38,6 +39,7 @@ class AllNotesFragment : Fragment() {
 
 
 
+
         /**
          * initialize and set adapter options
          */
@@ -46,9 +48,40 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-            layoutManager =
-                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+//            layoutManager =
+//                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+            layoutManager = GridLayoutManager(requireContext(), 2)
         }
+
+        val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
+                    ItemTouchHelper.DOWN or ItemTouchHelper.UP,
+            0
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val from = viewHolder.adapterPosition
+                val to = target.adapterPosition
+                viewModel.swap(from, to)
+                noteAdapter.notifyItemMoved(from, to)
+                viewModel.updateNoteList(viewModel.noteList)
+                viewModel.onDestroyActionMode()
+                return true
+            }
+
+            override fun onSwiped(
+                viewHolder: RecyclerView.ViewHolder,
+                direction: Int
+            ) {
+//                viewModel.deleteNote(viewModel.noteList[viewHolder.adapterPosition])
+//                noteAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+            }
+        })
+
+        helper.attachToRecyclerView(binding.recyclerView)
 
         binding.toolbarNoteMain.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -87,7 +120,7 @@ class AllNotesFragment : Fragment() {
         viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
             list?.let {
                 viewModel.noteContentList = it
-                viewModel.deleteUnused()
+//                viewModel.deleteUnused()
                 noteAdapter.notifyDataSetChanged()
             }
         })
@@ -185,6 +218,9 @@ class AllNotesFragment : Fragment() {
             }
         })
 
+
+
         return binding.root
     }
 }
+
