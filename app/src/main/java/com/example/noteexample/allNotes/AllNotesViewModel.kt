@@ -20,7 +20,7 @@ import kotlinx.coroutines.*
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
     //Flags
-    var actionModeStarted: Boolean = false
+    var actionModeStarted = false
 
     var noteContentList = listOf<NoteContent>()
     var noteList = listOf<Note>()
@@ -147,9 +147,19 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                     repository.deleteNoteContentList(contentList)
                 }
             }
+        }
+    }
+
+    fun updateHidden() {
+        viewModelScope.launch(Dispatchers.IO) {
             noteContentList.forEach {
-                if (it.hidden){
-                    repository.deleteNoteContent(it)
+                if (it.hidden) {
+                    if (it.note.isNotEmpty()) {
+                        it.photoPath = ""
+                        repository.updateNoteContent(it)
+                    } else {
+                        repository.deleteNoteContent(it)
+                    }
                 }
             }
         }

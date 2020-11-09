@@ -1,6 +1,7 @@
 package com.example.noteexample.updateNote
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -58,7 +59,7 @@ class UpdateNoteViewModel(
     }
 
     //Dao functions
-    private fun getNote(){
+    private fun getNote() {
         viewModelScope.launch {
             currentNote = repository.getNote(noteID)
             currentNote?.let {
@@ -70,23 +71,38 @@ class UpdateNoteViewModel(
         }
     }
 
-    fun insertPhoto(path: String){
-        viewModelScope.launch (Dispatchers.IO) {
-            val noteContent = NoteContent(
-                noteId = noteID,
-                photoPath = path
-            )
-            repository.insertNoteContent(noteContent)
+    fun insertCameraPhoto(path: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            currentNote?.let {
+                val localList = noteContentList.filter { list -> list.hidden }
+                if (localList.isEmpty()) {
+                    val noteContent = NoteContent(
+                        noteId = it.id,
+                        photoPath = path
+                    )
+                    repository.insertNoteContent(noteContent)
+                } else {
+                    localList.forEach { item ->
+                        if (item.hidden) {
+                            item.photoPath = path
+                            item.hidden = false
+                            Log.e("it.note", item.note)
+                            repository.updateNoteContent(item)
+                            return@forEach
+                        }
+                    }
+                }
+            }
         }
     }
 
-    fun insertNoteContentList(noteContent: List<NoteContent>){
+    fun insertNoteContentList(noteContent: List<NoteContent>) {
         viewModelScope.launch {
             repository.insertNoteContentList(noteContent)
         }
     }
 
-    fun updateCurrentNote(title: String, firstNote: String){
+    fun updateCurrentNote(title: String, firstNote: String) {
         viewModelScope.launch {
             currentNote?.let {
                 it.title = title
@@ -96,8 +112,8 @@ class UpdateNoteViewModel(
         }
     }
 
-    fun updateNoteContentList(noteContent: List<NoteContent>){
-        viewModelScope.launch {
+    fun updateNoteContentList(noteContent: List<NoteContent>) {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updateNoteContentList(noteContent)
         }
     }
@@ -114,13 +130,13 @@ class UpdateNoteViewModel(
         }
     }
 
-    fun deleteNoteContent(noteContent: NoteContent){
+    fun deleteNoteContent(noteContent: NoteContent) {
         viewModelScope.launch {
-           repository.deleteNoteContent(noteContent)
+            repository.deleteNoteContent(noteContent)
         }
     }
 
-    fun deleteNoteContentList(noteContent: List<NoteContent>){
+    fun deleteNoteContentList(noteContent: List<NoteContent>) {
         viewModelScope.launch {
             repository.deleteNoteContentList(noteContent)
         }

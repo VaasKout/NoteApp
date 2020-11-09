@@ -2,8 +2,9 @@ package com.example.noteexample.gallery
 
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
-import com.example.noteexample.database.GalleryData
+import com.example.noteexample.utils.dataClasses.GalleryData
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
@@ -14,6 +15,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
 
     //Variables
     var galleryList = listOf<GalleryData>()
+    var allNoteContentList = listOf<NoteContent>()
 
     //Flags
     var actionModeStarted = false
@@ -47,10 +49,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
             val photoList = mutableListOf<GalleryData>()
             val photos = galleryList.filter { list -> list.isChecked }
             photoList.addAll(photos)
-                allNoteContent.value?.forEach {
+                allNoteContentList.forEach {
                     if (it.hidden){
                         it.photoPath = photoList[0].imgSrcUrl
                         it.hidden = false
+                        Log.e("it.note", it.note)
                         repository.updateNoteContent(it)
                         photoList.removeAt(0)
                     }

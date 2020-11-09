@@ -18,7 +18,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.noteexample.utils.OneNoteEditAdapter
+import com.example.noteexample.utils.adapter.OneNoteEditAdapter
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentInsertNoteBinding
 import com.example.noteexample.utils.Camera
@@ -88,7 +88,8 @@ class InsertNoteFragment : Fragment() {
                 ActivityResultContracts.StartActivityForResult()
             ) {
                 if (it.resultCode == Activity.RESULT_OK) {
-                    viewModel.insertPhoto(camera.currentPhotoPath)
+                    viewModel.insertCameraPhoto(camera.currentPhotoPath)
+                    noteAdapter.notifyDataSetChanged()
                 }
             }
 
@@ -151,7 +152,7 @@ class InsertNoteFragment : Fragment() {
                 viewModel.noteContentList = list
                 noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
                 Log.e("noteID", "${viewModel.note?.id}")
-                Log.e("photoList", list.toString())
+                Log.e(".noteContentList", list.toString())
             }
         })
 
@@ -184,17 +185,15 @@ class InsertNoteFragment : Fragment() {
              * after [OneNoteEditAdapter.notifyDataSetChanged] method
              */
 
-            noteAdapter.currentList[holder.adapterPosition].note?.let { current ->
+            noteAdapter.currentList[holder.adapterPosition].note?.let { _ ->
 
 //            checkText(holder.binding.firstNoteEdit)
 
                 holder.binding.titleEdit.addTextChangedListener {
                     viewModel.title = it.toString()
-                    current.title = it.toString()
                 }
                 holder.binding.firstNoteEdit.addTextChangedListener {
                     viewModel.firstNote = it.toString()
-                    current.firstNote = it.toString()
 //                if (!viewModel.secondNoteInit){
 //                    noteAdapter.currentList.forEach {dataItem ->
 //                        dataItem.noteContent?.let { current ->
@@ -215,18 +214,13 @@ class InsertNoteFragment : Fragment() {
         })
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
-
-                holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                    current.note = editable.toString()
-                }
-
-                if (current.hidden){
+            noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
+                if (it.hidden) {
                     holder.binding.photo.visibility = View.GONE
                     holder.binding.restoreButton.visibility = View.VISIBLE
                     holder.binding.deleteCircleIcon.visibility = View.GONE
                     holder.binding.deleteCircle.visibility = View.GONE
-                } else{
+                } else {
                     holder.binding.photo.visibility = View.VISIBLE
                     holder.binding.restoreButton.visibility = View.GONE
                     holder.binding.deleteCircleIcon.visibility = View.VISIBLE
@@ -234,17 +228,24 @@ class InsertNoteFragment : Fragment() {
                 }
             }
 
+            holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
+                noteAdapter.currentList[holder.adapterPosition].noteContent?.note =
+                    editable.toString()
+            }
+
             holder.binding.deleteCircle.setOnClickListener {
                 noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = true
-                noteAdapter.notifyDataSetChanged()
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
+                noteAdapter.notifyDataSetChanged()
             }
+
             holder.binding.restoreButton.setOnClickListener {
                 noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = false
-                noteAdapter.notifyDataSetChanged()
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
+                noteAdapter.notifyDataSetChanged()
+
             }
         })
 
@@ -266,7 +267,8 @@ class InsertNoteFragment : Fragment() {
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
                 Log.e("contentList", viewModel.noteContentList.toString())
-                if (viewModel.noteContentList.none { item -> item.hidden }){
+                if (viewModel.noteContentList.none { item -> item.hidden } ||
+                    viewModel.noteContentList.any { item -> item.note.isNotEmpty() }) {
                     viewModel.allHidden = false
                 }
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
@@ -274,10 +276,10 @@ class InsertNoteFragment : Fragment() {
                 Log.e("photoListSize", "${viewModel.noteContentList.size}")
                 when {
                     (viewModel.noteContentList.isEmpty() ||
-                            viewModel.allHidden )&&
+                            viewModel.allHidden) &&
                             viewModel.title.isEmpty() &&
                             viewModel.firstNote.isEmpty()
-                             -> {
+                    -> {
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.deleteUnused()
                         viewModel.onDoneNavigating()

@@ -1,4 +1,4 @@
-package com.example.noteexample.database
+package com.example.noteexample.utils.dataClasses
 
 
 data class GalleryData (

@@ -16,12 +16,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
 class GalleryFragment : BottomSheetDialogFragment() {
+
+    private val args by navArgs<GalleryFragmentArgs>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        val args by navArgs<GalleryFragmentArgs>()
 
         val binding: FragmentGalleryBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_gallery, container, false)
@@ -37,6 +38,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
         /**
          * RecyclerView options
          */
+
         binding.galleryRecyclerView.apply {
             galleryAdapter.submitList(viewModel.galleryList)
             adapter = galleryAdapter
@@ -48,6 +50,10 @@ class GalleryFragment : BottomSheetDialogFragment() {
             binding.numberOfSelected.text =
                 viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
         }
+
+        viewModel.allNoteContent.observe(viewLifecycleOwner, {
+            viewModel.allNoteContentList = it.filter {list -> list.noteId == args.noteId }
+        })
 
         viewModel.actionMode.observe(viewLifecycleOwner, {
             if (it == true) {

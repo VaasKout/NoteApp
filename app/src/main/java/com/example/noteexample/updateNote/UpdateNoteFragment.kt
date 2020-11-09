@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.noteexample.utils.OneNoteEditAdapter
+import com.example.noteexample.utils.adapter.OneNoteEditAdapter
 import com.example.noteexample.R
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.FragmentUpdateNoteBinding
@@ -83,7 +83,8 @@ class UpdateNoteFragment : Fragment() {
                 ActivityResultContracts.StartActivityForResult()
             ) {
                 if (it.resultCode == Activity.RESULT_OK) {
-                    viewModel.insertPhoto(camera.currentPhotoPath)
+                    viewModel.insertCameraPhoto(camera.currentPhotoPath)
+                    noteAdapter.notifyDataSetChanged()
                 }
             }
 

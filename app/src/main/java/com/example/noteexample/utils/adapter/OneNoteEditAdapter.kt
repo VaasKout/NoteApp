@@ -1,4 +1,4 @@
-package com.example.noteexample.utils
+package com.example.noteexample.utils.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
+import com.example.noteexample.utils.dataClasses.DataItem
 import com.example.noteexample.databinding.HeaderEditBinding
 import com.example.noteexample.databinding.RecyclerNoteContentEditItemBinding
 import kotlinx.coroutines.CoroutineScope

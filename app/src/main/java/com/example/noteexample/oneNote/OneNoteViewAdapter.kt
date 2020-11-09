@@ -12,8 +12,8 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.HeaderViewBinding
 import com.example.noteexample.databinding.RecyclerNoteContentViewItemBinding
-import com.example.noteexample.utils.DataDiffCallBack
-import com.example.noteexample.utils.DataItem
+import com.example.noteexample.utils.adapter.DataDiffCallBack
+import com.example.noteexample.utils.dataClasses.DataItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

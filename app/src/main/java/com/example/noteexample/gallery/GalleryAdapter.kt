@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
-import com.example.noteexample.database.GalleryData
+import com.example.noteexample.utils.dataClasses.GalleryData
 import com.example.noteexample.databinding.GalleryRecyclerItemBinding
 
 

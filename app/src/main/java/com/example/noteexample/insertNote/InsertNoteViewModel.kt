@@ -1,6 +1,7 @@
 package com.example.noteexample.insertNote
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +10,7 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.utils.dataClasses.GalleryData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -66,25 +68,40 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 //        }
 //    }
 
-    fun insertPhoto(path: String) {
+
+    fun insertCameraPhoto(path: String) {
         viewModelScope.launch(Dispatchers.IO) {
             note?.let {
-                val noteContent = NoteContent(
-                    noteId = it.id,
-                    photoPath = path
-                )
-                repository.insertNoteContent(noteContent)
+                val localList = noteContentList.filter { list -> list.hidden }
+                if (localList.isEmpty()) {
+                    val noteContent = NoteContent(
+                        noteId = it.id,
+                        photoPath = path
+                    )
+                    repository.insertNoteContent(noteContent)
+                } else {
+                    localList.forEach { item ->
+                        if (item.hidden) {
+                            item.photoPath = path
+                            item.hidden = false
+                            Log.e("it.note", item.note)
+                            repository.updateNoteContent(item)
+                            return@forEach
+                        }
+                    }
+                }
             }
         }
     }
 
-    fun insertNote(){
-        viewModelScope.launch{
-                note = Note()
-                note?.let {
-                    repository.insertNote(it)
-                }
-                note = repository.getLastNote()
+
+    fun insertNote() {
+        viewModelScope.launch {
+            note = Note()
+            note?.let {
+                repository.insertNote(it)
+            }
+            note = repository.getLastNote()
         }
     }
 
@@ -111,9 +128,9 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun deleteNoteContent(noteContent: NoteContent) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteNoteContent(noteContent)
-        }
-    }
+//    fun deleteNoteContent(noteContent: NoteContent) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.deleteNoteContent(noteContent)
+//        }
+//    }
 }

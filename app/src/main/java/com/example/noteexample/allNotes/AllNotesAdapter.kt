@@ -5,13 +5,12 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.RecyclerMainItemBinding
-import com.example.noteexample.utils.NoteDiffCallBack
+import com.example.noteexample.utils.adapter.NoteDiffCallBack
 
 class NoteAdapter:
     ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()){

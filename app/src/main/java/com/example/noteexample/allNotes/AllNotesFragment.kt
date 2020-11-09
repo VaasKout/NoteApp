@@ -19,12 +19,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class AllNotesFragment : Fragment() {
 
     /**
-     *  define viewModel for NoteFragment
+     *  Define viewModel for NoteFragment
      */
 
     val viewModel by lazy {
         ViewModelProvider(this).get(AllNotesViewModel::class.java)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,6 +35,8 @@ class AllNotesFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_note, container, false)
         binding.noteViewModel = viewModel
         binding.lifecycleOwner = this
+
+
 
         /**
          * initialize and set adapter options
@@ -74,6 +77,7 @@ class AllNotesFragment : Fragment() {
             list?.let {
                 noteAdapter.submitList(it)
                 viewModel.noteList = it
+                viewModel.updateHidden()
                 if (viewModel.noteList.any { item -> item.isChecked }) {
                     viewModel.onStartActionMode(requireActivity())
                 }
@@ -83,8 +87,8 @@ class AllNotesFragment : Fragment() {
         viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
             list?.let {
                 viewModel.noteContentList = it
-                noteAdapter.notifyDataSetChanged()
                 viewModel.deleteUnused()
+                noteAdapter.notifyDataSetChanged()
             }
         })
 
@@ -122,6 +126,7 @@ class AllNotesFragment : Fragment() {
                  * Set [View.GONE] visibility for [RecyclerMainItemBinding.photoMain] to prevent
                  * bug in [ListAdapter]
                  */
+
                 //TODO Logic for empty photoPath and not empty note
                 holder.binding.photoMain.visibility = View.GONE
                 if (contentList.isNotEmpty()) {
@@ -132,7 +137,6 @@ class AllNotesFragment : Fragment() {
                             return@forEach
                         }
                     }
-                    Log.e("dataID", "${contentList[0].noteId}")
                     Log.e("noteID", "${current.id}")
                 }
             }
