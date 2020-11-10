@@ -207,6 +207,7 @@ class UpdateNoteFragment : Fragment() {
             viewModel.updateCurrentNote(viewModel.newTitle, viewModel.newFirstNote)
             if (viewModel.noteContentList.isNotEmpty()) {
                 viewModel.updateNoteContentList(viewModel.noteContentList)
+                viewModel.updateHidden()
             } else if (viewModel.noteContentList.isEmpty() &&
                 viewModel.newTitle.isEmpty() &&
                 viewModel.newFirstNote.isEmpty()

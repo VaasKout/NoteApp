@@ -2,9 +2,7 @@ package com.example.noteexample.allNotes
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -37,9 +35,6 @@ class AllNotesFragment : Fragment() {
         binding.noteViewModel = viewModel
         binding.lifecycleOwner = this
 
-
-
-
         /**
          * initialize and set adapter options
          */
@@ -48,9 +43,9 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-//            layoutManager =
-//                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-            layoutManager = GridLayoutManager(requireContext(), 2)
+            layoutManager =
+                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+//            layoutManager = GridLayoutManager(requireContext(), 2)
         }
 
         val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
@@ -65,9 +60,10 @@ class AllNotesFragment : Fragment() {
             ): Boolean {
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
-                viewModel.swap(from, to)
-                noteAdapter.notifyItemMoved(from, to)
-                viewModel.updateNoteList(viewModel.noteList)
+                if (from >= 0 && to >= 0) {
+                    viewModel.swap(from, to)
+                    noteAdapter.notifyItemMoved(from, to)
+                }
                 viewModel.onDestroyActionMode()
                 return true
             }
@@ -76,8 +72,6 @@ class AllNotesFragment : Fragment() {
                 viewHolder: RecyclerView.ViewHolder,
                 direction: Int
             ) {
-//                viewModel.deleteNote(viewModel.noteList[viewHolder.adapterPosition])
-//                noteAdapter.notifyItemRemoved(viewHolder.adapterPosition)
             }
         })
 
@@ -106,30 +100,29 @@ class AllNotesFragment : Fragment() {
          *  from ViewModel and makes it equal to notes [NoteAdapter.getCurrentList] from adapter
          */
 
+        viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
+            list?.let {
+                viewModel.noteContentList = it
+                viewModel.deleteUnused()
+                noteAdapter.notifyDataSetChanged()
+            }
+        })
+
         viewModel.allNotes.observe(viewLifecycleOwner, { list ->
             list?.let {
-                noteAdapter.submitList(it)
                 viewModel.noteList = it
-                viewModel.updateHidden()
+                noteAdapter.submitList(it)
                 if (viewModel.noteList.any { item -> item.isChecked }) {
                     viewModel.onStartActionMode(requireActivity())
                 }
             }
         })
 
-        viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
-            list?.let {
-                viewModel.noteContentList = it
-//                viewModel.deleteUnused()
-                noteAdapter.notifyDataSetChanged()
-            }
-        })
-
         /**
          * [AllNotesViewModel.actionModeStarted] checks if action mode needs to be start again
          */
-        viewModel.actionMode.observe(viewLifecycleOwner, { actionMode ->
-            if (actionMode != null) {
+        viewModel.actionMode.observe(viewLifecycleOwner, {
+            if (!viewModel.actionModeStarted) {
                 binding.fabToInsert.visibility = View.GONE
             } else {
                 binding.fabToInsert.visibility = View.VISIBLE
@@ -150,7 +143,9 @@ class AllNotesFragment : Fragment() {
 
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             val card = holder.binding.mainCard
+
             noteAdapter.currentList[holder.adapterPosition]?.let { current ->
+
                 val contentList = viewModel.noteContentList.filter {
                     it.noteId == current.id
                 }
@@ -188,6 +183,7 @@ class AllNotesFragment : Fragment() {
                 }
                 true
             }
+
             card.setOnClickListener {
                 if (viewModel.actionModeStarted) {
                     card.isChecked = !card.isChecked
@@ -217,8 +213,6 @@ class AllNotesFragment : Fragment() {
                 viewModel.onDoneEditNavigating()
             }
         })
-
-
 
         return binding.root
     }

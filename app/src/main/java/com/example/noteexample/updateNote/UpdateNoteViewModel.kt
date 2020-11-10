@@ -103,11 +103,26 @@ class UpdateNoteViewModel(
     }
 
     fun updateCurrentNote(title: String, firstNote: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             currentNote?.let {
                 it.title = title
                 it.firstNote = firstNote
                 repository.updateNote(it)
+            }
+        }
+    }
+
+    fun updateHidden() {
+        viewModelScope.launch(Dispatchers.IO) {
+            noteContentList.forEach {
+                if (it.hidden) {
+                    if (it.note.isNotEmpty()) {
+                        it.photoPath = ""
+                        repository.updateNoteContent(it)
+                    } else {
+                        repository.deleteNoteContent(it)
+                    }
+                }
             }
         }
     }
@@ -121,7 +136,7 @@ class UpdateNoteViewModel(
 
     fun deleteUnused() {
         viewModelScope.launch {
-            currentNote?.let { repository.deleteOneNote(it) }
+            currentNote?.let { repository.deleteNote(it) }
         }
     }
 

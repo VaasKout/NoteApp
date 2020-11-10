@@ -267,6 +267,7 @@ class InsertNoteFragment : Fragment() {
                 }
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
+
                 Log.e("photoListSize", "${viewModel.noteContentList.size}")
                 when {
                     (viewModel.noteContentList.isEmpty() ||
@@ -287,12 +288,14 @@ class InsertNoteFragment : Fragment() {
                                 viewModel.onDoneNavigating()
                             }
                             .setPositiveButton("Да") { _, _ ->
+                                viewModel.updateHidden()
                                 this@InsertNoteFragment.findNavController().popBackStack()
                                 viewModel.onDoneNavigating()
                             }.show()
                         viewModel.onDoneNavigating()
                     }
                     !viewModel.backPressed -> {
+                        viewModel.updateHidden()
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.onDoneNavigating()
                     }

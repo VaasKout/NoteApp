@@ -61,8 +61,9 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             if (noteList.any { it.isChecked }) {
                 noteList.map { it.isChecked = false }
             }
-            actionModeStarted = false
             _actionMode.value = null
+            actionModeStarted = false
+
         }
     }
 
@@ -121,11 +122,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun onDeleteSelected() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val deleteNoteList =
                 noteList.filter { it.isChecked }
             deleteNoteList.forEach { note ->
-                repository.deleteOneNote(note)
+                repository.deleteNote(note)
                 noteContentList
                     .filter { it.noteId == note.id }
                     .forEach {
@@ -151,33 +152,19 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                     note.firstNote.isEmpty() &&
                     contentList.isEmpty()
                 ) {
-                    repository.deleteOneNote(note)
+                    repository.deleteNote(note)
                     repository.deleteNoteContentList(contentList)
                 }
             }
         }
     }
 
-    fun updateHidden() {
-        viewModelScope.launch(Dispatchers.IO) {
-            noteContentList.forEach {
-                if (it.hidden) {
-                    if (it.note.isNotEmpty()) {
-                        it.photoPath = ""
-                        repository.updateNoteContent(it)
-                    } else {
-                        repository.deleteNoteContent(it)
-                    }
-                }
-            }
-        }
-    }
 
-    fun updateNoteList(noteList: List<Note>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateNoteList(noteList)
-        }
-    }
+//    fun updateNoteList(noteList: List<Note>) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.updateNoteList(noteList)
+//        }
+//    }
 
     fun onClear() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -187,22 +174,23 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun swap(from: Int, to: Int) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val tmpID = noteList[from].id
-            noteList[from].id = noteList[to].id
-            noteList[to].id = tmpID
+        viewModelScope.launch {
+            val fromID = noteList[from].id
+            val toID = noteList[to].id
+            noteList[from].id = toID
+            noteList[to].id = fromID
+
+            val changeList = mutableListOf<NoteContent>()
+            changeList.addAll(noteContentList.filter { it.noteId == fromID })
+            changeList.map { it.noteId = toID }
 
             noteContentList
-                .filter { it.noteId == noteList[from].id }
-                .map { it.noteId = noteList[to].id }
+                .filter { it.noteId == toID && !changeList.contains(it) }
+                .map { it.noteId = fromID }
 
-            noteContentList
-                .filter { it.noteId == noteList[to].id }
-                .map { it.noteId = noteList[from].id }
-            withContext(Dispatchers.IO) {
                 repository.updateNoteList(noteList)
                 repository.updateNoteContentList(noteContentList)
-            }
+
         }
     }
 }
