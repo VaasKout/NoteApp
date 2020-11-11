@@ -28,7 +28,9 @@ class OneNoteViewModel(
 
     private fun getNote(){
         viewModelScope.launch {
-            currentNote = repository.getNote(noteID)
+            while (currentNote == null){
+                currentNote = repository.getNote(noteID)
+            }
         }
     }
 }

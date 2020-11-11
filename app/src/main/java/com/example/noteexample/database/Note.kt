@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "note_table")
 data class Note(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo(name = "position") var pos: Int = 0,
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "firstNote") var firstNote: String = "",
     var isChecked: Boolean = false,

@@ -117,6 +117,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
             note?.let {
                 it.title = title
                 it.firstNote = firstNote
+                it.pos = it.id
                 repository.updateNote(it)
             }
         }

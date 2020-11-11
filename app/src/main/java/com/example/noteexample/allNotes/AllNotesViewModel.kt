@@ -21,18 +21,19 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     //Flags
     var actionModeStarted = false
+//    var needToNotify = true
 
     var noteContentList = listOf<NoteContent>()
     var noteList = listOf<Note>()
 
     private val repository: NoteRepository
-    var allNotes: LiveData<List<Note>>
+    var allSortedNotes: LiveData<List<Note>>
     val allNoteContent: LiveData<List<NoteContent>>
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-        allNotes = repository.allNotes
+        allSortedNotes = repository.allSortedNotes
         allNoteContent = repository.allNoteContent
     }
 
@@ -160,11 +161,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
 
-//    fun updateNoteList(noteList: List<Note>) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            repository.updateNoteList(noteList)
-//        }
-//    }
+    fun updateNoteList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNoteList(noteList)
+        }
+    }
 
     fun onClear() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -174,23 +175,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun swap(from: Int, to: Int) {
-        viewModelScope.launch {
-            val fromID = noteList[from].id
-            val toID = noteList[to].id
-            noteList[from].id = toID
-            noteList[to].id = fromID
-
-            val changeList = mutableListOf<NoteContent>()
-            changeList.addAll(noteContentList.filter { it.noteId == fromID })
-            changeList.map { it.noteId = toID }
-
-            noteContentList
-                .filter { it.noteId == toID && !changeList.contains(it) }
-                .map { it.noteId = fromID }
-
-                repository.updateNoteList(noteList)
-                repository.updateNoteContentList(noteContentList)
-
-        }
+        val tmpPos = noteList[from].pos
+        noteList[from].pos = noteList[to].pos
+        noteList[to].pos = tmpPos
     }
 }

@@ -1,17 +1,22 @@
 package com.example.noteexample.allNotes
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -30,6 +35,7 @@ class AllNotesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val cards = mutableListOf<MaterialCardView>()
         val binding: FragmentNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note, container, false)
         binding.noteViewModel = viewModel
@@ -62,16 +68,33 @@ class AllNotesFragment : Fragment() {
                 val to = target.adapterPosition
                 if (from >= 0 && to >= 0) {
                     viewModel.swap(from, to)
-                    noteAdapter.notifyItemMoved(from, to)
                 }
-                viewModel.onDestroyActionMode()
                 return true
             }
+
 
             override fun onSwiped(
                 viewHolder: RecyclerView.ViewHolder,
                 direction: Int
             ) {
+            }
+
+            override fun onMoved(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                fromPos: Int,
+                target: RecyclerView.ViewHolder,
+                toPos: Int,
+                x: Int,
+                y: Int
+            ) {
+                super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
+                    cards.forEach {
+                        it.isChecked = false
+                    }
+                    viewModel.updateNoteList()
+
+                viewModel.onDestroyActionMode()
             }
         })
 
@@ -96,9 +119,20 @@ class AllNotesFragment : Fragment() {
         }
 
         /**
-         *  Observes allNotes [AllNotesViewModel.allNotes]
+         *  Observes allNotes [AllNotesViewModel.allSortedNotes]
          *  from ViewModel and makes it equal to notes [NoteAdapter.getCurrentList] from adapter
          */
+
+        viewModel.allSortedNotes.observe(viewLifecycleOwner, { list ->
+            list?.let {
+                viewModel.noteList = it
+                noteAdapter.submitList(it)
+                Log.e("viewModel.noteList", viewModel.noteList.toString())
+                if (viewModel.noteList.any { item -> item.isChecked }) {
+                    viewModel.onStartActionMode(requireActivity())
+                }
+            }
+        })
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
             list?.let {
@@ -108,25 +142,17 @@ class AllNotesFragment : Fragment() {
             }
         })
 
-        viewModel.allNotes.observe(viewLifecycleOwner, { list ->
-            list?.let {
-                viewModel.noteList = it
-                noteAdapter.submitList(it)
-                if (viewModel.noteList.any { item -> item.isChecked }) {
-                    viewModel.onStartActionMode(requireActivity())
-                }
-            }
-        })
-
         /**
          * [AllNotesViewModel.actionModeStarted] checks if action mode needs to be start again
          */
         viewModel.actionMode.observe(viewLifecycleOwner, {
-            if (!viewModel.actionModeStarted) {
+            if (it != null) {
                 binding.fabToInsert.visibility = View.GONE
             } else {
                 binding.fabToInsert.visibility = View.VISIBLE
-                noteAdapter.notifyDataSetChanged()
+                cards.forEach { card ->
+                    card.isChecked = false
+                }
             }
         })
 
@@ -142,6 +168,7 @@ class AllNotesFragment : Fragment() {
         })
 
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
+            cards.add(holder.binding.mainCard)
             val card = holder.binding.mainCard
 
             noteAdapter.currentList[holder.adapterPosition]?.let { current ->
