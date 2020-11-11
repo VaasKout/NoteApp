@@ -15,16 +15,18 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
     //Flags
     var actionModeStarted = false
-//    var needToNotify = true
+    var startedMove = false
+//    var noteListInit = false
 
     var noteContentList = listOf<NoteContent>()
-    var noteList = listOf<Note>()
+    var noteList = mutableListOf<Note>()
 
     private val repository: NoteRepository
     var allSortedNotes: LiveData<List<Note>>
@@ -64,7 +66,6 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             }
             _actionMode.value = null
             actionModeStarted = false
-
         }
     }
 
@@ -162,7 +163,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
 
     fun updateNoteList() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO){
             repository.updateNoteList(noteList)
         }
     }

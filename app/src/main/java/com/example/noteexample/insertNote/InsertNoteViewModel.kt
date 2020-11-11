@@ -10,7 +10,6 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
-import com.example.noteexample.utils.dataClasses.GalleryData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -56,6 +55,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     fun onDoneNavigating() {
         _navigateToNoteFragment.value = false
+        backPressed = false
     }
 
     /**
@@ -94,7 +94,6 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-
     fun insertNote() {
         viewModelScope.launch {
             note = Note()
@@ -102,6 +101,9 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
                 repository.insertNote(it)
             }
             note = repository.getLastNote()
+            note?.let {
+                it.pos = it.id
+            }
         }
     }
 
@@ -117,7 +119,6 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
             note?.let {
                 it.title = title
                 it.firstNote = firstNote
-                it.pos = it.id
                 repository.updateNote(it)
             }
         }

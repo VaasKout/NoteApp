@@ -7,7 +7,6 @@ import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import com.example.noteexample.R
@@ -15,9 +14,8 @@ import com.example.noteexample.databinding.FragmentNoteBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
+import java.util.Collections.swap
 
 
 class AllNotesFragment : Fragment() {
@@ -31,6 +29,7 @@ class AllNotesFragment : Fragment() {
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,11 +48,13 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-            layoutManager =
-                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-//            layoutManager = GridLayoutManager(requireContext(), 2)
+//            layoutManager =
+//                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+            layoutManager = LinearLayoutManager(requireContext())
         }
 
+//        var from = 0
+//        var to = 0
         val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
                     ItemTouchHelper.DOWN or ItemTouchHelper.UP,
@@ -66,12 +67,29 @@ class AllNotesFragment : Fragment() {
             ): Boolean {
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
+
                 if (from >= 0 && to >= 0) {
+                    viewModel.startedMove = true
+                    noteAdapter.notifyItemMoved(from, to)
                     viewModel.swap(from, to)
+                }
+                if (viewModel.actionModeStarted) {
+                    viewModel.onDestroyActionMode()
                 }
                 return true
             }
 
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                super.clearView(recyclerView, viewHolder)
+                if (viewModel.startedMove) {
+                    viewModel.updateNoteList()
+                    noteAdapter.notifyDataSetChanged()
+                    viewModel.startedMove = false
+                }
+            }
 
             override fun onSwiped(
                 viewHolder: RecyclerView.ViewHolder,
@@ -79,23 +97,6 @@ class AllNotesFragment : Fragment() {
             ) {
             }
 
-            override fun onMoved(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                fromPos: Int,
-                target: RecyclerView.ViewHolder,
-                toPos: Int,
-                x: Int,
-                y: Int
-            ) {
-                super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
-                    cards.forEach {
-                        it.isChecked = false
-                    }
-                    viewModel.updateNoteList()
-
-                viewModel.onDestroyActionMode()
-            }
         })
 
         helper.attachToRecyclerView(binding.recyclerView)
@@ -125,7 +126,8 @@ class AllNotesFragment : Fragment() {
 
         viewModel.allSortedNotes.observe(viewLifecycleOwner, { list ->
             list?.let {
-                viewModel.noteList = it
+                viewModel.noteList = mutableListOf()
+                viewModel.noteList.addAll(it)
                 noteAdapter.submitList(it)
                 Log.e("viewModel.noteList", viewModel.noteList.toString())
                 if (viewModel.noteList.any { item -> item.isChecked }) {
@@ -170,7 +172,6 @@ class AllNotesFragment : Fragment() {
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             cards.add(holder.binding.mainCard)
             val card = holder.binding.mainCard
-
             noteAdapter.currentList[holder.adapterPosition]?.let { current ->
 
                 val contentList = viewModel.noteContentList.filter {
