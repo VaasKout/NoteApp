@@ -23,7 +23,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     //Flags
     var actionModeStarted = false
     var startedMove = false
-//    var noteListInit = false
+
 
     var noteContentList = listOf<NoteContent>()
     var noteList = mutableListOf<Note>()
@@ -35,7 +35,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-        allSortedNotes = repository.allSortedNotes
+        allSortedNotes = repository.allDESCSortedNotes
         allNoteContent = repository.allNoteContent
     }
 
@@ -61,8 +61,10 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            if (noteList.any { it.isChecked }) {
-                noteList.map { it.isChecked = false }
+            viewModelScope.launch (Dispatchers.Default){
+                if (noteList.any { it.isChecked }) {
+                    noteList.forEach { it.isChecked = false }
+                }
             }
             _actionMode.value = null
             actionModeStarted = false
@@ -105,7 +107,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         _actionMode.value = activity.startActionMode(actionModeController)
         _actionMode.value?.title =
             "${noteList.filter { it.isChecked }.size}"
-        Log.e("title", "${noteList.filter { it.isChecked }.size}")
+//        Log.e("title", "${noteList.filter { it.isChecked }.size}")
         actionModeStarted = true
 
     }
@@ -163,7 +165,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
 
     fun updateNoteList() {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updateNoteList(noteList)
         }
     }
@@ -176,8 +178,22 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun swap(from: Int, to: Int) {
-        val tmpPos = noteList[from].pos
-        noteList[from].pos = noteList[to].pos
-        noteList[to].pos = tmpPos
+        viewModelScope.launch(Dispatchers.Default) {
+            val fromItem = noteList[from]
+            noteList.removeAt(from)
+            noteList.add(to, fromItem)
+            if (fromItem.pos == from && noteList[to].pos == to) {
+                noteList.forEachIndexed { index, note ->
+                    note.pos = index
+                }
+            } else {
+                var pos = noteList.size - 1
+                noteList.forEach{
+                    it.pos = pos
+                    pos--
+                }
+                Log.e("list", noteList.toString())
+            }
+        }
     }
 }

@@ -12,7 +12,9 @@ interface NoteDao {
 //    @Query("SELECT * from note_table")
 //    fun getAllNotes() : LiveData<List<Note>>
     @Query("SELECT * from note_table ORDER BY position DESC")
-    fun getAllSortedNotes(): LiveData<List<Note>>
+    fun getAllDESCSortedNotes(): LiveData<List<Note>>
+    @Query("SELECT * from note_table ORDER BY position ASC")
+    fun getAllASCSortedNotes(): LiveData<List<Note>>
     @Delete
     suspend fun deleteNote(note: Note)
     @Query("SELECT * from note_table WHERE id = :key")

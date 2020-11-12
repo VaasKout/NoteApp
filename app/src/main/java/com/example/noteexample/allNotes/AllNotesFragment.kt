@@ -1,6 +1,5 @@
 package com.example.noteexample.allNotes
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -14,8 +13,6 @@ import com.example.noteexample.databinding.FragmentNoteBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.*
-import java.util.Collections.swap
 
 
 class AllNotesFragment : Fragment() {
@@ -29,7 +26,6 @@ class AllNotesFragment : Fragment() {
     }
 
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,6 +35,8 @@ class AllNotesFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_note, container, false)
         binding.noteViewModel = viewModel
         binding.lifecycleOwner = this
+//        var noteListInit = false
+
 
         /**
          * initialize and set adapter options
@@ -53,6 +51,7 @@ class AllNotesFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
+
 //        var from = 0
 //        var to = 0
         val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
@@ -65,16 +64,16 @@ class AllNotesFragment : Fragment() {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
+                if (viewModel.actionModeStarted) {
+                    viewModel.onDestroyActionMode()
+                }
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
 
                 if (from >= 0 && to >= 0) {
-                    viewModel.startedMove = true
-                    noteAdapter.notifyItemMoved(from, to)
                     viewModel.swap(from, to)
-                }
-                if (viewModel.actionModeStarted) {
-                    viewModel.onDestroyActionMode()
+                    noteAdapter.notifyItemMoved(from, to)
+                    viewModel.startedMove = true
                 }
                 return true
             }
@@ -84,11 +83,10 @@ class AllNotesFragment : Fragment() {
                 viewHolder: RecyclerView.ViewHolder
             ) {
                 super.clearView(recyclerView, viewHolder)
-                if (viewModel.startedMove) {
-                    viewModel.updateNoteList()
-                    noteAdapter.notifyDataSetChanged()
-                    viewModel.startedMove = false
-                }
+                    if (viewModel.startedMove) {
+                        viewModel.startedMove = false
+                        viewModel.updateNoteList()
+                    }
             }
 
             override fun onSwiped(
@@ -126,10 +124,9 @@ class AllNotesFragment : Fragment() {
 
         viewModel.allSortedNotes.observe(viewLifecycleOwner, { list ->
             list?.let {
-                viewModel.noteList = mutableListOf()
-                viewModel.noteList.addAll(it)
-                noteAdapter.submitList(it)
-                Log.e("viewModel.noteList", viewModel.noteList.toString())
+                    viewModel.noteList = mutableListOf()
+                    viewModel.noteList.addAll(it)
+                    noteAdapter.submitList(viewModel.noteList)
                 if (viewModel.noteList.any { item -> item.isChecked }) {
                     viewModel.onStartActionMode(requireActivity())
                 }

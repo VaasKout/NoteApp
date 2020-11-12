@@ -29,19 +29,24 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     var title = ""
     var firstNote = ""
     var note: Note? = null
+    var size = 0
 
     var noteContentList = listOf<NoteContent>()
+
 
     //Live Data
     private val _navigateToNoteFragment = MutableLiveData<Boolean>()
     val navigateToNoteFragment: LiveData<Boolean> = _navigateToNoteFragment
+    val allNotes: LiveData<List<Note>>
     val allNoteContent: LiveData<List<NoteContent>>
+
 
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
+        allNotes = repository.allASCSortedNotes
         insertNote()
     }
 
@@ -101,9 +106,6 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
                 repository.insertNote(it)
             }
             note = repository.getLastNote()
-            note?.let {
-                it.pos = it.id
-            }
         }
     }
 
@@ -119,6 +121,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
             note?.let {
                 it.title = title
                 it.firstNote = firstNote
+                it.pos = size
                 repository.updateNote(it)
             }
         }

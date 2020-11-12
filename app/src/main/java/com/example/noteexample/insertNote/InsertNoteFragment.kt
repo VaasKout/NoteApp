@@ -140,6 +140,11 @@ class InsertNoteFragment : Fragment() {
             }
         }
 
+        viewModel.allNotes.observe(viewLifecycleOwner, {
+            viewModel.size = it.size - 1
+        })
+
+
         /**
          * [InsertNoteViewModel.updateCurrentNote] initializes current note, if(it == null)
          * and updates it data
