@@ -8,7 +8,6 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class OneNoteViewModel(

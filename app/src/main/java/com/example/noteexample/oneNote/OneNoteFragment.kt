@@ -2,17 +2,16 @@ package com.example.noteexample.oneNote
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOneNoteBinding
-import com.example.noteexample.updateNote.UpdateNoteFragment
 
 class OneNoteFragment : Fragment() {
     override fun onCreateView(
@@ -37,7 +36,6 @@ class OneNoteFragment : Fragment() {
         viewModel.allNoteContent.observe(viewLifecycleOwner, {allContent ->
             val list = allContent.filter { list -> list.noteId == args.noteId }
             viewModel.currentNote?.let { note ->
-                Log.e("oneNoteID", "${note.id}")
                 oneNoteAdapter.addHeaderAndSubmitList(note, list)
             }
         })

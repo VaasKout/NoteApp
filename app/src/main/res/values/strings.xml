@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Note Example</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="title">Название</string>
     <string name="note">Заметка</string>
     <string name="save">Сохранить</string>
@@ -9,12 +8,10 @@
     <string name="delete">Delete</string>
     <string name="photo">photo</string>
     <string name="camera_error">Произошла ошибка при попытке открыть камеру</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="gallery_photos">Фотографии из галереи</string>
     <string name="accept_selected_photos">Accept selected photos</string>
     <string name="delete_selected_photos">Delete selected photos</string>
-    <string name="camera_request_failed">Необходим доступ к хранилищу, чтобы отобразить фотографии</string>
+    <string name="camera_request_failed">Необходим доступ к хранилищу, чтобы загрузить фотографии</string>
     <string name="edit">Edit</string>
     <string name="photo_main">Photo main</string>
     <string name="circle">Circle</string>

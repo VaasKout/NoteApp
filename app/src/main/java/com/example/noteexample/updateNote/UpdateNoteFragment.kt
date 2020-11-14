@@ -6,7 +6,6 @@ import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,7 +72,6 @@ class UpdateNoteFragment : Fragment() {
                                 .actionEditNoteFragmentToGalleryFragment
                                     (args.noteId)
                         )
-                    Log.e("requestId", "${args.noteId}")
                 }
             }
 
@@ -100,7 +98,6 @@ class UpdateNoteFragment : Fragment() {
                                     startCamera.launch(
                                         camera.dispatchTakePictureIntent(binding.editButton)
                                     )
-                                    Log.e("currentPhotoPath", camera.currentPhotoPath)
                                 }
                                 1 -> {
                                     if (ContextCompat.checkSelfPermission(
@@ -153,8 +150,6 @@ class UpdateNoteFragment : Fragment() {
                     }
                     viewModel.startListInit = true
                 }
-                Log.e("currentNote", "${viewModel.currentNote?.id}")
-                Log.e("photoList", list.toString())
             }
         })
 
@@ -169,7 +164,7 @@ class UpdateNoteFragment : Fragment() {
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
-                if (it.hidden) {
+                if (it.hidden ) {
                     holder.binding.photo.visibility = View.GONE
                     holder.binding.restoreButton.visibility = View.VISIBLE
                     holder.binding.deleteCircleIcon.visibility = View.GONE
@@ -224,13 +219,9 @@ class UpdateNoteFragment : Fragment() {
 
         viewModel.navigateToOneNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
-                Log.e("startNoteContentList", "${viewModel.startNoteContentList.size}")
-                Log.e("noteContentList", "${viewModel.noteContentList.size}")
 
                 if (viewModel.startNoteContentList.size == viewModel.noteContentList.size) {
                     viewModel.noteContentList.forEachIndexed { index, noteContent ->
-                        Log.e("currentListNote", noteContent.note)
-                        Log.e("startListNote", viewModel.startNoteContentList[index].note)
                         if (noteContent != viewModel.startNoteContentList[index]) {
                             viewModel.textChanged = true
                         }

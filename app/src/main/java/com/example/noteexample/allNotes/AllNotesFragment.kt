@@ -1,8 +1,9 @@
 package com.example.noteexample.allNotes
 
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -25,7 +26,6 @@ class AllNotesFragment : Fragment() {
         ViewModelProvider(this).get(AllNotesViewModel::class.java)
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,8 +35,6 @@ class AllNotesFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_note, container, false)
         binding.noteViewModel = viewModel
         binding.lifecycleOwner = this
-//        var noteListInit = false
-
 
         /**
          * initialize and set adapter options
@@ -46,14 +44,11 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-//            layoutManager =
-//                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager =
+                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+//            layoutManager = LinearLayoutManager(requireContext())
         }
 
-
-//        var from = 0
-//        var to = 0
         val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
                     ItemTouchHelper.DOWN or ItemTouchHelper.UP,
@@ -72,7 +67,7 @@ class AllNotesFragment : Fragment() {
 
                 if (from >= 0 && to >= 0) {
                     viewModel.swap(from, to)
-                    noteAdapter.notifyItemMoved(from, to)
+                    recyclerView.adapter?.notifyItemMoved(from, to)
                     viewModel.startedMove = true
                 }
                 return true
@@ -92,8 +87,7 @@ class AllNotesFragment : Fragment() {
             override fun onSwiped(
                 viewHolder: RecyclerView.ViewHolder,
                 direction: Int
-            ) {
-            }
+            ) {}
 
         })
 
@@ -180,17 +174,21 @@ class AllNotesFragment : Fragment() {
                  * bug in [ListAdapter]
                  */
 
-                //TODO Logic for empty photoPath and not empty note
                 holder.binding.photoMain.visibility = View.GONE
                 if (contentList.isNotEmpty()) {
-                    contentList.forEach {
-                        if (it.photoPath.isNotEmpty()) {
+                    for(content in contentList){
+                        if (content.photoPath.isNotEmpty()) {
+                            holder.binding.data = content
                             holder.binding.photoMain.visibility = View.VISIBLE
-                            holder.binding.data = it
-                            return@forEach
+                            break
                         }
                     }
-                    Log.e("noteID", "${current.id}")
+                }
+
+                if (holder.binding.photoMain.visibility == View.GONE
+                    && current.firstNote.isEmpty()
+                    && contentList.isNotEmpty()){
+                    current.firstNote = contentList[0].note
                 }
             }
 

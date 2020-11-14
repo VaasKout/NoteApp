@@ -9,6 +9,7 @@
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
         <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
 
+
     </style>
 
     <style name="Widget.App.ActionMode" parent="Widget.AppCompat.ActionMode">

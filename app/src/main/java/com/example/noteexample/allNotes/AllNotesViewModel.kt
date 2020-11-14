@@ -61,7 +61,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            viewModelScope.launch (Dispatchers.Default){
+            viewModelScope.launch(Dispatchers.Default) {
                 if (noteList.any { it.isChecked }) {
                     noteList.forEach { it.isChecked = false }
                 }
@@ -126,17 +126,16 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun onDeleteSelected() {
-        viewModelScope.launch {
-            val deleteNoteList =
+        viewModelScope.launch (Dispatchers.IO){
+            val noteContentListToDelete = mutableListOf<NoteContent>()
+            val noteListToDelete =
                 noteList.filter { it.isChecked }
-            deleteNoteList.forEach { note ->
-                repository.deleteNote(note)
-                noteContentList
-                    .filter { it.noteId == note.id }
-                    .forEach {
-                        repository.deleteNoteContent(it)
-                    }
+            noteListToDelete.forEach { note ->
+                noteContentListToDelete.addAll(noteContentList
+                    .filter { it.noteId == note.id })
             }
+            repository.deleteNoteList(noteListToDelete)
+            repository.deleteNoteContentList(noteContentListToDelete)
         }
     }
 
@@ -149,15 +148,15 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 //    }
 
     fun deleteUnused() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             noteList.forEach { note ->
-                val contentList = noteContentList.filter { it.noteId == note.id }
                 if (note.title.isEmpty() &&
-                    note.firstNote.isEmpty() &&
-                    contentList.isEmpty()
-                ) {
-                    repository.deleteNote(note)
-                    repository.deleteNoteContentList(contentList)
+                    note.firstNote.isEmpty()){
+                    val contentList = noteContentList.filter { it.noteId == note.id }
+                    if (contentList.isEmpty()) {
+                        repository.deleteNote(note)
+                        repository.deleteNoteContentList(contentList)
+                    }
                 }
             }
         }
@@ -188,11 +187,10 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                 }
             } else {
                 var pos = noteList.size - 1
-                noteList.forEach{
+                noteList.forEach {
                     it.pos = pos
                     pos--
                 }
-                Log.e("list", noteList.toString())
             }
         }
     }

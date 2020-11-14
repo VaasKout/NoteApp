@@ -1,7 +1,6 @@
 package com.example.noteexample.gallery
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,7 +51,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
         }
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            viewModel.allNoteContentList = it.filter {list -> list.noteId == args.noteId }
+            viewModel.currentNoteContentList = it.filter {list -> list.noteId == args.noteId }
         })
 
         viewModel.actionMode.observe(viewLifecycleOwner, {
@@ -94,9 +93,10 @@ class GalleryFragment : BottomSheetDialogFragment() {
             viewModel.onDoneActionMode()
         }
 
+        //TODO Customize bottom sheet dialog
+
         binding.acceptSelectedPhotos.setOnClickListener {
             viewModel.insertImages(args.noteId)
-            Log.e("argsID", "${args.noteId}")
             this.findNavController().popBackStack()
             viewModel.onDoneActionMode()
         }

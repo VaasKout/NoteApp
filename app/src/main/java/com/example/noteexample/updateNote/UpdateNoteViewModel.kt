@@ -1,7 +1,6 @@
 package com.example.noteexample.updateNote
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -82,14 +81,10 @@ class UpdateNoteViewModel(
                     )
                     repository.insertNoteContent(noteContent)
                 } else {
-                    localList.forEach { item ->
-                        if (item.hidden) {
-                            item.photoPath = path
-                            item.hidden = false
-                            Log.e("it.note", item.note)
-                            repository.updateNoteContent(item)
-                            return@forEach
-                        }
+                    localList[0].apply {
+                        photoPath = path
+                        hidden = false
+                        repository.updateNoteContent(this)
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package com.example.noteexample.insertNote
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -77,7 +76,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     fun insertCameraPhoto(path: String) {
         viewModelScope.launch(Dispatchers.IO) {
             note?.let {
-                val localList = noteContentList.filter { list -> list.hidden }
+                val localList = noteContentList.filter { item -> item.hidden }
                 if (localList.isEmpty()) {
                     val noteContent = NoteContent(
                         noteId = it.id,
@@ -85,14 +84,10 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
                     )
                     repository.insertNoteContent(noteContent)
                 } else {
-                    localList.forEach { item ->
-                        if (item.hidden) {
-                            item.photoPath = path
-                            item.hidden = false
-                            Log.e("it.note", item.note)
-                            repository.updateNoteContent(item)
-                            return@forEach
-                        }
+                    localList[0].apply {
+                        photoPath = path
+                        hidden = false
+                        repository.updateNoteContent(this)
                     }
                 }
             }
@@ -109,9 +104,9 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun updateNoteContentList(noteContent: List<NoteContent>) {
+    fun updateNoteContentList(noteContentList: List<NoteContent>) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateNoteContentList(noteContent)
+            repository.updateNoteContentList(noteContentList)
         }
     }
 
@@ -133,6 +128,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
                 if (it.hidden) {
                     if (it.note.isNotEmpty()) {
                         it.photoPath = ""
+                        it.hidden = false
                         repository.updateNoteContent(it)
                     } else {
                         repository.deleteNoteContent(it)

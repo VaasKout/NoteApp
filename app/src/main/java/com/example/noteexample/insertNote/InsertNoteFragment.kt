@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +22,7 @@ import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentInsertNoteBinding
 import com.example.noteexample.utils.Camera
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 
 class InsertNoteFragment : Fragment() {
 
@@ -77,9 +77,13 @@ class InsertNoteFragment : Fragment() {
                                         (it.id)
                             )
                     }
-                    Log.e("requestId", "${viewModel.note?.id}")
+                } else {
+                    Snackbar.make(
+                        binding.saveButton,
+                        R.string.camera_request_failed,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
-                //TODO Make else
             }
 
         //Launcher for camera itself
@@ -110,7 +114,6 @@ class InsertNoteFragment : Fragment() {
                                     startCamera.launch(
                                         camera.dispatchTakePictureIntent(binding.saveButton)
                                     )
-                                    Log.e("currentPhotoPath", camera.currentPhotoPath)
                                 }
                                 1 -> {
                                     if (ContextCompat.checkSelfPermission(
@@ -152,11 +155,8 @@ class InsertNoteFragment : Fragment() {
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
             if (it != null) {
-                val list = it.filter { list -> list.noteId == viewModel.note?.id }
-                viewModel.noteContentList = list
-                noteAdapter.addHeaderAndSubmitList(viewModel.note, list)
-                Log.e("noteID", "${viewModel.note?.id}")
-                Log.e(".noteContentList", list.toString())
+                viewModel.noteContentList = it.filter { list -> list.noteId == viewModel.note?.id }
+                noteAdapter.addHeaderAndSubmitList(viewModel.note, viewModel.noteContentList)
             }
         })
 
@@ -213,8 +213,8 @@ class InsertNoteFragment : Fragment() {
         })
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
-                if (it.hidden) {
+            noteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
+                if (current.hidden) {
                     holder.binding.photo.visibility = View.GONE
                     holder.binding.restoreButton.visibility = View.VISIBLE
                     holder.binding.deleteCircleIcon.visibility = View.GONE
@@ -236,14 +236,14 @@ class InsertNoteFragment : Fragment() {
                 noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = true
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
-                noteAdapter.notifyDataSetChanged()
+                noteAdapter.notifyItemChanged(holder.adapterPosition)
             }
 
             holder.binding.restoreButton.setOnClickListener {
                 noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = false
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
-                noteAdapter.notifyDataSetChanged()
+                noteAdapter.notifyItemChanged(holder.adapterPosition)
 
             }
         })
@@ -265,15 +265,13 @@ class InsertNoteFragment : Fragment() {
 
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
-                Log.e("contentList", viewModel.noteContentList.toString())
-                if (viewModel.noteContentList.none { item -> item.hidden } ||
+                if (viewModel.noteContentList.any { item -> !item.hidden } ||
                     viewModel.noteContentList.any { item -> item.note.isNotEmpty() }) {
                     viewModel.allHidden = false
                 }
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
 
-                Log.e("photoListSize", "${viewModel.noteContentList.size}")
                 when {
                     (viewModel.noteContentList.isEmpty() ||
                             viewModel.allHidden) &&

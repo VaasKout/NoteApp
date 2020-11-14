@@ -7,7 +7,6 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
@@ -87,7 +86,6 @@ class Camera(private val activity: Activity) {
                 imageId = cursor.getLong(columnIndexID)
                 val uriImage = Uri.withAppendedPath(uriExternal, imageId.toString()).toString()
                 val imgUrl = GalleryData(uriImage)
-                Log.e("url", uriImage)
                 listOfAllImages.add(imgUrl)
             }
             cursor.close()
