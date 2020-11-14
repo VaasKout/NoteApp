@@ -265,10 +265,13 @@ class InsertNoteFragment : Fragment() {
 
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
+
+
                 if (viewModel.noteContentList.any { item -> !item.hidden } ||
                     viewModel.noteContentList.any { item -> item.note.isNotEmpty() }) {
                     viewModel.allHidden = false
                 }
+
                 viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
 
@@ -291,14 +294,12 @@ class InsertNoteFragment : Fragment() {
                                 viewModel.onDoneNavigating()
                             }
                             .setPositiveButton("Да") { _, _ ->
-                                viewModel.updateHidden()
                                 this@InsertNoteFragment.findNavController().popBackStack()
                                 viewModel.onDoneNavigating()
                             }.show()
                         viewModel.onDoneNavigating()
                     }
                     !viewModel.backPressed -> {
-                        viewModel.updateHidden()
                         this@InsertNoteFragment.findNavController().popBackStack()
                         viewModel.onDoneNavigating()
                     }

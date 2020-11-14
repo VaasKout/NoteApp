@@ -19,7 +19,7 @@
         android:id="@+id/main_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="4dp"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
@@ -75,8 +75,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/small_img_height"
                 android:adjustViewBounds="true"
-                android:contentDescription="@string/photo_main"
                 android:scaleType="centerCrop"
+                android:contentDescription="@string/photo_main"
                 imageUrl="@{data.photoPath}"
                 tools:src="@tools:sample/backgrounds/scenic" />
         </LinearLayout>

@@ -8,7 +8,7 @@
         android:id="@+id/allNotesFragment"
         android:name="com.example.noteexample.allNotes.AllNotesFragment"
         android:label="AllNotes"
-        tools:layout="@layout/fragment_note">
+        tools:layout="@layout/fragment_note_main">
         <action
             android:id="@+id/action_noteFragment_to_insertNoteFragment"
             app:destination="@id/insertNoteFragment" />

@@ -77,6 +77,7 @@ fun ImageView.bindImage(imgUrl: String?) {
     }
 }
 
+
 @BindingAdapter(value = ["dataIsEmpty", "titleIsEmpty"], requireAll = true)
 fun View.setViewVisibility(data: NoteContent?, note: Note?) {
     note?.let {

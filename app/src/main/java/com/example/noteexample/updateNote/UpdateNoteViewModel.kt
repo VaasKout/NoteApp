@@ -107,21 +107,6 @@ class UpdateNoteViewModel(
         }
     }
 
-    fun updateHidden() {
-        viewModelScope.launch(Dispatchers.IO) {
-            noteContentList.forEach {
-                if (it.hidden) {
-                    if (it.note.isNotEmpty()) {
-                        it.photoPath = ""
-                        repository.updateNoteContent(it)
-                    } else {
-                        repository.deleteNoteContent(it)
-                    }
-                }
-            }
-        }
-    }
-
     fun updateNoteContentList(noteContent: List<NoteContent>) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateNoteContentList(noteContent)

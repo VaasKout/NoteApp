@@ -1,7 +1,6 @@
 package com.example.noteexample.allNotes
 
 import android.app.Application
-import android.util.Log
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -17,6 +16,7 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -107,7 +107,6 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         _actionMode.value = activity.startActionMode(actionModeController)
         _actionMode.value?.title =
             "${noteList.filter { it.isChecked }.size}"
-//        Log.e("title", "${noteList.filter { it.isChecked }.size}")
         actionModeStarted = true
 
     }
@@ -126,7 +125,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun onDeleteSelected() {
-        viewModelScope.launch (Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             val noteContentListToDelete = mutableListOf<NoteContent>()
             val noteListToDelete =
                 noteList.filter { it.isChecked }
@@ -148,15 +147,27 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 //    }
 
     fun deleteUnused() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             noteList.forEach { note ->
-                if (note.title.isEmpty() &&
-                    note.firstNote.isEmpty()){
-                    val contentList = noteContentList.filter { it.noteId == note.id }
-                    if (contentList.isEmpty()) {
-                        repository.deleteNote(note)
-                        repository.deleteNoteContentList(contentList)
-                    }
+                val contentList = noteContentList.filter { it.noteId == note.id }
+                if (contentList.isEmpty() &&
+                    note.title.isEmpty() &&
+                    note.firstNote.isEmpty()
+                ) {
+                    repository.deleteNote(note)
+                    repository.deleteNoteContentList(contentList)
+                } else if (contentList.isNotEmpty()) {
+                    contentList
+                        .filter { it.hidden }
+                        .forEach {
+                            if (it.note.isNotEmpty()) {
+                                it.photoPath = ""
+                                it.hidden = false
+                                repository.updateNoteContent(it)
+                            } else {
+                                repository.deleteNoteContent(it)
+                            }
+                        }
                 }
             }
         }

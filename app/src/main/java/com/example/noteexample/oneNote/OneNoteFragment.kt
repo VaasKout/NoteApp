@@ -33,11 +33,10 @@ class OneNoteFragment : Fragment() {
             setHasFixedSize(true)
         }
 
-        viewModel.allNoteContent.observe(viewLifecycleOwner, {allContent ->
+        viewModel.allNoteContent.observe(viewLifecycleOwner, { allContent ->
             val list = allContent.filter { list -> list.noteId == args.noteId }
-            viewModel.currentNote?.let { note ->
-                oneNoteAdapter.addHeaderAndSubmitList(note, list)
-            }
+            oneNoteAdapter.addHeaderAndSubmitList(viewModel.currentNote, list)
+            oneNoteAdapter.notifyDataSetChanged()
         })
 
         /**
@@ -45,11 +44,13 @@ class OneNoteFragment : Fragment() {
          */
 
         binding.toolbarOneNote.setOnMenuItemClickListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.edit_item -> {
                     this.findNavController()
-                        .navigate(OneNoteFragmentDirections
-                            .actionOneNoteFragmentToUpdateNoteFragment(args.noteId))
+                        .navigate(
+                            OneNoteFragmentDirections
+                                .actionOneNoteFragmentToUpdateNoteFragment(args.noteId)
+                        )
                     true
                 }
                 else -> false

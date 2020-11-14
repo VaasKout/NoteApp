@@ -122,22 +122,6 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun updateHidden() {
-        viewModelScope.launch(Dispatchers.IO) {
-            noteContentList.forEach {
-                if (it.hidden) {
-                    if (it.note.isNotEmpty()) {
-                        it.photoPath = ""
-                        it.hidden = false
-                        repository.updateNoteContent(it)
-                    } else {
-                        repository.deleteNoteContent(it)
-                    }
-                }
-            }
-        }
-    }
-
     fun deleteUnused() {
         viewModelScope.launch(Dispatchers.IO) {
             note?.let { repository.deleteNote(it) }

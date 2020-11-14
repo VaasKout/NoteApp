@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import com.example.noteexample.R
-import com.example.noteexample.databinding.FragmentNoteBinding
+import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -26,15 +27,21 @@ class AllNotesFragment : Fragment() {
         ViewModelProvider(this).get(AllNotesViewModel::class.java)
     }
 
+        //TODO Filter with photos, without photos
+        //TODO Note search in SQL
+        //TODO order by old, by recent
+        //TODO Date for notes
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val cards = mutableListOf<MaterialCardView>()
-        val binding: FragmentNoteBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_note, container, false)
+        val binding: FragmentNoteMainBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
         binding.noteViewModel = viewModel
         binding.lifecycleOwner = this
+        viewModel.deleteUnused()
 
         /**
          * initialize and set adapter options
@@ -130,7 +137,6 @@ class AllNotesFragment : Fragment() {
         viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
             list?.let {
                 viewModel.noteContentList = it
-                viewModel.deleteUnused()
                 noteAdapter.notifyDataSetChanged()
             }
         })
@@ -163,6 +169,7 @@ class AllNotesFragment : Fragment() {
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             cards.add(holder.binding.mainCard)
             val card = holder.binding.mainCard
+            val img = holder.binding.photoMain
             noteAdapter.currentList[holder.adapterPosition]?.let { current ->
 
                 val contentList = viewModel.noteContentList.filter {
@@ -179,13 +186,13 @@ class AllNotesFragment : Fragment() {
                     for(content in contentList){
                         if (content.photoPath.isNotEmpty()) {
                             holder.binding.data = content
-                            holder.binding.photoMain.visibility = View.VISIBLE
+                            img.visibility = View.VISIBLE
                             break
                         }
                     }
                 }
 
-                if (holder.binding.photoMain.visibility == View.GONE
+                if (img.visibility == View.GONE
                     && current.firstNote.isEmpty()
                     && contentList.isNotEmpty()){
                     current.firstNote = contentList[0].note

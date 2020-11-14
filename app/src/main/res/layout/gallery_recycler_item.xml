@@ -25,12 +25,12 @@
 
         <ImageView
             android:id="@+id/gallery_image"
+            imageUrl="@{data.imgSrcUrl}"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="@dimen/small_img_height"
             android:adjustViewBounds="true"
             android:contentDescription="@string/gallery_photos"
             android:scaleType="centerCrop"
-            imageUrl="@{data.imgSrcUrl}"
             tools:src="@tools:sample/backgrounds/scenic" />
     </com.google.android.material.card.MaterialCardView>
 </layout>

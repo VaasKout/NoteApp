@@ -26,6 +26,7 @@ import com.example.noteexample.databinding.FragmentUpdateNoteBinding
 import com.example.noteexample.insertNote.InsertNoteFragmentDirections
 import com.example.noteexample.utils.Camera
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 
 class UpdateNoteFragment : Fragment() {
 
@@ -72,6 +73,12 @@ class UpdateNoteFragment : Fragment() {
                                 .actionEditNoteFragmentToGalleryFragment
                                     (args.noteId)
                         )
+                } else {
+                    Snackbar.make(
+                        binding.editButton,
+                        R.string.camera_request_failed,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -135,11 +142,10 @@ class UpdateNoteFragment : Fragment() {
              * it's caused by var fields in [NoteContent]
              */
             if (it != null) {
-                val list = it.filter { list -> list.noteId == args.noteId }
-                viewModel.noteContentList = list
-                noteAdapter.addHeaderAndSubmitList(viewModel.currentNote, list)
+                viewModel.noteContentList = it.filter { list -> list.noteId == args.noteId }
+                noteAdapter.addHeaderAndSubmitList(viewModel.currentNote, viewModel.noteContentList)
                 if (!viewModel.startListInit) {
-                    list.forEach { element ->
+                    viewModel.noteContentList.forEach { element ->
                         val noteContent = NoteContent(
                             id = element.id,
                             noteId = element.noteId,
@@ -184,16 +190,14 @@ class UpdateNoteFragment : Fragment() {
 
             holder.binding.deleteCircle.setOnClickListener {
                 noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = true
-                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
-                noteAdapter.notifyDataSetChanged()
+                noteAdapter.notifyItemChanged(holder.adapterPosition)
             }
 
             holder.binding.restoreButton.setOnClickListener {
                 noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = false
-                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
                 viewModel.updateNoteContentList(viewModel.noteContentList)
-                noteAdapter.notifyDataSetChanged()
+                noteAdapter.notifyItemChanged(holder.adapterPosition)
             }
         })
 
@@ -202,7 +206,6 @@ class UpdateNoteFragment : Fragment() {
             viewModel.updateCurrentNote(viewModel.newTitle, viewModel.newFirstNote)
             if (viewModel.noteContentList.isNotEmpty()) {
                 viewModel.updateNoteContentList(viewModel.noteContentList)
-                viewModel.updateHidden()
             } else if (viewModel.noteContentList.isEmpty() &&
                 viewModel.newTitle.isEmpty() &&
                 viewModel.newFirstNote.isEmpty()
@@ -264,7 +267,6 @@ class UpdateNoteFragment : Fragment() {
             viewModel.backPressed = true
             viewModel.onStartNavigating()
         }
-
 
         return binding.root
     }
