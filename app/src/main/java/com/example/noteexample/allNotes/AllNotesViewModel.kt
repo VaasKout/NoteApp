@@ -61,11 +61,9 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            viewModelScope.launch(Dispatchers.Default) {
                 if (noteList.any { it.isChecked }) {
                     noteList.forEach { it.isChecked = false }
                 }
-            }
             _actionMode.value = null
             actionModeStarted = false
         }
@@ -125,7 +123,6 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun onDeleteSelected() {
-        viewModelScope.launch(Dispatchers.IO) {
             val noteContentListToDelete = mutableListOf<NoteContent>()
             val noteListToDelete =
                 noteList.filter { it.isChecked }
@@ -133,6 +130,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                 noteContentListToDelete.addAll(noteContentList
                     .filter { it.noteId == note.id })
             }
+        viewModelScope.launch (Dispatchers.IO){
             repository.deleteNoteList(noteListToDelete)
             repository.deleteNoteContentList(noteContentListToDelete)
         }
@@ -146,32 +144,38 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 //        }
 //    }
 
-    fun deleteUnused() {
+    fun deleteEmpty() {
         viewModelScope.launch(Dispatchers.Default) {
             noteList.forEach { note ->
                 val contentList = noteContentList.filter { it.noteId == note.id }
-                if (contentList.isEmpty() &&
-                    note.title.isEmpty() &&
-                    note.firstNote.isEmpty()
+                if (note.title.isEmpty() &&
+                    note.firstNote.isEmpty() &&
+                    (contentList.isEmpty() ||
+                            contentList.none { !it.hidden || it.note.isNotEmpty() })
                 ) {
                     repository.deleteNote(note)
                     repository.deleteNoteContentList(contentList)
-                } else if (contentList.isNotEmpty()) {
-                    contentList
-                        .filter { it.hidden }
-                        .forEach {
-                            if (it.note.isNotEmpty()) {
-                                it.photoPath = ""
-                                it.hidden = false
-                                repository.updateNoteContent(it)
-                            } else {
-                                repository.deleteNoteContent(it)
-                            }
-                        }
+                }
+            }
+            noteContentList.forEach {
+                if (it.hidden) {
+                    if (it.note.isNotEmpty()) {
+                        it.photoPath = ""
+                        it.hidden = false
+                        repository.updateNoteContent(it)
+                    } else {
+                        repository.deleteNoteContent(it)
+                    }
                 }
             }
         }
     }
+
+//    fun deleteHidden() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//
+//        }
+//    }
 
 
     fun updateNoteList() {

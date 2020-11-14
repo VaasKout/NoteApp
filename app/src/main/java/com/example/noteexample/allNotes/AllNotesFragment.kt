@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import com.example.noteexample.R
@@ -15,6 +16,8 @@ import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class AllNotesFragment : Fragment() {
@@ -23,14 +26,15 @@ class AllNotesFragment : Fragment() {
      *  Define viewModel for NoteFragment
      */
 
+
     val viewModel by lazy {
         ViewModelProvider(this).get(AllNotesViewModel::class.java)
     }
 
-        //TODO Filter with photos, without photos
-        //TODO Note search in SQL
-        //TODO order by old, by recent
-        //TODO Date for notes
+    //TODO Filter with photos, without photos
+    //TODO Note search in SQL
+    //TODO order by old, by recent
+    //TODO Date for notes
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +45,6 @@ class AllNotesFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
         binding.noteViewModel = viewModel
         binding.lifecycleOwner = this
-        viewModel.deleteUnused()
 
         /**
          * initialize and set adapter options
@@ -85,16 +88,17 @@ class AllNotesFragment : Fragment() {
                 viewHolder: RecyclerView.ViewHolder
             ) {
                 super.clearView(recyclerView, viewHolder)
-                    if (viewModel.startedMove) {
-                        viewModel.startedMove = false
-                        viewModel.updateNoteList()
-                    }
+                if (viewModel.startedMove) {
+                    viewModel.startedMove = false
+                    viewModel.updateNoteList()
+                }
             }
 
             override fun onSwiped(
                 viewHolder: RecyclerView.ViewHolder,
                 direction: Int
-            ) {}
+            ) {
+            }
 
         })
 
@@ -125,9 +129,9 @@ class AllNotesFragment : Fragment() {
 
         viewModel.allSortedNotes.observe(viewLifecycleOwner, { list ->
             list?.let {
-                    viewModel.noteList = mutableListOf()
-                    viewModel.noteList.addAll(it)
-                    noteAdapter.submitList(viewModel.noteList)
+                viewModel.noteList = mutableListOf()
+                viewModel.noteList.addAll(it)
+                noteAdapter.submitList(viewModel.noteList)
                 if (viewModel.noteList.any { item -> item.isChecked }) {
                     viewModel.onStartActionMode(requireActivity())
                 }
@@ -137,6 +141,7 @@ class AllNotesFragment : Fragment() {
         viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
             list?.let {
                 viewModel.noteContentList = it
+                viewModel.deleteEmpty()
                 noteAdapter.notifyDataSetChanged()
             }
         })
@@ -183,7 +188,7 @@ class AllNotesFragment : Fragment() {
 
                 holder.binding.photoMain.visibility = View.GONE
                 if (contentList.isNotEmpty()) {
-                    for(content in contentList){
+                    for (content in contentList) {
                         if (content.photoPath.isNotEmpty()) {
                             holder.binding.data = content
                             img.visibility = View.VISIBLE
@@ -194,7 +199,8 @@ class AllNotesFragment : Fragment() {
 
                 if (img.visibility == View.GONE
                     && current.firstNote.isEmpty()
-                    && contentList.isNotEmpty()){
+                    && contentList.isNotEmpty()
+                ) {
                     current.firstNote = contentList[0].note
                 }
             }
