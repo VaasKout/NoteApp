@@ -46,30 +46,31 @@ fun TextView.firstNoteText(note: Note?) {
                 text = it.firstNote
             }
         }
-
     }
 }
 
 @BindingAdapter("photoNoteText")
 fun TextView.photoNoteText(data: NoteContent?) {
-    data?.let {
+    if (data == null) {
+        visibility = View.GONE
+    } else {
         when {
             this is EditText -> {
-                setText(it.note)
+                setText(data.note)
             }
-            it.note.isEmpty() -> {
+            data.note.isEmpty() -> {
                 visibility = View.GONE
             }
             else -> {
                 visibility = View.VISIBLE
-                text = it.note
+                text = data.note
             }
         }
     }
 }
 
-@BindingAdapter("imageUrl")
-fun ImageView.bindImage(imgUrl: String?) {
+@BindingAdapter("imageEditUrl")
+fun ImageView.bindEditImage(imgUrl: String?) {
     if (!imgUrl.isNullOrEmpty()) {
         Glide.with(this.context)
             .load(imgUrl)
@@ -77,12 +78,12 @@ fun ImageView.bindImage(imgUrl: String?) {
     }
 }
 
-
-@BindingAdapter(value = ["dataIsEmpty", "titleIsEmpty"], requireAll = true)
-fun View.setViewVisibility(data: NoteContent?, note: Note?) {
-    note?.let {
-        data?.let {
-            visibility = View.VISIBLE
-        }
-    }
+@BindingAdapter("imageViewUrl")
+fun ImageView.bindViewImage(imgUrl: String?) {
+    if (!imgUrl.isNullOrEmpty()) {
+        visibility = View.VISIBLE
+        Glide.with(this.context)
+            .load(imgUrl)
+            .into(this)
+    } else visibility = View.GONE
 }

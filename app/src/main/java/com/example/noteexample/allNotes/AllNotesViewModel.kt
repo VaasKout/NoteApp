@@ -9,6 +9,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
@@ -23,6 +25,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     //Flags
     var actionModeStarted = false
     var startedMove = false
+    var searchStarted = false
 
 
     var noteContentList = listOf<NoteContent>()
@@ -30,14 +33,17 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     private val repository: NoteRepository
     var allSortedNotes: LiveData<List<Note>>
-    val allNoteContent: LiveData<List<NoteContent>>
+//    val allNoteContent: LiveData<List<NoteContent>>
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
+//        allNoteContent = repository.allNoteContent
         allSortedNotes = repository.allDESCSortedNotes
-        allNoteContent = repository.allNoteContent
     }
+
+    private val _searchMode = MutableLiveData<Boolean>()
+    var searchMode: LiveData<Boolean> = _searchMode
 
     private val _actionMode = MutableLiveData<ActionMode?>()
     var actionMode: LiveData<ActionMode?> = _actionMode
@@ -72,33 +78,57 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * LiveData
-     */
-    private val _navigateToInsertFragment = MutableLiveData<Boolean>()
-    val navigateToInsertFragment: LiveData<Boolean> = _navigateToInsertFragment
+    val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
+                ItemTouchHelper.DOWN or ItemTouchHelper.UP,
+        0
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            if (actionModeStarted) {
+                onDestroyActionMode()
+            }
+            val from = viewHolder.adapterPosition
+            val to = target.adapterPosition
 
-    private val _navigateToUpdateNoteFragment = MutableLiveData<Int>()
-    val navigateToUpdateNoteFragment: LiveData<Int> = _navigateToUpdateNoteFragment
+            if (from >= 0 && to >= 0) {
+                swap(from, to)
+                recyclerView.adapter?.notifyItemMoved(from, to)
+                startedMove = true
+            }
+            return true
+        }
 
-    /**
-     * Navigating methods
-     */
-    fun onStartNavigating() {
-        _navigateToInsertFragment.value = true
+        override fun clearView(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ) {
+            super.clearView(recyclerView, viewHolder)
+            if (startedMove) {
+                startedMove = false
+                updateNoteList()
+            }
+        }
+
+        override fun onSwiped(
+            viewHolder: RecyclerView.ViewHolder,
+            direction: Int
+        ) {
+        }
+
+    })
+
+    fun onStartSearch() {
+        _searchMode.value = true
     }
 
-    fun onDoneEditNavigating() {
-        _navigateToInsertFragment.value = false
+    fun onDoneSearch() {
+        _searchMode.value = false
     }
 
-    fun onNoteClicked(id: Int) {
-        _navigateToUpdateNoteFragment.value = id
-    }
-
-    fun onDoneUpdateNavigating() {
-        _navigateToUpdateNoteFragment.value = -1
-    }
 
     /**
      * Action mode lifecycle functions
@@ -125,6 +155,10 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * Coroutine functions
      */
 
+    suspend fun getNoteContent() {
+        noteContentList = repository.allNoteContentSimpleList()
+    }
+
     fun onDeleteSelected() {
         val noteContentListToDelete = mutableListOf<NoteContent>()
         val noteListToDelete =
@@ -147,34 +181,31 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 //        }
 //    }
 
-    fun deleteUnused() {
-        viewModelScope.launch(Dispatchers.Default) {
-            noteList.forEach { note ->
-                val contentList = noteContentList.filter { it.noteId == note.id }
-                if (note.title.isEmpty() &&
-                    note.firstNote.isEmpty() &&
-                    (contentList.isEmpty() ||
-                            contentList.none { !it.hidden || it.note.isNotEmpty() })
-                ) {
-                    withContext(Dispatchers.IO) {
-                        repository.deleteNote(note)
-                        repository.deleteNoteContentList(contentList)
-                    }
-
+    suspend fun deleteUnused() {
+        noteList.forEach { note ->
+            val contentList = noteContentList.filter { it.noteId == note.id }
+            if (note.title.isEmpty() &&
+                note.firstNote.isEmpty() &&
+                (contentList.isEmpty() ||
+                        contentList.none { !it.hidden || it.note.isNotEmpty() })
+            ) {
+                withContext(Dispatchers.IO) {
+                    repository.deleteNote(note)
+                    repository.deleteNoteContentList(contentList)
                 }
             }
-            noteContentList.forEach {
-                if (it.hidden) {
-                    if (it.note.isNotEmpty()) {
-                        it.photoPath = ""
-                        it.hidden = false
-                        withContext(Dispatchers.IO) {
-                            repository.updateNoteContent(it)
-                        }
-                    } else {
-                        withContext(Dispatchers.IO) {
-                            repository.deleteNoteContent(it)
-                        }
+        }
+        noteContentList.forEach {
+            if (it.hidden) {
+                if (it.note.isNotEmpty()) {
+                    it.photoPath = ""
+                    it.hidden = false
+                    withContext(Dispatchers.IO) {
+                        repository.updateNoteContent(it)
+                    }
+                } else {
+                    withContext(Dispatchers.IO) {
+                        repository.deleteNoteContent(it)
                     }
                 }
             }

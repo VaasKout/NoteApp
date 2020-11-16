@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="noteViewModel"
-            type="com.example.noteexample.allNotes.AllNotesViewModel" />
-    </data>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,13 +10,14 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar_note_main"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
-            app:title="@string/app_name"
-            app:menu="@menu/note_main_menu"/>
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar_note_main"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:menu="@menu/note_main_menu"
+                app:title="@string/app_name" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,6 +27,18 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:context=".allNotes.AllNotesFragment">
 
+            <EditText
+                android:id="@+id/search_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
+                android:autofillHints="@string/search"
+                android:inputType="text"
+                tools:ignore="LabelFor"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="0dp"
@@ -39,7 +46,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/search_edit"
                 tools:listitem="@layout/recycler_main_item" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -48,11 +55,11 @@
             android:id="@+id/fab_to_insert"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/save"
-            android:onClick="@{() -> noteViewModel.onStartNavigating()}"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            android:src="@drawable/ic_add"
             android:layout_gravity="bottom|end"
-            android:layout_margin="32dp"/>
+            android:layout_margin="32dp"
+            android:src="@drawable/ic_add"
+            android:text="@string/save"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:contentDescription="@string/insert_note" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

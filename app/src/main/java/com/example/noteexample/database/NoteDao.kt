@@ -61,6 +61,9 @@ interface NoteDao {
     @Query("SELECT * from note_content")
     fun getAllNoteContent(): LiveData<List<NoteContent>>
 
+    @Query("SELECT * from note_content")
+    suspend fun getAllNoteContentSimpleList(): List<NoteContent>
+
     @Query("SELECT * from note_content WHERE id = :key")
-    fun selectNoteContent(key: Int): LiveData<NoteContent>
+    suspend fun getNoteContent(key: Int): NoteContent
 }

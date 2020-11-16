@@ -25,7 +25,7 @@
 
         <ImageView
             android:id="@+id/gallery_image"
-            imageUrl="@{data.imgSrcUrl}"
+            imageEditUrl="@{data.imgSrcUrl}"
             android:layout_width="match_parent"
             android:layout_height="@dimen/small_img_height"
             android:adjustViewBounds="true"

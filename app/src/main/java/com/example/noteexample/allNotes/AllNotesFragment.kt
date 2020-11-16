@@ -1,10 +1,11 @@
 package com.example.noteexample.allNotes
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,8 +17,9 @@ import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class AllNotesFragment : Fragment() {
@@ -32,9 +34,12 @@ class AllNotesFragment : Fragment() {
     }
 
     //TODO Filter with photos, without photos
-    //TODO Note search in SQL
     //TODO order by old, by recent
     //TODO Date for notes
+    //TODO Entity of flags in DB
+    //TODO end icon in search field
+    //TODO backButton close search
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +48,7 @@ class AllNotesFragment : Fragment() {
         val cards = mutableListOf<MaterialCardView>()
         val binding: FragmentNoteMainBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
-        binding.noteViewModel = viewModel
-        binding.lifecycleOwner = this
+
 
         /**
          * initialize and set adapter options
@@ -59,50 +63,8 @@ class AllNotesFragment : Fragment() {
 //            layoutManager = LinearLayoutManager(requireContext())
         }
 
-        val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
-                    ItemTouchHelper.DOWN or ItemTouchHelper.UP,
-            0
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                if (viewModel.actionModeStarted) {
-                    viewModel.onDestroyActionMode()
-                }
-                val from = viewHolder.adapterPosition
-                val to = target.adapterPosition
+        viewModel.helper.attachToRecyclerView(binding.recyclerView)
 
-                if (from >= 0 && to >= 0) {
-                    viewModel.swap(from, to)
-                    recyclerView.adapter?.notifyItemMoved(from, to)
-                    viewModel.startedMove = true
-                }
-                return true
-            }
-
-            override fun clearView(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ) {
-                super.clearView(recyclerView, viewHolder)
-                if (viewModel.startedMove) {
-                    viewModel.startedMove = false
-                    viewModel.updateNoteList()
-                }
-            }
-
-            override fun onSwiped(
-                viewHolder: RecyclerView.ViewHolder,
-                direction: Int
-            ) {
-            }
-
-        })
-
-        helper.attachToRecyclerView(binding.recyclerView)
 
         binding.toolbarNoteMain.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -118,9 +80,48 @@ class AllNotesFragment : Fragment() {
                     }
                     true
                 }
+                R.id.search_note -> {
+                    if (!viewModel.searchStarted) {
+                        viewModel.onStartSearch()
+                    } else {
+                        viewModel.onDoneSearch()
+                    }
+                    true
+                }
                 else -> false
             }
         }
+
+        binding.searchEdit.addTextChangedListener {
+            if (it.toString().isNotEmpty()) {
+                val noteContentList = viewModel.noteContentList.filter { item ->
+                    item.note.contains(it.toString())
+                }
+
+                val noteList = viewModel.noteList.filter { item ->
+                    item.title.contains(it.toString()) ||
+                            item.firstNote.contains(it.toString()) ||
+                            noteContentList.any { content -> content.noteId == item.id }
+                }
+                noteAdapter.submitList(noteList)
+            } else {
+                noteAdapter.submitList(viewModel.noteList)
+            }
+        }
+
+        viewModel.searchMode.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.searchEdit.visibility = View.VISIBLE
+                binding.searchEdit.setText("")
+                viewModel.searchStarted = true
+            } else {
+                binding.searchEdit.visibility = View.GONE
+                binding.searchEdit.setText("")
+                noteAdapter.submitList(viewModel.noteList)
+                viewModel.searchStarted = false
+            }
+        })
+
 
         /**
          *  Observes allNotes [AllNotesViewModel.allSortedNotes]
@@ -129,20 +130,18 @@ class AllNotesFragment : Fragment() {
 
         viewModel.allSortedNotes.observe(viewLifecycleOwner, { list ->
             list?.let {
-                viewModel.noteList = mutableListOf()
-                viewModel.noteList.addAll(it)
-                noteAdapter.submitList(viewModel.noteList)
-                if (viewModel.noteList.any { item -> item.isChecked }) {
-                    viewModel.onStartActionMode(requireActivity())
+                lifecycleScope.launch(Dispatchers.Default) {
+                    viewModel.getNoteContent()
+                    viewModel.noteList = mutableListOf()
+                    viewModel.noteList.addAll(it)
+                    viewModel.deleteUnused()
+                    withContext(Dispatchers.Main) {
+                        noteAdapter.submitList(viewModel.noteList)
+                    }
+                    if (viewModel.noteList.any { item -> item.isChecked }) {
+                        viewModel.onStartActionMode(requireActivity())
+                    }
                 }
-            }
-        })
-
-        viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
-            list?.let {
-                viewModel.noteContentList = it
-                viewModel.deleteUnused()
-                noteAdapter.notifyDataSetChanged()
             }
         })
 
@@ -160,33 +159,25 @@ class AllNotesFragment : Fragment() {
             }
         })
 
-        viewModel.navigateToUpdateNoteFragment.observe(viewLifecycleOwner, { noteId ->
-            if (noteId > -1) {
-                this.findNavController()
-                    .navigate(
-                        AllNotesFragmentDirections
-                            .actionAllNotesFragmentToOneNoteFragment(noteId)
-                    )
-                viewModel.onDoneUpdateNavigating()
-            }
-        })
 
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             cards.add(holder.binding.mainCard)
             val card = holder.binding.mainCard
             val img = holder.binding.photoMain
-            noteAdapter.currentList[holder.adapterPosition]?.let { current ->
+            val view1 = holder.binding.view1
+            val view2 = holder.binding.view2
 
-                val contentList = viewModel.noteContentList.filter {
-                    it.noteId == current.id
-                }
+            val contentList = viewModel.noteContentList.filter {
+                it.noteId == noteAdapter.currentList[holder.adapterPosition].id
+            }
+            noteAdapter.currentList[holder.adapterPosition]?.let { current ->
 
                 /**
                  * Set [View.GONE] visibility for [RecyclerMainItemBinding.photoMain] to prevent
                  * bug in [ListAdapter]
                  */
 
-                holder.binding.photoMain.visibility = View.GONE
+                img.visibility = View.GONE
                 if (contentList.isNotEmpty()) {
                     for (content in contentList) {
                         if (content.photoPath.isNotEmpty()) {
@@ -202,10 +193,26 @@ class AllNotesFragment : Fragment() {
                     && contentList.isNotEmpty()
                 ) {
                     current.firstNote = contentList[0].note
+                    if (current.title.isNotEmpty()) {
+                        view1.visibility = View.VISIBLE
+                    }
+                }
+
+                if (current.title.isNotEmpty() && current.firstNote.isNotEmpty()) {
+                    view1.visibility = View.VISIBLE
+                }
+                if ((current.firstNote.isNotEmpty() || current.title.isNotEmpty()) &&
+                    img.visibility == View.VISIBLE
+                ) {
+                    view2.visibility = View.VISIBLE
                 }
             }
 
+
             card.setOnLongClickListener {
+                if (viewModel.searchStarted) {
+                    viewModel.onDoneSearch()
+                }
                 card.isChecked = !card.isChecked
                 noteAdapter.currentList[holder.adapterPosition].isChecked =
                     card.isChecked
@@ -221,6 +228,9 @@ class AllNotesFragment : Fragment() {
             }
 
             card.setOnClickListener {
+                if (viewModel.searchStarted) {
+                    viewModel.onDoneSearch()
+                }
                 if (viewModel.actionModeStarted) {
                     card.isChecked = !card.isChecked
                     noteAdapter.currentList[holder.adapterPosition].isChecked =
@@ -230,7 +240,38 @@ class AllNotesFragment : Fragment() {
                         viewModel.onDestroyActionMode()
                     }
                 } else if (!viewModel.actionModeStarted) {
-                    viewModel.onNoteClicked(noteAdapter.currentList[holder.adapterPosition].id)
+                    when {
+                        contentList.isEmpty() -> {
+                            this.findNavController()
+                                .navigate(
+                                    AllNotesFragmentDirections
+                                        .actionAllNotesFragmentToOnePhotoFragment
+                                            (
+                                            noteAdapter.currentList[holder.adapterPosition].id,
+                                            -1
+                                        )
+                                )
+                        }
+                        contentList.size == 1 -> {
+                            this.findNavController()
+                                .navigate(
+                                    AllNotesFragmentDirections
+                                        .actionAllNotesFragmentToOnePhotoFragment
+                                            (
+                                            noteAdapter.currentList[holder.adapterPosition].id,
+                                            contentList[0].id
+                                        )
+                                )
+                        }
+                        else -> {
+                            this.findNavController()
+                                .navigate(
+                                    AllNotesFragmentDirections
+                                        .actionAllNotesFragmentToOneNoteFragment
+                                            (noteAdapter.currentList[holder.adapterPosition].id)
+                                )
+                        }
+                    }
                 }
             }
         })
@@ -238,18 +279,14 @@ class AllNotesFragment : Fragment() {
         /**
          * listen to fab click
          */
-
-        viewModel.navigateToInsertFragment.observe(viewLifecycleOwner, {
-            if (it == true && !viewModel.actionModeStarted) {
-                this.findNavController()
-                    .navigate(
-                        AllNotesFragmentDirections
-                            .actionNoteFragmentToInsertNoteFragment()
-                    )
-                viewModel.onDoneEditNavigating()
-            }
-        })
-
+        binding.fabToInsert.setOnClickListener {
+            this.findNavController()
+                .navigate(
+                    AllNotesFragmentDirections
+                        .actionNoteFragmentToInsertNoteFragment()
+                )
+        }
+        binding.lifecycleOwner = this
         return binding.root
     }
 }

@@ -11,49 +11,41 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
-import com.example.noteexample.databinding.FragmentOneNoteBinding
+import com.example.noteexample.databinding.FragmentOnePhotoBinding
 import kotlinx.coroutines.launch
 
-class OneNoteFragment : Fragment() {
+class OnePhotoFragment : Fragment() {
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val args by navArgs<OneNoteFragmentArgs>()
-        val binding: FragmentOneNoteBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_one_note, container, false)
+        val args by navArgs<OnePhotoFragmentArgs>()
+        val binding: FragmentOnePhotoBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_one_photo, container, false)
         binding.lifecycleOwner = this
 
         val application = requireNotNull(this.activity).application
-        val viewModelFactory = OneNoteViewModelFactory(application, args.noteID)
+        val viewModelFactory = OneNoteViewModelFactory(application, args.noteID, args.noteContentID)
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
-
-        val oneNoteAdapter = OneNoteViewAdapter()
-        binding.recyclerOneNote.apply {
-            adapter = oneNoteAdapter
-            setHasFixedSize(true)
+        lifecycleScope.launch {
+            viewModel.getNote()
+            binding.note = viewModel.currentNote
+            binding.data = viewModel.currentNoteContent
         }
-
-        viewModel.allNoteContent.observe(viewLifecycleOwner, { allContent ->
-            val list = allContent.filter { list -> list.noteId == args.noteID }
-            lifecycleScope.launch {
-                viewModel.getNote()
-                oneNoteAdapter.addHeaderAndSubmitList(viewModel.currentNote, list)
-            }
-        })
 
         /**
          * Menu onClickListener
          */
 
-        binding.toolbarOneNote.setOnMenuItemClickListener {
+        binding.toolbarOnePhoto.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.edit_item -> {
                     this.findNavController()
                         .navigate(
-                            OneNoteFragmentDirections
-                                .actionOneNoteFragmentToUpdateNoteFragment(args.noteID)
+                            OnePhotoFragmentDirections
+                                .actionOnePhotoFragmentToUpdateNoteFragment(args.noteID)
                         )
                     true
                 }

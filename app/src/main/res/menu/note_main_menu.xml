@@ -2,8 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/search_note"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/delete_from_main"
-        android:title="@string/delete_all"
         android:icon="@drawable/ic_delete"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/delete_all"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_allNotesFragment_to_oneNoteFragment"
             app:destination="@id/oneNoteFragment" />
+        <action
+            android:id="@+id/action_allNotesFragment_to_onePhotoFragment"
+            app:destination="@id/onePhotoFragment" />
 
     </fragment>
     <fragment
@@ -54,7 +57,7 @@
         android:label="OneNoteFragment"
         tools:layout="@layout/fragment_one_note">
         <argument
-            android:name="noteId"
+            android:name="noteID"
             app:argType="integer" />
         <action
             android:id="@+id/action_oneNoteFragment_to_updateNoteFragment"
@@ -69,4 +72,19 @@
             android:name="noteId"
             app:argType="integer" />
     </dialog>
+    <fragment
+        android:id="@+id/onePhotoFragment"
+        android:name="com.example.noteexample.oneNote.OnePhotoFragment"
+        android:label="OnePhotoFragment"
+        tools:layout="@layout/fragment_one_photo">
+        <argument
+            android:name="noteID"
+            app:argType="integer" />
+        <argument
+            android:name="noteContentID"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_onePhotoFragment_to_updateNoteFragment"
+            app:destination="@id/updateNoteFragment" />
+    </fragment>
 </navigation>
