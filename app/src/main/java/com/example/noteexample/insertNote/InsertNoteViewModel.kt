@@ -95,8 +95,8 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun insertNote() {
+        note = Note()
         viewModelScope.launch {
-            note = Note()
             note?.let {
                 repository.insertNote(it)
             }

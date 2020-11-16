@@ -141,7 +141,7 @@ class AllNotesFragment : Fragment() {
         viewModel.allNoteContent.observe(viewLifecycleOwner, { list ->
             list?.let {
                 viewModel.noteContentList = it
-                viewModel.deleteEmpty()
+                viewModel.deleteUnused()
                 noteAdapter.notifyDataSetChanged()
             }
         })

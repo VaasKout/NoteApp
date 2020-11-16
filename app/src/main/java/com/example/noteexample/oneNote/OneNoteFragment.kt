@@ -1,7 +1,6 @@
 package com.example.noteexample.oneNote
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,7 +35,6 @@ class OneNoteFragment : Fragment() {
         viewModel.allNoteContent.observe(viewLifecycleOwner, { allContent ->
             val list = allContent.filter { list -> list.noteId == args.noteId }
             oneNoteAdapter.addHeaderAndSubmitList(viewModel.currentNote, list)
-            oneNoteAdapter.notifyDataSetChanged()
         })
 
         /**

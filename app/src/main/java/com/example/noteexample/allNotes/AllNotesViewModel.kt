@@ -61,9 +61,12 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
+            viewModelScope.launch(Dispatchers.Default) {
                 if (noteList.any { it.isChecked }) {
                     noteList.forEach { it.isChecked = false }
                 }
+            }
+
             _actionMode.value = null
             actionModeStarted = false
         }
@@ -123,14 +126,14 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun onDeleteSelected() {
-            val noteContentListToDelete = mutableListOf<NoteContent>()
-            val noteListToDelete =
-                noteList.filter { it.isChecked }
-            noteListToDelete.forEach { note ->
-                noteContentListToDelete.addAll(noteContentList
-                    .filter { it.noteId == note.id })
-            }
-        viewModelScope.launch (Dispatchers.IO){
+        val noteContentListToDelete = mutableListOf<NoteContent>()
+        val noteListToDelete =
+            noteList.filter { it.isChecked }
+        noteListToDelete.forEach { note ->
+            noteContentListToDelete.addAll(noteContentList
+                .filter { it.noteId == note.id })
+        }
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteNoteList(noteListToDelete)
             repository.deleteNoteContentList(noteContentListToDelete)
         }
@@ -144,7 +147,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 //        }
 //    }
 
-    fun deleteEmpty() {
+    fun deleteUnused() {
         viewModelScope.launch(Dispatchers.Default) {
             noteList.forEach { note ->
                 val contentList = noteContentList.filter { it.noteId == note.id }
@@ -153,8 +156,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                     (contentList.isEmpty() ||
                             contentList.none { !it.hidden || it.note.isNotEmpty() })
                 ) {
-                    repository.deleteNote(note)
-                    repository.deleteNoteContentList(contentList)
+                    withContext(Dispatchers.IO) {
+                        repository.deleteNote(note)
+                        repository.deleteNoteContentList(contentList)
+                    }
+
                 }
             }
             noteContentList.forEach {
@@ -162,21 +168,18 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                     if (it.note.isNotEmpty()) {
                         it.photoPath = ""
                         it.hidden = false
-                        repository.updateNoteContent(it)
+                        withContext(Dispatchers.IO) {
+                            repository.updateNoteContent(it)
+                        }
                     } else {
-                        repository.deleteNoteContent(it)
+                        withContext(Dispatchers.IO) {
+                            repository.deleteNoteContent(it)
+                        }
                     }
                 }
             }
         }
     }
-
-//    fun deleteHidden() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//
-//        }
-//    }
-
 
     fun updateNoteList() {
         viewModelScope.launch(Dispatchers.IO) {

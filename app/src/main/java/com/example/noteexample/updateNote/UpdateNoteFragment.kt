@@ -184,8 +184,12 @@ class UpdateNoteFragment : Fragment() {
             }
 
             holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                noteAdapter.currentList[holder.adapterPosition].noteContent?.note =
-                    editable.toString()
+                noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
+                    it.note = editable.toString()
+                    if (it.photoPath.isEmpty() && it.note.isEmpty()) {
+                        viewModel.deleteNoteContent(it)
+                    }
+                }
             }
 
             holder.binding.deleteCircle.setOnClickListener {

@@ -127,11 +127,11 @@ class UpdateNoteViewModel(
         }
     }
 
-    //    fun deleteNoteContent(noteContent: NoteContent) {
-//        viewModelScope.launch {
-//            repository.deleteNoteContent(noteContent)
-//        }
-//    }
+        fun deleteNoteContent(noteContent: NoteContent) {
+        viewModelScope.launch {
+            repository.deleteNoteContent(noteContent)
+        }
+    }
 
     //    fun updateNoteContent(noteContent: NoteContent){
 //        viewModelScope.launch {
