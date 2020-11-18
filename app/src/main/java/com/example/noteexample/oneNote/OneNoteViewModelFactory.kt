@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 class OneNoteViewModelFactory (
     private val application: Application,
     private val noteID: Int,
-    private val noteContentID: Int = 0
+    private val noteContentID: Int = -1
 ): ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OneNoteViewModel::class.java)){

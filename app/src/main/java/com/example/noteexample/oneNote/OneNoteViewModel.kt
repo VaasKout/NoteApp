@@ -11,7 +11,7 @@ import com.example.noteexample.repository.NoteRepository
 class OneNoteViewModel(
     application: Application,
     private val noteID: Int,
-    private val noteContentID: Int = 0
+    private val noteContentID: Int = -1
 ) : AndroidViewModel(application) {
 
     private val repository: NoteRepository
@@ -27,8 +27,6 @@ class OneNoteViewModel(
 
     suspend fun getNote() {
         currentNote = repository.getNote(noteID)
-        if (noteContentID > -1) {
-            currentNoteContent = repository.getNoteContent(noteContentID)
-        }
+        currentNoteContent = repository.getNoteContent(noteContentID)
     }
 }

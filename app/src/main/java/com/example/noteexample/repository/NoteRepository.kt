@@ -1,15 +1,18 @@
 package com.example.noteexample.repository
 
 import androidx.lifecycle.LiveData
+import com.example.noteexample.database.Flags
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteDao
 
 class NoteRepository(private val noteDao: NoteDao) {
 
-    //    val allNotes = noteDao.getAllNotes()
-    val allDESCSortedNotes: LiveData<List<Note>> = noteDao.getAllDESCSortedNotes()
-    val allASCSortedNotes: LiveData<List<Note>> = noteDao.getAllASCSortedNotes()
+    val allNotes = noteDao.getAllNotes()
+//    val allDESCSortedNotes: LiveData<List<Note>> = noteDao.getAllDESCSortedNotes()
+//    val allASCSortedNotes: LiveData<List<Note>> = noteDao.getAllASCSortedNotes()
+    suspend fun allDESCSortedNotes(): List<Note> = noteDao.getAllDESCSortedNotes()
+    suspend fun allASCSortedNotes(): List<Note> = noteDao.getAllASCSortedNotes()
     suspend fun getNote(key: Int): Note = noteDao.getNote(key)
 
     suspend fun insertNote(note: Note) {
@@ -72,5 +75,11 @@ class NoteRepository(private val noteDao: NoteDao) {
 
     suspend fun updateNoteContentList(noteContent: List<NoteContent>) {
         noteDao.updateNoteContentList(noteContent)
+    }
+
+    val flags: LiveData<Flags> = noteDao.getFlags()
+
+    suspend fun updateFlags(flags: Flags) {
+        noteDao.updateFlags(flags)
     }
 }

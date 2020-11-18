@@ -4,24 +4,39 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 
-@Database(entities = [Note::class, NoteContent::class], version = 1, exportSchema = false)
-abstract class NoteRoomDatabase : RoomDatabase(){
-    abstract fun noteDao() : NoteDao
+@Database(
+    entities = [Note::class, NoteContent::class, Flags::class],
+    version = 1,
+    exportSchema = false
+)
+abstract class NoteRoomDatabase : RoomDatabase() {
+    abstract fun noteDao(): NoteDao
 
-    companion object{
+    companion object {
         @Volatile
-        private var INSTANCE : NoteRoomDatabase? = null
+        private var INSTANCE: NoteRoomDatabase? = null
 
-        fun getDatabase(context: Context) : NoteRoomDatabase{
-            synchronized(this){
+        fun getDatabase(context: Context): NoteRoomDatabase {
+            synchronized(this) {
                 var instance = INSTANCE
-                if (instance == null){
+                if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         NoteRoomDatabase::class.java,
                         "note_database"
-                    )   .fallbackToDestructiveMigration()
+                    ).addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            GlobalScope.launch {
+                                getDatabase(context).noteDao().insertFlags(Flags())
+                            }
+                        }
+                    }).fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance
                 }

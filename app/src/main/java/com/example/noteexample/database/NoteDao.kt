@@ -9,11 +9,14 @@ interface NoteDao {
     @Query("DELETE FROM note_table")
     suspend fun deleteAllNotes()
 
+    @Query("SELECT * from note_table")
+    fun getAllNotes(): LiveData<List<Note>>
+
     @Query("SELECT * from note_table ORDER BY position DESC")
-    fun getAllDESCSortedNotes(): LiveData<List<Note>>
+    suspend fun getAllDESCSortedNotes(): List<Note>
 
     @Query("SELECT * from note_table ORDER BY position ASC")
-    fun getAllASCSortedNotes(): LiveData<List<Note>>
+    suspend fun getAllASCSortedNotes(): List<Note>
 
     @Query("SELECT * from note_table WHERE id = :key")
     suspend fun getNote(key: Int): Note
@@ -35,6 +38,7 @@ interface NoteDao {
 
     @Delete
     suspend fun deleteNoteList(noteList: List<Note>)
+
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -66,4 +70,15 @@ interface NoteDao {
 
     @Query("SELECT * from note_content WHERE id = :key")
     suspend fun getNoteContent(key: Int): NoteContent
+
+
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFlags(flags: Flags)
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun updateFlags(flags: Flags)
+
+    @Query("SELECT * from flags WHERE id = 0")
+    fun getFlags(): LiveData<Flags>
 }

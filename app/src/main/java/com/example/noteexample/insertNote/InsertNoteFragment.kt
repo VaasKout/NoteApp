@@ -160,24 +160,6 @@ class InsertNoteFragment : Fragment() {
             }
         })
 
-
-//        fun checkText(editText: EditText) {
-//            if (editText.text.isEmpty() &&
-//                viewModel.secondNoteInit &&
-//                viewModel.noteContentList.isNotEmpty()
-//            ) {
-//                editText.setText(viewModel.secondNote)
-//                viewModel.firstNote = viewModel.secondNote
-//                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
-//                viewModel.updateNoteContentList(viewModel.noteContentList)
-//                viewModel.noteContentToDelete?.let { delete ->
-//                    viewModel.deleteNoteContent(delete)
-//                }
-//                viewModel.secondNoteInit = false
-//            }
-//        }
-
-
         /**
          * LiveData for holders from [OneNoteEditAdapter]
          */
@@ -186,28 +168,11 @@ class InsertNoteFragment : Fragment() {
 
             noteAdapter.currentList[holder.adapterPosition].note?.let { _ ->
 
-//            checkText(holder.binding.firstNoteEdit)
-
                 holder.binding.titleEdit.addTextChangedListener {
                     viewModel.title = it.toString()
                 }
                 holder.binding.firstNoteEdit.addTextChangedListener {
                     viewModel.firstNote = it.toString()
-//                if (!viewModel.secondNoteInit){
-//                    noteAdapter.currentList.forEach {dataItem ->
-//                        dataItem.noteContent?.let { current ->
-//                            if (current.note.isNotEmpty() &&
-//                                current.photoPath.isEmpty()) {
-//                                viewModel.secondNote = current.note
-//                                viewModel.noteContentToDelete = current
-//                                viewModel.secondNoteInit = true
-//                                return@forEach
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                checkText(holder.binding.firstNoteEdit)
                 }
             }
         })
@@ -266,7 +231,6 @@ class InsertNoteFragment : Fragment() {
         viewModel.navigateToNoteFragment.observe(viewLifecycleOwner, {
             if (it == true) {
 
-
                 if (viewModel.noteContentList.any { item -> !item.hidden } ||
                     viewModel.noteContentList.any { item -> item.note.isNotEmpty() }) {
                     viewModel.allHidden = false
@@ -316,3 +280,39 @@ class InsertNoteFragment : Fragment() {
         viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
     }
 }
+
+
+//                if (!viewModel.secondNoteInit){
+//                    noteAdapter.currentList.forEach {dataItem ->
+//                        dataItem.noteContent?.let { current ->
+//                            if (current.note.isNotEmpty() &&
+//                                current.photoPath.isEmpty()) {
+//                                viewModel.secondNote = current.note
+//                                viewModel.noteContentToDelete = current
+//                                viewModel.secondNoteInit = true
+//                                return@forEach
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                checkText(holder.binding.firstNoteEdit)
+
+
+//        fun checkText(editText: EditText) {
+//            if (editText.text.isEmpty() &&
+//                viewModel.secondNoteInit &&
+//                viewModel.noteContentList.isNotEmpty()
+//            ) {
+//                editText.setText(viewModel.secondNote)
+//                viewModel.firstNote = viewModel.secondNote
+//                viewModel.updateCurrentNote(viewModel.title, viewModel.firstNote)
+//                viewModel.updateNoteContentList(viewModel.noteContentList)
+//                viewModel.noteContentToDelete?.let { delete ->
+//                    viewModel.deleteNoteContent(delete)
+//                }
+//                viewModel.secondNoteInit = false
+//            }
+//        }
+
+//            checkText(holder.binding.firstNoteEdit)

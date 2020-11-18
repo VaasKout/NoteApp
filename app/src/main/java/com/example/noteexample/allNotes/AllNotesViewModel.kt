@@ -5,13 +5,11 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
+import com.example.noteexample.database.Flags
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
@@ -30,17 +28,20 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     var noteContentList = listOf<NoteContent>()
     var noteList = mutableListOf<Note>()
+    var flagsObj: Flags? = null
+
+    val flags: LiveData<Flags>
 
     private val repository: NoteRepository
-    var allSortedNotes: LiveData<List<Note>>
-//    val allNoteContent: LiveData<List<NoteContent>>
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-//        allNoteContent = repository.allNoteContent
-        allSortedNotes = repository.allDESCSortedNotes
+        flags = repository.flags
     }
+
+    private val _allSortedNotes = MutableLiveData<List<Note>>()
+    val allSortedNotes: LiveData<List<Note>> = _allSortedNotes
 
     private val _searchMode = MutableLiveData<Boolean>()
     var searchMode: LiveData<Boolean> = _searchMode
@@ -48,6 +49,132 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     private val _actionMode = MutableLiveData<ActionMode?>()
     var actionMode: LiveData<ActionMode?> = _actionMode
 
+    /**
+     * Coroutine functions
+     */
+
+    suspend fun getNoteContent() {
+        noteContentList = repository.allNoteContentSimpleList()
+    }
+
+    fun getASCNotes(onlyNotes: Boolean, onlyPhotos: Boolean) {
+        viewModelScope.launch {
+            when {
+                onlyNotes -> {
+                    _allSortedNotes.value =
+                        repository.allASCSortedNotes().filter { !it.hasNoteContent }
+                }
+                onlyPhotos -> {
+                    _allSortedNotes.value =
+                        repository.allASCSortedNotes().filter { it.hasNoteContent }
+                }
+                else -> {
+                    _allSortedNotes.value = repository.allASCSortedNotes()
+                }
+            }
+        }
+    }
+
+    fun getDESCNotes(onlyNotes: Boolean, onlyPhotos: Boolean) {
+        viewModelScope.launch {
+            when {
+                onlyNotes -> {
+                    _allSortedNotes.value =
+                        repository.allDESCSortedNotes().filter { !it.hasNoteContent }
+                }
+                onlyPhotos -> {
+                    _allSortedNotes.value =
+                        repository.allDESCSortedNotes().filter { it.hasNoteContent }
+                }
+                else -> {
+                    _allSortedNotes.value = repository.allDESCSortedNotes()
+                }
+            }
+        }
+    }
+
+    fun onDeleteSelected() {
+        val noteContentListToDelete = mutableListOf<NoteContent>()
+        val noteListToDelete =
+            noteList.filter { it.isChecked }
+        noteListToDelete.forEach { note ->
+            noteContentListToDelete.addAll(noteContentList
+                .filter { it.noteId == note.id })
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteNoteList(noteListToDelete)
+            repository.deleteNoteContentList(noteContentListToDelete)
+            flagsObj?.let { repository.updateFlags(it) }
+        }
+    }
+
+    suspend fun deleteUnused() {
+        noteList.forEach { note ->
+            val contentList = noteContentList.filter { it.noteId == note.id }
+            if (note.title.isEmpty() &&
+                note.firstNote.isEmpty() &&
+                (contentList.isEmpty() ||
+                        contentList.none { !it.hidden || it.note.isNotEmpty() })
+            ) {
+                withContext(Dispatchers.IO) {
+                    repository.deleteNote(note)
+                    repository.deleteNoteContentList(contentList)
+                }
+            }
+        }
+        noteContentList.forEach {
+            if (it.hidden) {
+                if (it.note.isNotEmpty()) {
+                    it.photoPath = ""
+                    it.hidden = false
+                    withContext(Dispatchers.IO) {
+                        repository.updateNoteContent(it)
+                    }
+                } else {
+                    withContext(Dispatchers.IO) {
+                        repository.deleteNoteContent(it)
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateNoteList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNoteList(noteList)
+        }
+    }
+
+    fun onClear() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAllNotes()
+            repository.deleteAllNoteContent()
+            flagsObj?.let { repository.updateFlags(it) }
+        }
+    }
+
+    fun swap(from: Int, to: Int) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val fromItem = noteList[from]
+            if (fromItem.pos == from && noteList[to].pos == to) {
+                noteList.remove(noteList[from])
+                noteList.add(to, fromItem)
+                noteList.forEachIndexed { index, note ->
+                    note.pos = index
+                }
+            } else {
+                noteList.remove(noteList[from])
+                noteList.add(to, fromItem)
+                var pos = noteList.size - 1
+                noteList.forEach {
+                    it.pos = pos
+                    pos--
+                }
+            }
+        }
+    }
+
+    //CallBacks
     private val actionModeController = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu, menu)
@@ -149,98 +276,5 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     fun onDestroyActionMode() {
         _actionMode.value?.finish()
-    }
-
-    /**
-     * Coroutine functions
-     */
-
-    suspend fun getNoteContent() {
-        noteContentList = repository.allNoteContentSimpleList()
-    }
-
-    fun onDeleteSelected() {
-        val noteContentListToDelete = mutableListOf<NoteContent>()
-        val noteListToDelete =
-            noteList.filter { it.isChecked }
-        noteListToDelete.forEach { note ->
-            noteContentListToDelete.addAll(noteContentList
-                .filter { it.noteId == note.id })
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteNoteList(noteListToDelete)
-            repository.deleteNoteContentList(noteContentListToDelete)
-        }
-    }
-
-//    fun deleteNote(note: Note) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val contentList = noteContentList.filter { it.noteId == note.id }
-//            repository.deleteNoteContentList(contentList)
-//            repository.deleteOneNote(note)
-//        }
-//    }
-
-    suspend fun deleteUnused() {
-        noteList.forEach { note ->
-            val contentList = noteContentList.filter { it.noteId == note.id }
-            if (note.title.isEmpty() &&
-                note.firstNote.isEmpty() &&
-                (contentList.isEmpty() ||
-                        contentList.none { !it.hidden || it.note.isNotEmpty() })
-            ) {
-                withContext(Dispatchers.IO) {
-                    repository.deleteNote(note)
-                    repository.deleteNoteContentList(contentList)
-                }
-            }
-        }
-        noteContentList.forEach {
-            if (it.hidden) {
-                if (it.note.isNotEmpty()) {
-                    it.photoPath = ""
-                    it.hidden = false
-                    withContext(Dispatchers.IO) {
-                        repository.updateNoteContent(it)
-                    }
-                } else {
-                    withContext(Dispatchers.IO) {
-                        repository.deleteNoteContent(it)
-                    }
-                }
-            }
-        }
-    }
-
-    fun updateNoteList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateNoteList(noteList)
-        }
-    }
-
-    fun onClear() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteAllNotes()
-            repository.deleteAllNoteContent()
-        }
-    }
-
-    fun swap(from: Int, to: Int) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val fromItem = noteList[from]
-            noteList.removeAt(from)
-            noteList.add(to, fromItem)
-            if (fromItem.pos == from && noteList[to].pos == to) {
-                noteList.forEachIndexed { index, note ->
-                    note.pos = index
-                }
-            } else {
-                var pos = noteList.size - 1
-                noteList.forEach {
-                    it.pos = pos
-                    pos--
-                }
-            }
-        }
     }
 }

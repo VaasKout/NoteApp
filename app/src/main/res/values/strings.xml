@@ -17,9 +17,16 @@
     <string name="circle">Circle</string>
     <string name="clear">Clear</string>
     <string name="restore">Восстановить</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="one_photo">One Photo</string>
     <string name="search">Поиск</string>
     <string name="insert_note">Insert note</string>
+    <string name="settings">Настройки</string>
+    <string name="show_date">Показывать дату</string>
+    <string name="sort">Упорядочить</string>
+    <string name="filter">Показывать</string>
+    <string name="all">Все</string>
+    <string name="only_photos">Только с фотографиями</string>
+    <string name="only_notes">Только с текстом</string>
+    <string name="new_first">Сначала новые</string>
+    <string name="old_first">Сначала старые</string>
 </resources>

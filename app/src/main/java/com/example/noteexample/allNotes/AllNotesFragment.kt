@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -21,6 +22,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+//Date cal = Calendar.getInstance().getTime();
+//val time = SimpleDateFormat("HH:mm", Locale.ENGLISH).format(cal.time)
+
 
 class AllNotesFragment : Fragment() {
 
@@ -28,18 +32,11 @@ class AllNotesFragment : Fragment() {
      *  Define viewModel for NoteFragment
      */
 
-
     val viewModel by lazy {
         ViewModelProvider(this).get(AllNotesViewModel::class.java)
     }
 
-    //TODO Filter with photos, without photos
-    //TODO order by old, by recent
     //TODO Date for notes
-    //TODO Entity of flags in DB
-    //TODO end icon in search field
-    //TODO backButton close search
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -88,6 +85,14 @@ class AllNotesFragment : Fragment() {
                     }
                     true
                 }
+                R.id.settings -> {
+                    this.findNavController()
+                        .navigate(
+                            AllNotesFragmentDirections
+                                .actionAllNotesFragmentToSettingsFragment()
+                        )
+                    true
+                }
                 else -> false
             }
         }
@@ -119,6 +124,19 @@ class AllNotesFragment : Fragment() {
                 binding.searchEdit.setText("")
                 noteAdapter.submitList(viewModel.noteList)
                 viewModel.searchStarted = false
+            }
+        })
+
+        viewModel.flags.observe(viewLifecycleOwner, {
+            if (it != null) {
+                viewModel.flagsObj = it
+                lifecycleScope.launch {
+                    if (it.ascendingOrder) {
+                        viewModel.getASCNotes(it.onlyNotes, it.onlyPhotos)
+                    } else {
+                        viewModel.getDESCNotes(it.onlyNotes, it.onlyPhotos)
+                    }
+                }
             }
         })
 
@@ -285,7 +303,17 @@ class AllNotesFragment : Fragment() {
                     AllNotesFragmentDirections
                         .actionNoteFragmentToInsertNoteFragment()
                 )
+            viewModel.onDoneSearch()
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (viewModel.searchStarted) {
+                viewModel.onDoneSearch()
+            } else {
+                requireActivity().finishAffinity()
+            }
+        }
+
         binding.lifecycleOwner = this
         return binding.root
     }

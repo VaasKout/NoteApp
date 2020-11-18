@@ -34,7 +34,7 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
+            android:id="@+id/one_photo_constraint"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -42,7 +42,7 @@
 
             <ImageView
                 android:id="@+id/img_one_photo"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/one_photo"
@@ -90,8 +90,8 @@
 
 
             <TextView
-                android:id="@+id/photo_note_one_note"
-                android:layout_width="0dp"
+                android:id="@+id/note_view_one_photo"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/greyTransparent"
                 android:paddingStart="16dp"
@@ -100,9 +100,8 @@
                 android:paddingBottom="12dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="@+id/img_one_photo"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:photoNoteText="@{data}"
                 tools:text="Note" />

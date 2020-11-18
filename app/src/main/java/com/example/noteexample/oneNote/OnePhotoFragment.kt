@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -33,6 +34,22 @@ class OnePhotoFragment : Fragment() {
             viewModel.getNote()
             binding.note = viewModel.currentNote
             binding.data = viewModel.currentNoteContent
+
+            viewModel.currentNoteContent?.let {
+                if (it.photoPath.isEmpty() && it.note.isNotEmpty()) {
+                    val constraintSet = ConstraintSet()
+                    constraintSet.clone(binding.onePhotoConstraint)
+                    constraintSet.clear(R.id.note_view_one_photo, ConstraintSet.BOTTOM)
+                    constraintSet.connect(
+                        R.id.note_view_one_photo,
+                        ConstraintSet.TOP,
+                        R.id.first_note_view_one_photo,
+                        ConstraintSet.BOTTOM,
+                        0
+                    )
+                    constraintSet.applyTo(binding.onePhotoConstraint)
+                }
+            }
         }
 
         /**

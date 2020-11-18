@@ -18,6 +18,9 @@
         <action
             android:id="@+id/action_allNotesFragment_to_onePhotoFragment"
             app:destination="@id/onePhotoFragment" />
+        <action
+            android:id="@+id/action_allNotesFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
 
     </fragment>
     <fragment
@@ -87,4 +90,9 @@
             android:id="@+id/action_onePhotoFragment_to_updateNoteFragment"
             app:destination="@id/updateNoteFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/settingsFragment"
+        android:name="com.example.noteexample.settings.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/fragment_settings"/>
 </navigation>

@@ -17,19 +17,15 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     //Flags
     var backPressed = false
     var allHidden = true
-//    var secondNoteInit = false
 
     //Repository
     private val repository: NoteRepository
 
     //Variables
-//    var secondNote = ""
-//    var noteContentToDelete: NoteContent? = null
     var title = ""
     var firstNote = ""
     var note: Note? = null
     var size = 0
-
     var noteContentList = listOf<NoteContent>()
 
 
@@ -40,12 +36,11 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     val allNoteContent: LiveData<List<NoteContent>>
 
 
-
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
-        allNotes = repository.allASCSortedNotes
+        allNotes = repository.allNotes
         insertNote()
     }
 
@@ -65,13 +60,6 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     /**
      * Coroutine methods
      */
-
-//    fun updateNoteContent(noteContent: NoteContent) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            repository.updateNoteContent(noteContent)
-//        }
-//    }
-
 
     fun insertCameraPhoto(path: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -117,6 +105,9 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
                 it.title = title
                 it.firstNote = firstNote
                 it.pos = size
+                if (noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }) {
+                    it.hasNoteContent = true
+                }
                 repository.updateNote(it)
             }
         }
@@ -131,6 +122,12 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 //    fun deleteNoteContent(noteContent: NoteContent) {
 //        viewModelScope.launch(Dispatchers.IO) {
 //            repository.deleteNoteContent(noteContent)
+//        }
+//    }
+
+    //    fun updateNoteContent(noteContent: NoteContent) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.updateNoteContent(noteContent)
 //        }
 //    }
 }
