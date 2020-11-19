@@ -69,6 +69,13 @@ fun TextView.photoNoteText(data: NoteContent?) {
     }
 }
 
+@BindingAdapter("date")
+fun TextView.setDate(note: Note?){
+    note?.let {
+        text = note.date
+    }
+}
+
 @BindingAdapter("imageEditUrl")
 fun ImageView.bindEditImage(imgUrl: String?) {
     if (!imgUrl.isNullOrEmpty()) {

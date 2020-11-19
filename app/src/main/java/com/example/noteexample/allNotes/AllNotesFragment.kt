@@ -1,7 +1,6 @@
 package com.example.noteexample.allNotes
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,9 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-//Date cal = Calendar.getInstance().getTime();
-//val time = SimpleDateFormat("HH:mm", Locale.ENGLISH).format(cal.time)
-
 
 class AllNotesFragment : Fragment() {
 
@@ -32,16 +28,11 @@ class AllNotesFragment : Fragment() {
      *  Define viewModel for NoteFragment
      */
 
-    val viewModel by lazy {
-        ViewModelProvider(this).get(AllNotesViewModel::class.java)
-    }
-
-    //TODO Date for notes
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val viewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
         val cards = mutableListOf<MaterialCardView>()
         val binding: FragmentNoteMainBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
@@ -137,6 +128,7 @@ class AllNotesFragment : Fragment() {
                         viewModel.getDESCNotes(it.onlyNotes, it.onlyPhotos)
                     }
                 }
+                noteAdapter.notifyDataSetChanged()
             }
         })
 
@@ -184,6 +176,21 @@ class AllNotesFragment : Fragment() {
             val img = holder.binding.photoMain
             val view1 = holder.binding.view1
             val view2 = holder.binding.view2
+            val view3 = holder.binding.view3
+            val noteMain = holder.binding.noteMain
+            val date = holder.binding.dateMain
+
+            img.visibility = View.GONE
+            noteMain.visibility = View.GONE
+            date.visibility = View.GONE
+            view3.visibility = View.GONE
+
+            viewModel.flagsObj?.let {
+                if (it.showDate) {
+                    date.visibility = View.VISIBLE
+                    view3.visibility = View.VISIBLE
+                }
+            }
 
             val contentList = viewModel.noteContentList.filter {
                 it.noteId == noteAdapter.currentList[holder.adapterPosition].id
@@ -195,7 +202,6 @@ class AllNotesFragment : Fragment() {
                  * bug in [ListAdapter]
                  */
 
-                img.visibility = View.GONE
                 if (contentList.isNotEmpty()) {
                     for (content in contentList) {
                         if (content.photoPath.isNotEmpty()) {
@@ -206,11 +212,16 @@ class AllNotesFragment : Fragment() {
                     }
                 }
 
+                if (current.firstNote.isNotEmpty()) {
+                    holder.binding.noteMain.visibility = View.VISIBLE
+                }
+
                 if (img.visibility == View.GONE
                     && current.firstNote.isEmpty()
                     && contentList.isNotEmpty()
                 ) {
-                    current.firstNote = contentList[0].note
+                    holder.binding.noteMain.text = contentList[0].note
+                    holder.binding.noteMain.visibility = View.VISIBLE
                     if (current.title.isNotEmpty()) {
                         view1.visibility = View.VISIBLE
                     }

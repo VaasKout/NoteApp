@@ -119,6 +119,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                 withContext(Dispatchers.IO) {
                     repository.deleteNote(note)
                     repository.deleteNoteContentList(contentList)
+                    flagsObj?.let { repository.updateFlags(it) }
                 }
             }
         }
@@ -142,6 +143,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     fun updateNoteList() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateNoteList(noteList)
+            flagsObj?.let { repository.updateFlags(it) }
         }
     }
 

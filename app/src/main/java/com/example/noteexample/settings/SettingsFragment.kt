@@ -1,7 +1,6 @@
 package com.example.noteexample.settings
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +27,9 @@ class SettingsFragment : BottomSheetDialogFragment() {
                 binding.sortASC.isChecked = true
             } else {
                 binding.sortDESC.isChecked = true
+            }
+            if (it.showDate){
+                binding.switchDate.isChecked = true
             }
             when {
                 it.onlyPhotos -> {
@@ -89,8 +91,6 @@ class SettingsFragment : BottomSheetDialogFragment() {
                 viewModel.updateFlags()
             }
         }
-
-
 
         return binding.root
     }

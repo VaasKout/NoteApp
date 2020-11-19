@@ -11,6 +11,9 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.DateFormat.getDateInstance
+import java.text.SimpleDateFormat
+import java.util.*
 
 class InsertNoteViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -101,10 +104,13 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
     fun updateCurrentNote(title: String = "", firstNote: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
+            val cal = Calendar.getInstance().time
+            val time = SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
             note?.let {
                 it.title = title
                 it.firstNote = firstNote
                 it.pos = size
+                it.date = time
                 if (noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }) {
                     it.hasNoteContent = true
                 }

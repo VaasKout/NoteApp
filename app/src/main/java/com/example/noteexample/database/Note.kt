@@ -3,7 +3,6 @@ package com.example.noteexample.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.function.BinaryOperator
 
 @Entity(tableName = "note_table")
 data class Note(
@@ -11,6 +10,7 @@ data class Note(
     @ColumnInfo(name = "position") var pos: Int = 0,
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "firstNote") var firstNote: String = "",
+    @ColumnInfo(name = "date") var date: String = "",
     @ColumnInfo(name = "hasNoteContent") var hasNoteContent: Boolean = false,
     var isChecked: Boolean = false,
 )
