@@ -1,17 +1,22 @@
 package com.example.noteexample.gallery
 
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentGalleryBinding
 import com.example.noteexample.utils.Camera
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.launch
 
 
 class GalleryFragment : BottomSheetDialogFragment() {
@@ -29,7 +34,57 @@ class GalleryFragment : BottomSheetDialogFragment() {
         val galleryAdapter = GalleryAdapter()
         val camera = Camera(requireActivity())
 
-        if (!viewModel.galleryListInit){
+        dialog?.setOnShowListener {
+            val bottomSheetBehavior = (dialog as BottomSheetDialog).behavior
+
+            val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+//                    when(newState){
+//                        BottomSheetBehavior.STATE_EXPANDED ->{
+//                            binding.lineGallery.visibility = View.GONE
+//                            binding.viewGallery.visibility = View.GONE
+//                            viewModel.showExpandPanel = true
+//                            if (!viewModel.actionModeStarted){
+//                                binding.galleryExpandPanel.visibility = View.VISIBLE
+//                            }
+//                        }
+//                        else ->{
+//                            binding.lineGallery.visibility = View.VISIBLE
+//                            binding.viewGallery.visibility = View.VISIBLE
+//                            binding.galleryExpandPanel.visibility = View.GONE
+//                            viewModel.showExpandPanel = false
+//                        }
+//                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    when (slideOffset) {
+                        0.1f -> {
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        }
+                        1f -> {
+                            binding.lineGallery.visibility = View.GONE
+//                            binding.viewGallery.visibility = View.GONE
+                            viewModel.showExpandPanel = true
+                            if (!viewModel.actionModeStarted) {
+                                binding.galleryExpandPanel.visibility = View.VISIBLE
+                            }
+                        }
+                        else -> {
+                            if (!viewModel.actionModeStarted) {
+                                binding.lineGallery.visibility = View.VISIBLE
+//                                binding.viewGallery.visibility = View.VISIBLE
+                            }
+                            binding.galleryExpandPanel.visibility = View.GONE
+                            viewModel.showExpandPanel = false
+                        }
+                    }
+                }
+            }
+            bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
+        }
+
+        if (!viewModel.galleryListInit) {
             viewModel.getData(camera)
             viewModel.galleryListInit = true
         }
@@ -51,18 +106,26 @@ class GalleryFragment : BottomSheetDialogFragment() {
         }
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            viewModel.currentNoteContentList = it.filter {list -> list.noteId == args.noteId }
+            viewModel.currentNoteContentList = it.filter { list -> list.noteId == args.noteId }
         })
 
         viewModel.actionMode.observe(viewLifecycleOwner, {
             if (it == true) {
                 viewModel.actionModeStarted = true
                 binding.selectPanel.visibility = View.VISIBLE
-                binding.galleryTitle.visibility = View.GONE
+                binding.lineGallery.visibility = View.GONE
+//                binding.viewGallery.visibility = View.GONE
+                binding.galleryExpandPanel.visibility = View.GONE
             } else {
                 viewModel.actionModeStarted = false
                 binding.selectPanel.visibility = View.GONE
-                binding.galleryTitle.visibility = View.VISIBLE
+                if (viewModel.showExpandPanel) {
+                    binding.galleryExpandPanel.visibility = View.VISIBLE
+//                    binding.viewGallery.visibility = View.GONE
+                } else {
+                    binding.lineGallery.visibility = View.VISIBLE
+//                    binding.viewGallery.visibility = View.VISIBLE
+                }
             }
         })
 
@@ -84,7 +147,6 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 binding.numberOfSelected.text =
                     viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
             }
-
         })
 
         binding.deleteSelectedPhotos.setOnClickListener {
@@ -93,12 +155,16 @@ class GalleryFragment : BottomSheetDialogFragment() {
             viewModel.onDoneActionMode()
         }
 
-        //TODO Customize bottom sheet dialog
-
         binding.acceptSelectedPhotos.setOnClickListener {
-            viewModel.insertImages(args.noteId)
+            lifecycleScope.launch {
+                viewModel.insertImages(args.noteId)
+                this@GalleryFragment.findNavController().popBackStack()
+                viewModel.onDoneActionMode()
+            }
+        }
+
+        binding.galleryBackButton.setOnClickListener {
             this.findNavController().popBackStack()
-            viewModel.onDoneActionMode()
         }
 
         binding.lifecycleOwner = this

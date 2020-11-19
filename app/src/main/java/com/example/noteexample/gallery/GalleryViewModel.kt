@@ -22,6 +22,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     //Flags
     var actionModeStarted = false
     var galleryListInit = false
+    var showExpandPanel = false
 
     //LiveData
     val allNoteContent: LiveData<List<NoteContent>>
@@ -46,13 +47,13 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun insertImages(noteId: Int) {
-        viewModelScope.launch {
-            val photoList = mutableListOf<GalleryData>()
-            val newNoteContentList = mutableListOf<NoteContent>()
-            photoList.addAll(galleryList.filter { list -> list.isChecked })
+    suspend fun insertImages(noteId: Int) {
+        val photoList = mutableListOf<GalleryData>()
+        val newNoteContentList = mutableListOf<NoteContent>()
+        photoList.addAll(galleryList.filter { list -> list.isChecked })
+        if (photoList.isNotEmpty()) {
             currentNoteContentList.forEach {
-                if (photoList.isNotEmpty() && it.hidden) {
+                if (it.hidden || it.photoPath.isEmpty()) {
                     it.photoPath = photoList[0].imgSrcUrl
                     it.hidden = false
                     photoList.removeAt(0)
@@ -60,16 +61,14 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                     return@forEach
                 }
             }
-            if (photoList.isNotEmpty()){
-                photoList.forEach { photo ->
-                    val noteContent = NoteContent(
-                        noteId = noteId,
-                        photoPath = photo.imgSrcUrl
-                    )
-                    newNoteContentList.add(noteContent)
-                }
-                repository.insertNoteContentList(newNoteContentList)
+            photoList.forEach { photo ->
+                val noteContent = NoteContent(
+                    noteId = noteId,
+                    photoPath = photo.imgSrcUrl
+                )
+                newNoteContentList.add(noteContent)
             }
+            repository.insertNoteContentList(newNoteContentList)
             repository.updateNoteContentList(currentNoteContentList)
         }
     }

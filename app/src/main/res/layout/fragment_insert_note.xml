@@ -17,7 +17,7 @@
             android:id="@+id/toolbar_note_insert"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
+            style="@style/Widget.MaterialComponents.Toolbar.Surface"
             app:title="@string/app_name"
             app:menu="@menu/note_edit_menu"/>
         </com.google.android.material.appbar.AppBarLayout>

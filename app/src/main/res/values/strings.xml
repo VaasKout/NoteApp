@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Note Example</string>
+    <string name="app_name">Заметки</string>
     <string name="title">Название</string>
     <string name="note">Заметка</string>
     <string name="save">Сохранить</string>
@@ -29,4 +29,6 @@
     <string name="only_notes">Только с текстом</string>
     <string name="new_first">Сначала новые</string>
     <string name="old_first">Сначала старые</string>
+    <string name="dialog_line">Dialog line</string>
+    <string name="gallery">Галерея</string>
 </resources>
