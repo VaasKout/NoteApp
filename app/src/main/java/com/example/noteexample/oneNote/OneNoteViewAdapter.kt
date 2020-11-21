@@ -3,6 +3,8 @@ package com.example.noteexample.oneNote
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
@@ -26,8 +28,8 @@ class OneNoteViewAdapter :
 //    private val _noteHolder = MutableLiveData<NoteViewHolder>()
 //    val noteHolder: LiveData<NoteViewHolder> = _noteHolder
 //
-//    private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
-//    val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder
+    private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
+    val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -96,7 +98,7 @@ class OneNoteViewAdapter :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(noteContent: NoteContent?) {
-//            _noteContentHolder.value = this
+            _noteContentHolder.value = this
             binding.data = noteContent
         }
     }

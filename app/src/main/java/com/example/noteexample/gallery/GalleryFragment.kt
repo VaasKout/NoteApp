@@ -1,7 +1,6 @@
 package com.example.noteexample.gallery
 
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +15,7 @@ import com.example.noteexample.utils.Camera
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.android.synthetic.main.fragment_gallery.view.*
 import kotlinx.coroutines.launch
 
 
@@ -39,46 +39,33 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
             val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
-//                    when(newState){
-//                        BottomSheetBehavior.STATE_EXPANDED ->{
-//                            binding.lineGallery.visibility = View.GONE
-//                            binding.viewGallery.visibility = View.GONE
-//                            viewModel.showExpandPanel = true
-//                            if (!viewModel.actionModeStarted){
-//                                binding.galleryExpandPanel.visibility = View.VISIBLE
-//                            }
-//                        }
-//                        else ->{
-//                            binding.lineGallery.visibility = View.VISIBLE
-//                            binding.viewGallery.visibility = View.VISIBLE
-//                            binding.galleryExpandPanel.visibility = View.GONE
-//                            viewModel.showExpandPanel = false
-//                        }
-//                    }
-                }
-
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    when (slideOffset) {
-                        0.1f -> {
-                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        }
-                        1f -> {
-                            binding.lineGallery.visibility = View.GONE
-//                            binding.viewGallery.visibility = View.GONE
-                            viewModel.showExpandPanel = true
-                            if (!viewModel.actionModeStarted) {
-                                binding.galleryExpandPanel.visibility = View.VISIBLE
-                            }
+                    when (newState) {
+                        BottomSheetBehavior.STATE_EXPANDED -> {
+                            binding.galleryMotion.transitionToEnd()
+                            viewModel.expandedState = true
                         }
                         else -> {
                             if (!viewModel.actionModeStarted) {
-                                binding.lineGallery.visibility = View.VISIBLE
-//                                binding.viewGallery.visibility = View.VISIBLE
+                                binding.galleryMotion.transitionToStart()
                             }
-                            binding.galleryExpandPanel.visibility = View.GONE
-                            viewModel.showExpandPanel = false
+                            viewModel.expandedState = false
                         }
                     }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+//                    when (slideOffset) {
+//                        1f -> {
+//                            binding.lineGallery.visibility = View.GONE
+//                            binding.galleryMenuTitle.visibility = View.VISIBLE
+//                            binding.galleryBackButton.visibility = View.VISIBLE
+//                        }
+//                        else -> {
+//                            binding.lineGallery.visibility = View.VISIBLE
+//                            binding.galleryMenuTitle.visibility = View.GONE
+//                            binding.galleryBackButton.visibility = View.GONE
+//                        }
+//                    }
                 }
             }
             bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
@@ -101,7 +88,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
         if (viewModel.galleryList.any { list -> list.isChecked }) {
             viewModel.onStartActionMode()
-            binding.numberOfSelected.text =
+            binding.galleryMenuTitle.text =
                 viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
         }
 
@@ -112,19 +99,14 @@ class GalleryFragment : BottomSheetDialogFragment() {
         viewModel.actionMode.observe(viewLifecycleOwner, {
             if (it == true) {
                 viewModel.actionModeStarted = true
-                binding.selectPanel.visibility = View.VISIBLE
-                binding.lineGallery.visibility = View.GONE
-//                binding.viewGallery.visibility = View.GONE
-                binding.galleryExpandPanel.visibility = View.GONE
+                binding.acceptSelectedPhotos.visibility = View.VISIBLE
+                binding.galleryMotion.transitionToEnd()
             } else {
                 viewModel.actionModeStarted = false
-                binding.selectPanel.visibility = View.GONE
-                if (viewModel.showExpandPanel) {
-                    binding.galleryExpandPanel.visibility = View.VISIBLE
-//                    binding.viewGallery.visibility = View.GONE
-                } else {
-                    binding.lineGallery.visibility = View.VISIBLE
-//                    binding.viewGallery.visibility = View.VISIBLE
+                binding.acceptSelectedPhotos.visibility = View.GONE
+                binding.galleryMenuTitle.text = resources.getText(R.string.gallery)
+                if (!viewModel.expandedState){
+                    binding.galleryMotion.transitionToStart()
                 }
             }
         })
@@ -136,6 +118,8 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 card.isChecked = !card.isChecked
                 viewModel.galleryList[holder.adapterPosition].isChecked =
                     card.isChecked
+                binding.galleryMenuTitle.text =
+                    viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
 
                 if (!viewModel.actionModeStarted) {
                     viewModel.onStartActionMode()
@@ -144,15 +128,17 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 ) {
                     viewModel.onDoneActionMode()
                 }
-                binding.numberOfSelected.text =
-                    viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
             }
         })
 
-        binding.deleteSelectedPhotos.setOnClickListener {
-            viewModel.clearSelected()
-            galleryAdapter.notifyDataSetChanged()
-            viewModel.onDoneActionMode()
+        binding.galleryBackButton.setOnClickListener {
+            if (viewModel.actionModeStarted) {
+                viewModel.clearSelected()
+                galleryAdapter.notifyDataSetChanged()
+                viewModel.onDoneActionMode()
+            } else {
+                this.findNavController().popBackStack()
+            }
         }
 
         binding.acceptSelectedPhotos.setOnClickListener {
@@ -161,10 +147,6 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 this@GalleryFragment.findNavController().popBackStack()
                 viewModel.onDoneActionMode()
             }
-        }
-
-        binding.galleryBackButton.setOnClickListener {
-            this.findNavController().popBackStack()
         }
 
         binding.lifecycleOwner = this

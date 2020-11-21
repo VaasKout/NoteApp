@@ -16,6 +16,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.noteexample.utils.adapter.OneNoteEditAdapter
 import com.example.noteexample.R
@@ -23,6 +24,9 @@ import com.example.noteexample.databinding.FragmentInsertNoteBinding
 import com.example.noteexample.utils.Camera
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class InsertNoteFragment : Fragment() {
 
@@ -154,9 +158,14 @@ class InsertNoteFragment : Fragment() {
          */
 
         viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            if (it != null) {
-                viewModel.noteContentList = it.filter { list -> list.noteId == viewModel.note?.id }
-                noteAdapter.addHeaderAndSubmitList(viewModel.note, viewModel.noteContentList)
+            lifecycleScope.launch(Dispatchers.Default) {
+                viewModel.insertNote()
+                if (it != null) {
+                    viewModel.noteContentList = it.filter { list -> list.noteId == viewModel.note?.id }
+                    withContext(Dispatchers.Main){
+                        noteAdapter.addHeaderAndSubmitList(viewModel.note, viewModel.noteContentList)
+                    }
+                }
             }
         })
 

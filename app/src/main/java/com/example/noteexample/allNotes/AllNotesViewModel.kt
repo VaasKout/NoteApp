@@ -53,10 +53,6 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * Coroutine functions
      */
 
-    suspend fun getNoteContent() {
-        noteContentList = repository.allNoteContentSimpleList()
-    }
-
     fun getASCNotes(onlyNotes: Boolean, onlyPhotos: Boolean) {
         viewModelScope.launch {
             when {
@@ -109,6 +105,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     suspend fun deleteUnused() {
+        noteContentList = repository.allNoteContentSimpleList()
         noteList.forEach { note ->
             val contentList = noteContentList.filter { it.noteId == note.id }
             if (note.title.isEmpty() &&
@@ -123,19 +120,23 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                 }
             }
         }
-        noteContentList.forEach {
-            if (it.hidden) {
-                if (it.note.isNotEmpty()) {
-                    it.photoPath = ""
-                    it.hidden = false
+
+        noteContentList.forEachIndexed { index, noteContent ->
+            if (noteContent.hidden) {
+                if (noteContent.note.isNotEmpty()) {
+                    noteContent.photoPath = ""
+                    noteContent.hidden = false
                     withContext(Dispatchers.IO) {
-                        repository.updateNoteContent(it)
+                        repository.updateNoteContent(noteContent)
                     }
                 } else {
                     withContext(Dispatchers.IO) {
-                        repository.deleteNoteContent(it)
+                        repository.deleteNoteContent(noteContent)
                     }
                 }
+            }
+            if (index == noteContentList.size - 1){
+                noteContentList = repository.allNoteContentSimpleList()
             }
         }
     }

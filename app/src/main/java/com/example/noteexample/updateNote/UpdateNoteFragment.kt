@@ -17,6 +17,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.utils.adapter.OneNoteEditAdapter
@@ -27,6 +28,9 @@ import com.example.noteexample.insertNote.InsertNoteFragmentDirections
 import com.example.noteexample.utils.Camera
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UpdateNoteFragment : Fragment() {
 
@@ -141,20 +145,28 @@ class UpdateNoteFragment : Fragment() {
              * reflect changes in [UpdateNoteViewModel.startNoteContentList],
              * it's caused by var fields in [NoteContent]
              */
-            if (it != null) {
-                viewModel.noteContentList = it.filter { list -> list.noteId == args.noteId }
-                noteAdapter.addHeaderAndSubmitList(viewModel.currentNote, viewModel.noteContentList)
-                if (!viewModel.startListInit) {
-                    viewModel.noteContentList.forEach { element ->
-                        val noteContent = NoteContent(
-                            id = element.id,
-                            noteId = element.noteId,
-                            note = element.note,
-                            photoPath = element.photoPath,
-                        )
-                        viewModel.startNoteContentList.add(noteContent)
+            lifecycleScope.launch(Dispatchers.Default) {
+                viewModel.getNote()
+                if (it != null) {
+                    viewModel.noteContentList = it.filter { list -> list.noteId == args.noteId }
+                    if (!viewModel.startListInit) {
+                        viewModel.noteContentList.forEach { element ->
+                            val noteContent = NoteContent(
+                                id = element.id,
+                                noteId = element.noteId,
+                                note = element.note,
+                                photoPath = element.photoPath,
+                            )
+                            viewModel.startNoteContentList.add(noteContent)
+                        }
+                        viewModel.startListInit = true
                     }
-                    viewModel.startListInit = true
+                    withContext(Dispatchers.Main) {
+                        noteAdapter.addHeaderAndSubmitList(
+                            viewModel.currentNote,
+                            viewModel.noteContentList
+                        )
+                    }
                 }
             }
         })
@@ -170,7 +182,7 @@ class UpdateNoteFragment : Fragment() {
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
-                if (it.hidden ) {
+                if (it.hidden) {
                     holder.binding.photo.visibility = View.GONE
                     holder.binding.restoreButton.visibility = View.VISIBLE
                     holder.binding.deleteCircleIcon.visibility = View.GONE

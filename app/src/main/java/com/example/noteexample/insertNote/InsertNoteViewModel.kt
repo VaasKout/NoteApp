@@ -20,6 +20,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     //Flags
     var backPressed = false
     var allHidden = true
+    var noteInserted = false
 
     //Repository
     private val repository: NoteRepository
@@ -44,7 +45,6 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
         allNotes = repository.allNotes
-        insertNote()
     }
 
     /**
@@ -85,13 +85,14 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun insertNote() {
-        note = Note()
-        viewModelScope.launch {
+    suspend fun insertNote() {
+        if (!noteInserted) {
+            note = Note()
             note?.let {
                 repository.insertNote(it)
             }
             note = repository.getLastNote()
+            noteInserted = true
         }
     }
 

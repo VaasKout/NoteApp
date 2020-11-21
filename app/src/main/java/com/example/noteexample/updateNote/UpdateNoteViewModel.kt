@@ -21,6 +21,7 @@ class UpdateNoteViewModel(
     var textChanged = false
     var sizeChanged = false
     var startListInit = false
+    var noteInit = false
 
     /**
      * This list is needed to reflect changes in [UpdateNoteFragment]
@@ -46,7 +47,6 @@ class UpdateNoteViewModel(
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNoteContent = repository.allNoteContent
-        getNote()
     }
 
     fun onStartNavigating() {
@@ -58,8 +58,8 @@ class UpdateNoteViewModel(
     }
 
     //Dao functions
-    private fun getNote() {
-        viewModelScope.launch {
+   suspend fun getNote() {
+        if (!noteInit){
             currentNote = repository.getNote(noteID)
             currentNote?.let {
                 title = it.title
@@ -67,6 +67,7 @@ class UpdateNoteViewModel(
                 newTitle = it.title
                 newFirstNote = it.firstNote
             }
+            noteInit = true
         }
     }
 

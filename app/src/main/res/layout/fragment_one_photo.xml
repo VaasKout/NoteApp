@@ -12,7 +12,6 @@
         <variable
             name="note"
             type="com.example.noteexample.database.Note" />
-
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -33,17 +32,17 @@
                 app:title="@string/app_name" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/one_photo_constraint"
+        <androidx.constraintlayout.motion.widget.MotionLayout
+            android:id="@+id/motion_one_photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layoutDescription="@xml/fragment_one_photo_xml_one_photo_constraint_scene"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-            <ImageView
+            <com.ortiz.touchview.TouchImageView
                 android:id="@+id/img_one_photo"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/one_photo"
                 android:scaleType="fitCenter"
@@ -64,10 +63,6 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                android:textColor="#FFFFFF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:titleText="@{note}"
                 tools:text="@string/title" />
 
@@ -81,11 +76,7 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                android:textColor="#FFFFFF"
                 app:firstNoteText="@{note}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title_view_one_photo"
                 tools:text="Заметка" />
 
 
@@ -99,12 +90,8 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="12dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:photoNoteText="@{data}"
                 tools:text="Note" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.motion.widget.MotionLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

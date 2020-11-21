@@ -65,6 +65,9 @@
         <action
             android:id="@+id/action_oneNoteFragment_to_updateNoteFragment"
             app:destination="@id/updateNoteFragment" />
+        <action
+            android:id="@+id/action_oneNoteFragment_to_onePhotoFragment"
+            app:destination="@id/onePhotoFragment" />
     </fragment>
     <dialog
         android:id="@+id/galleryFragment"
@@ -82,7 +85,7 @@
         tools:layout="@layout/fragment_one_photo">
         <argument
             android:name="noteID"
-            app:argType="integer" />
+            app:argType="integer"/>
         <argument
             android:name="noteContentID"
             app:argType="integer" />

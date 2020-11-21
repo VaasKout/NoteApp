@@ -22,7 +22,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     //Flags
     var actionModeStarted = false
     var galleryListInit = false
-    var showExpandPanel = false
+    var expandedState = false
 
     //LiveData
     val allNoteContent: LiveData<List<NoteContent>>

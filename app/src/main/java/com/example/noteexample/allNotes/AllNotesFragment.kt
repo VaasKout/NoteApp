@@ -1,6 +1,7 @@
 package com.example.noteexample.allNotes
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -140,8 +141,7 @@ class AllNotesFragment : Fragment() {
 
         viewModel.allSortedNotes.observe(viewLifecycleOwner, { list ->
             list?.let {
-                lifecycleScope.launch(Dispatchers.Default) {
-                    viewModel.getNoteContent()
+                lifecycleScope.launch (Dispatchers.Default){
                     viewModel.noteList = mutableListOf()
                     viewModel.noteList.addAll(it)
                     viewModel.deleteUnused()
@@ -195,6 +195,7 @@ class AllNotesFragment : Fragment() {
             val contentList = viewModel.noteContentList.filter {
                 it.noteId == noteAdapter.currentList[holder.adapterPosition].id
             }
+            Log.e("contentList", contentList.size.toString())
             noteAdapter.currentList[holder.adapterPosition]?.let { current ->
 
                 /**
@@ -213,15 +214,16 @@ class AllNotesFragment : Fragment() {
                 }
 
                 if (current.firstNote.isNotEmpty()) {
-                    holder.binding.noteMain.visibility = View.VISIBLE
+                    noteMain.visibility = View.VISIBLE
+                    noteMain.text = current.firstNote
                 }
 
                 if (img.visibility == View.GONE
                     && current.firstNote.isEmpty()
                     && contentList.isNotEmpty()
                 ) {
-                    holder.binding.noteMain.text = contentList[0].note
-                    holder.binding.noteMain.visibility = View.VISIBLE
+                    noteMain.text = contentList[0].note
+                    noteMain.visibility = View.VISIBLE
                     if (current.title.isNotEmpty()) {
                         view1.visibility = View.VISIBLE
                     }
@@ -269,37 +271,24 @@ class AllNotesFragment : Fragment() {
                         viewModel.onDestroyActionMode()
                     }
                 } else if (!viewModel.actionModeStarted) {
-                    when {
-                        contentList.isEmpty() -> {
-                            this.findNavController()
-                                .navigate(
-                                    AllNotesFragmentDirections
-                                        .actionAllNotesFragmentToOnePhotoFragment
-                                            (
-                                            noteAdapter.currentList[holder.adapterPosition].id,
-                                            -1
-                                        )
-                                )
-                        }
-                        contentList.size == 1 -> {
-                            this.findNavController()
-                                .navigate(
-                                    AllNotesFragmentDirections
-                                        .actionAllNotesFragmentToOnePhotoFragment
-                                            (
-                                            noteAdapter.currentList[holder.adapterPosition].id,
-                                            contentList[0].id
-                                        )
-                                )
-                        }
-                        else -> {
-                            this.findNavController()
-                                .navigate(
-                                    AllNotesFragmentDirections
-                                        .actionAllNotesFragmentToOneNoteFragment
-                                            (noteAdapter.currentList[holder.adapterPosition].id)
-                                )
-                        }
+
+                    if (contentList.size == 1 && contentList[0].photoPath.isNotEmpty()) {
+                        this.findNavController()
+                            .navigate(
+                                AllNotesFragmentDirections
+                                    .actionAllNotesFragmentToOnePhotoFragment
+                                        (
+                                        noteAdapter.currentList[holder.adapterPosition].id,
+                                        contentList[0].id
+                                    )
+                            )
+                    } else {
+                        this.findNavController()
+                            .navigate(
+                                AllNotesFragmentDirections
+                                    .actionAllNotesFragmentToOneNoteFragment
+                                        (noteAdapter.currentList[holder.adapterPosition].id)
+                            )
                     }
                 }
             }

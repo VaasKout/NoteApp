@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 @Suppress("UNCHECKED_CAST")
 class OneNoteViewModelFactory (
     private val application: Application,
-    private val noteID: Int,
+    private val noteID: Int = -1,
     private val noteContentID: Int = -1
 ): ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

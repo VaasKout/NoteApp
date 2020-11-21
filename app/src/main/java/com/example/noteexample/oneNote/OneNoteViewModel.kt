@@ -10,7 +10,7 @@ import com.example.noteexample.repository.NoteRepository
 
 class OneNoteViewModel(
     application: Application,
-    private val noteID: Int,
+    private val noteID: Int = -1,
     private val noteContentID: Int = -1
 ) : AndroidViewModel(application) {
 
@@ -18,6 +18,8 @@ class OneNoteViewModel(
     val allNoteContent: LiveData<List<NoteContent>>
     var currentNote: Note? = null
     var currentNoteContent: NoteContent? = null
+
+    var imgClicked = false
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()

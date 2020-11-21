@@ -16,7 +16,7 @@
         android:paddingBottom="4dp">
 
         <TextView
-            android:id="@+id/photo_note_one_note"
+            android:id="@+id/note_one_note"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"

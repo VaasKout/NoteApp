@@ -43,6 +43,16 @@ class OneNoteFragment : Fragment() {
             }
         })
 
+        oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, {holder ->
+           oneNoteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
+               holder.binding.photoOneNote.setOnClickListener {
+                   this.findNavController()
+                       .navigate(OneNoteFragmentDirections
+                           .actionOneNoteFragmentToOnePhotoFragment(args.noteID, current.id))
+               }
+           }
+        })
+
         /**
          * Menu onClickListener
          */
