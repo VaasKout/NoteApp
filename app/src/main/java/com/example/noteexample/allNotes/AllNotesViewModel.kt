@@ -16,7 +16,6 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -97,7 +96,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             noteContentListToDelete.addAll(noteContentList
                 .filter { it.noteId == note.id })
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.deleteNoteList(noteListToDelete)
             repository.deleteNoteContentList(noteContentListToDelete)
             flagsObj?.let { repository.updateFlags(it) }
@@ -113,11 +112,9 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                 (contentList.isEmpty() ||
                         contentList.none { !it.hidden || it.note.isNotEmpty() })
             ) {
-                withContext(Dispatchers.IO) {
-                    repository.deleteNote(note)
-                    repository.deleteNoteContentList(contentList)
-                    flagsObj?.let { repository.updateFlags(it) }
-                }
+                repository.deleteNote(note)
+                repository.deleteNoteContentList(contentList)
+                flagsObj?.let { repository.updateFlags(it) }
             }
         }
 
@@ -126,30 +123,27 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                 if (noteContent.note.isNotEmpty()) {
                     noteContent.photoPath = ""
                     noteContent.hidden = false
-                    withContext(Dispatchers.IO) {
-                        repository.updateNoteContent(noteContent)
-                    }
+
+                    repository.updateNoteContent(noteContent)
                 } else {
-                    withContext(Dispatchers.IO) {
-                        repository.deleteNoteContent(noteContent)
-                    }
+                    repository.deleteNoteContent(noteContent)
                 }
             }
-            if (index == noteContentList.size - 1){
+            if (index == noteContentList.size - 1) {
                 noteContentList = repository.allNoteContentSimpleList()
             }
         }
     }
 
     fun updateNoteList() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.updateNoteList(noteList)
             flagsObj?.let { repository.updateFlags(it) }
         }
     }
 
     fun onClear() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.deleteAllNotes()
             repository.deleteAllNoteContent()
             flagsObj?.let { repository.updateFlags(it) }

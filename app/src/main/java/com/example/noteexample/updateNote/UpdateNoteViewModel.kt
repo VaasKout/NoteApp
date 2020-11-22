@@ -72,7 +72,7 @@ class UpdateNoteViewModel(
     }
 
     fun insertCameraPhoto(path: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             currentNote?.let {
                 val localList = noteContentList.filter { list -> list.hidden }
                 if (localList.isEmpty()) {
@@ -99,7 +99,7 @@ class UpdateNoteViewModel(
     }
 
     fun updateCurrentNote(title: String, firstNote: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             currentNote?.let {
                 it.title = title
                 it.firstNote = firstNote
@@ -109,7 +109,7 @@ class UpdateNoteViewModel(
     }
 
     fun updateNoteContentList(noteContent: List<NoteContent>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.updateNoteContentList(noteContent)
         }
     }

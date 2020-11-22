@@ -63,9 +63,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="32dp"
+            android:contentDescription="@string/insert_note"
             android:src="@drawable/ic_add"
             android:text="@string/save"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            android:contentDescription="@string/insert_note" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

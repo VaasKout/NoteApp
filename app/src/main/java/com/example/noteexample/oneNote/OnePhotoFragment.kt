@@ -40,6 +40,10 @@ class OnePhotoFragment : Fragment() {
          * Menu onClickListener
          */
 
+        binding.toolbarOnePhoto.setNavigationOnClickListener {
+            this.findNavController().popBackStack()
+        }
+
         binding.toolbarOnePhoto.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.edit_item -> {

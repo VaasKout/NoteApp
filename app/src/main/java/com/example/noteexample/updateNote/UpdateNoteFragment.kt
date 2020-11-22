@@ -52,7 +52,6 @@ class UpdateNoteFragment : Fragment() {
 
         val binding: FragmentUpdateNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_update_note, container, false)
-        binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
 
@@ -79,7 +78,7 @@ class UpdateNoteFragment : Fragment() {
                         )
                 } else {
                     Snackbar.make(
-                        binding.editButton,
+                        binding.updateRecycler,
                         R.string.camera_request_failed,
                         Snackbar.LENGTH_SHORT
                     ).show()
@@ -97,6 +96,11 @@ class UpdateNoteFragment : Fragment() {
                 }
             }
 
+        binding.toolbarNoteUpdate.setNavigationOnClickListener {
+            viewModel.backPressed = true
+            viewModel.onStartNavigating()
+        }
+
         binding.toolbarNoteUpdate.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
@@ -107,7 +111,7 @@ class UpdateNoteFragment : Fragment() {
                             when (index) {
                                 0 -> {
                                     startCamera.launch(
-                                        camera.dispatchTakePictureIntent(binding.editButton)
+                                        camera.dispatchTakePictureIntent(binding.updateRecycler)
                                     )
                                 }
                                 1 -> {
@@ -132,6 +136,10 @@ class UpdateNoteFragment : Fragment() {
                                 }
                             }
                         }.show()
+                    true
+                }
+                R.id.save_note -> {
+                    viewModel.onStartNavigating()
                     true
                 }
                 else -> false

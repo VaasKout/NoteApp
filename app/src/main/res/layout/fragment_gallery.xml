@@ -18,7 +18,7 @@
             android:visibility="gone"
             android:contentDescription="@string/accept_selected_photos"
             android:focusable="true"
-            android:src="@drawable/ic_accept_selected" />
+            android:src="@drawable/ic_accept" />
 
         <ImageView
             android:id="@+id/line_gallery"
@@ -34,7 +34,7 @@
             android:clickable="true"
             android:contentDescription="@string/delete_selected_photos"
             android:focusable="true"
-            android:src="@drawable/ic_cancel_selected" />
+            android:src="@drawable/ic_back_arrow" />
 
         <TextView
             android:id="@+id/gallery_menu_title"

@@ -16,7 +16,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class GalleryFragment : BottomSheetDialogFragment() {
@@ -142,10 +144,12 @@ class GalleryFragment : BottomSheetDialogFragment() {
         }
 
         binding.acceptSelectedPhotos.setOnClickListener {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.Default) {
                 viewModel.insertImages(args.noteId)
-                this@GalleryFragment.findNavController().popBackStack()
-                viewModel.onDoneActionMode()
+                withContext(Dispatchers.Main){
+                    this@GalleryFragment.findNavController().popBackStack()
+                    viewModel.onDoneActionMode()
+                }
             }
         }
 

@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="viewModel"
-            type="com.example.noteexample.updateNote.UpdateNoteViewModel" />
-    </data>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -19,9 +13,9 @@
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_note_update"
                 android:layout_width="match_parent"
+                app:navigationIcon="@drawable/ic_back_arrow"
                 android:layout_height="?attr/actionBarSize"
                 style="@style/Widget.MaterialComponents.Toolbar.Surface"
-                app:title="@string/app_name"
                 app:menu="@menu/note_edit_menu"/>
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -42,21 +36,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/recycler_note_content_edit_item" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/edit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:backgroundTint="?attr/colorPrimary"
-                    android:onClick="@{() -> viewModel.onStartNavigating()}"
-                    android:text="@string/update"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
-                    android:textColor="#FFFFFF"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

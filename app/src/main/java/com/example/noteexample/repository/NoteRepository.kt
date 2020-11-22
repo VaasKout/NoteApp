@@ -5,81 +5,126 @@ import com.example.noteexample.database.Flags
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteDao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class NoteRepository(private val noteDao: NoteDao) {
-
     val allNotes = noteDao.getAllNotes()
-//    val allDESCSortedNotes: LiveData<List<Note>> = noteDao.getAllDESCSortedNotes()
-//    val allASCSortedNotes: LiveData<List<Note>> = noteDao.getAllASCSortedNotes()
-    suspend fun allDESCSortedNotes(): List<Note> = noteDao.getAllDESCSortedNotes()
-    suspend fun allASCSortedNotes(): List<Note> = noteDao.getAllASCSortedNotes()
-    suspend fun getNote(key: Int): Note = noteDao.getNote(key)
+
+    suspend fun allDESCSortedNotes(): List<Note> =
+        withContext(Dispatchers.IO) { noteDao.getAllDESCSortedNotes() }
+
+    suspend fun allASCSortedNotes(): List<Note> =
+        withContext(Dispatchers.IO) { noteDao.getAllASCSortedNotes() }
+
+    suspend fun getNote(key: Int): Note =
+        withContext(Dispatchers.IO) { noteDao.getNote(key) }
 
     suspend fun insertNote(note: Note) {
-        noteDao.insertNote(note)
+        withContext(Dispatchers.IO) {
+            noteDao.insertNote(note)
+        }
     }
 
     suspend fun deleteAllNotes() {
-        noteDao.deleteAllNotes()
+        withContext(Dispatchers.IO) {
+            noteDao.deleteAllNotes()
+        }
     }
 
     suspend fun deleteNoteList(noteList: List<Note>) {
-        noteDao.deleteNoteList(noteList)
+        withContext(Dispatchers.IO) {
+            noteDao.deleteNoteList(noteList)
+        }
+
     }
 
     suspend fun deleteNote(note: Note) {
-        noteDao.deleteNote(note)
+        withContext(Dispatchers.IO) {
+            noteDao.deleteNote(note)
+
+        }
     }
 
     suspend fun updateNote(note: Note) {
-        noteDao.updateNote(note)
+        withContext(Dispatchers.IO) {
+            noteDao.updateNote(note)
+        }
+
     }
 
     suspend fun updateNoteList(noteList: List<Note>) {
-        noteDao.updateNoteList(noteList)
+        withContext(Dispatchers.IO) {
+            noteDao.updateNoteList(noteList)
+        }
+
     }
 
-    suspend fun getLastNote() = noteDao.getLastNote()
+    suspend fun getLastNote() = withContext(Dispatchers.IO) { noteDao.getLastNote() }
 
 
     val allNoteContent: LiveData<List<NoteContent>> = noteDao.getAllNoteContent()
 
     suspend fun allNoteContentSimpleList(): List<NoteContent> =
-        noteDao.getAllNoteContentSimpleList()
+        withContext(Dispatchers.IO) { noteDao.getAllNoteContentSimpleList() }
 
-    suspend fun getNoteContent(key: Int): NoteContent = noteDao.getNoteContent(key)
+    suspend fun getNoteContent(key: Int): NoteContent =
+        withContext(Dispatchers.IO) { noteDao.getNoteContent(key) }
 
     suspend fun insertNoteContent(noteContent: NoteContent) {
-        noteDao.insertNoteContent(noteContent)
+        withContext(Dispatchers.IO) {
+            noteDao.insertNoteContent(noteContent)
+        }
+
     }
 
     suspend fun insertNoteContentList(noteContentList: List<NoteContent>) {
-        noteDao.insertNoteContentList(noteContentList)
+        withContext(Dispatchers.IO) {
+            noteDao.insertNoteContentList(noteContentList)
+        }
+
     }
 
     suspend fun deleteAllNoteContent() {
-        noteDao.deleteAllNoteContent()
+        withContext(Dispatchers.IO) {
+            noteDao.deleteAllNoteContent()
+        }
+
     }
 
     suspend fun deleteNoteContentList(noteContentList: List<NoteContent>) {
-        noteDao.deleteNoteContentList(noteContentList)
+        withContext(Dispatchers.IO) {
+            noteDao.deleteNoteContentList(noteContentList)
+        }
+
     }
 
     suspend fun deleteNoteContent(noteContent: NoteContent) {
-        noteDao.deleteNoteContent(noteContent)
+        withContext(Dispatchers.IO) {
+            noteDao.deleteNoteContent(noteContent)
+        }
+
     }
 
     suspend fun updateNoteContent(noteContent: NoteContent) {
-        noteDao.updateNoteContent(noteContent)
+        withContext(Dispatchers.IO) {
+            noteDao.updateNoteContent(noteContent)
+        }
+
     }
 
     suspend fun updateNoteContentList(noteContent: List<NoteContent>) {
-        noteDao.updateNoteContentList(noteContent)
+        withContext(Dispatchers.IO) {
+            noteDao.updateNoteContentList(noteContent)
+        }
+
     }
 
     val flags: LiveData<Flags> = noteDao.getFlags()
 
     suspend fun updateFlags(flags: Flags) {
-        noteDao.updateFlags(flags)
+        withContext(Dispatchers.IO) {
+            noteDao.updateFlags(flags)
+        }
     }
 }

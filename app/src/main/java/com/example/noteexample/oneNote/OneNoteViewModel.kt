@@ -18,7 +18,6 @@ class OneNoteViewModel(
     val allNoteContent: LiveData<List<NoteContent>>
     var currentNote: Note? = null
     var currentNoteContent: NoteContent? = null
-
     var imgClicked = false
 
     init {

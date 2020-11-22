@@ -37,7 +37,7 @@ class InsertNoteFragment : Fragment() {
      * Initialize viewModel for [InsertNoteViewModel]
      */
 
-    val viewModel by lazy {
+    private val viewModel by lazy {
         ViewModelProvider(this).get(InsertNoteViewModel::class.java)
     }
 
@@ -50,7 +50,6 @@ class InsertNoteFragment : Fragment() {
         //binding for EditNoteFragment
         val binding: FragmentInsertNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_insert_note, container, false)
-        binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
         /**
@@ -83,7 +82,7 @@ class InsertNoteFragment : Fragment() {
                     }
                 } else {
                     Snackbar.make(
-                        binding.saveButton,
+                        binding.insertRecycler,
                         R.string.camera_request_failed,
                         Snackbar.LENGTH_SHORT
                     ).show()
@@ -105,6 +104,11 @@ class InsertNoteFragment : Fragment() {
          * toolbar clickListener
          */
 
+        binding.toolbarNoteInsert.setNavigationOnClickListener {
+            viewModel.backPressed = true
+            viewModel.onStartNavigating()
+        }
+
         binding.toolbarNoteInsert.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
@@ -116,7 +120,7 @@ class InsertNoteFragment : Fragment() {
                             when (index) {
                                 0 -> {
                                     startCamera.launch(
-                                        camera.dispatchTakePictureIntent(binding.saveButton)
+                                        camera.dispatchTakePictureIntent(binding.insertRecycler)
                                     )
                                 }
                                 1 -> {
@@ -141,6 +145,10 @@ class InsertNoteFragment : Fragment() {
                                 }
                             }
                         }.show()
+                    true
+                }
+                R.id.save_note ->{
+                    viewModel.onStartNavigating()
                     true
                 }
                 else -> false

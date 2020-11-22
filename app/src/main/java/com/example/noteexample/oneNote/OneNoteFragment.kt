@@ -57,6 +57,10 @@ class OneNoteFragment : Fragment() {
          * Menu onClickListener
          */
 
+        binding.toolbarOneNote.setNavigationOnClickListener {
+            this.findNavController().popBackStack()
+        }
+
         binding.toolbarOneNote.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.edit_item -> {

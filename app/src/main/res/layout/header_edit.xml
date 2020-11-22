@@ -22,7 +22,10 @@
             android:hint="@string/title"
             android:autofillHints="@string/title"
             android:background="@android:color/transparent"
-            android:padding="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
+            android:paddingTop="8dp"
             android:maxLength="200"
             app:titleText="@{note}"/>
 
@@ -34,7 +37,10 @@
             android:background="@android:color/transparent"
             android:hint="@string/note"
             android:inputType="textMultiLine|text"
-            android:padding="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
+            android:paddingTop="8dp"
             android:maxLength="400"
             app:firstNoteText="@{note}"
             app:layout_constraintEnd_toEndOf="parent"

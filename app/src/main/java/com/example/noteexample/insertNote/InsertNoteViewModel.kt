@@ -65,7 +65,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
      */
 
     fun insertCameraPhoto(path: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             note?.let {
                 val localList = noteContentList.filter { item -> item.hidden }
                 if (localList.isEmpty()) {
@@ -104,7 +104,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
 
 
     fun updateCurrentNote(title: String = "", firstNote: String = "") {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val cal = Calendar.getInstance().time
             val time = SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
             note?.let {
@@ -121,7 +121,7 @@ class InsertNoteViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun deleteUnused() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             note?.let { repository.deleteNote(it) }
         }
     }
