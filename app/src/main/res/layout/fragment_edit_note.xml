@@ -13,7 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_back_arrow"
-            style="@style/Widget.MaterialComponents.Toolbar.Surface"
+            style="@style/Widget.AppCompat.Toolbar"
+            android:background="@color/primaryColor"
             app:menu="@menu/note_edit_menu"/>
         </com.google.android.material.appbar.AppBarLayout>
 

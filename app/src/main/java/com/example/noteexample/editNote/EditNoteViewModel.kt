@@ -149,6 +149,9 @@ class EditNoteViewModel(
             currentNote?.let {
                 it.title = title
                 it.firstNote = firstNote
+                if (noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }) {
+                    it.hasNoteContent = true
+                }
                 repository.updateNote(it)
             }
         }

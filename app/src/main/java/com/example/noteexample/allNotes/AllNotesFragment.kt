@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -48,8 +49,8 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-            layoutManager =
-                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+//            layoutManager =
+//                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
 //            layoutManager = LinearLayoutManager(requireContext())
         }
 
@@ -91,19 +92,18 @@ class AllNotesFragment : Fragment() {
         }
 
         binding.searchEdit.addTextChangedListener {
-            if (it.toString().isNotEmpty()) {
-                val noteContentList = viewModel.noteContentList.filter { item ->
-                    item.note.contains(it.toString())
-                }
-
-                val noteList = viewModel.noteList.filter { item ->
-                    item.title.contains(it.toString()) ||
-                            item.firstNote.contains(it.toString()) ||
-                            noteContentList.any { content -> content.noteId == item.id }
-                }
-                noteAdapter.submitList(noteList)
-            } else {
+            val noteContentList = viewModel.noteContentList.filter { item ->
+                item.note.contains(it.toString())
+            }
+            val noteList = viewModel.noteList.filter { item ->
+                item.title.contains(it.toString()) ||
+                        item.firstNote.contains(it.toString()) ||
+                        noteContentList.any { content -> content.noteId == item.id }
+            }
+            if (it.toString().isEmpty()) {
                 noteAdapter.submitList(viewModel.noteList)
+            } else {
+                noteAdapter.submitList(noteList)
             }
         }
 
@@ -127,6 +127,13 @@ class AllNotesFragment : Fragment() {
                     viewModel.getASCNotes(it.onlyNotes, it.onlyPhotos)
                 } else {
                     viewModel.getDESCNotes(it.onlyNotes, it.onlyPhotos)
+                }
+                if (it.twoColumns) {
+                    binding.recyclerView.layoutManager =
+                        StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+                } else {
+                    binding.recyclerView.layoutManager =
+                        LinearLayoutManager(requireContext())
                 }
                 noteAdapter.notifyDataSetChanged()
             }

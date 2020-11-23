@@ -370,7 +370,6 @@ class EditNoteFragment : Fragment() {
                 }
             })
         }
-
         return binding.root
     }
 

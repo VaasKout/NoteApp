@@ -30,4 +30,7 @@
     <string name="old_first">Сначала старые</string>
     <string name="dialog_line">Dialog line</string>
     <string name="gallery">Галерея</string>
+    <string name="columns">Расположение</string>
+    <string name="one_column">1 колонка</string>
+    <string name="two_columns">2 колонки</string>
 </resources>

@@ -21,15 +21,41 @@ class SettingsFragment : BottomSheetDialogFragment() {
         binding.lifecycleOwner = this
         val viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
 
+//        dialog?.let {
+//            val bottomSheetBehavior = (dialog as BottomSheetDialog).behavior
+//
+//            val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+//                override fun onStateChanged(bottomSheet: View, newState: Int) {
+//                    when (newState) {
+//                        BottomSheetBehavior.STATE_EXPANDED -> {
+//                        }
+//                        else -> {
+//                        }
+//                    }
+//                }
+//                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+//                }
+//            }
+////            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+//            bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
+//        }
+
         viewModel.flags.observe(viewLifecycleOwner, {
             viewModel.flagsObj = it
+            if (it.showDate) {
+                binding.switchDate.isChecked = true
+            }
+
+            if (it.twoColumns){
+                binding.twoColumns.isChecked = true
+            } else{
+                binding.oneColumn.isChecked = true
+            }
+
             if (it.ascendingOrder) {
                 binding.sortASC.isChecked = true
             } else {
                 binding.sortDESC.isChecked = true
-            }
-            if (it.showDate){
-                binding.switchDate.isChecked = true
             }
             when {
                 it.onlyPhotos -> {
@@ -43,6 +69,30 @@ class SettingsFragment : BottomSheetDialogFragment() {
                 }
             }
         })
+
+        binding.switchDate.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewModel.flagsObj?.showDate = true
+                viewModel.updateFlags()
+            } else {
+                viewModel.flagsObj?.showDate = false
+                viewModel.updateFlags()
+            }
+        }
+
+        binding.oneColumn.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewModel.flagsObj?.twoColumns = false
+                viewModel.updateFlags()
+            }
+        }
+
+        binding.twoColumns.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked){
+                viewModel.flagsObj?.twoColumns = true
+                viewModel.updateFlags()
+            }
+        }
 
         binding.sortDESC.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -82,15 +132,6 @@ class SettingsFragment : BottomSheetDialogFragment() {
             }
         }
 
-        binding.switchDate.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.flagsObj?.showDate = true
-                viewModel.updateFlags()
-            } else {
-                viewModel.flagsObj?.showDate = false
-                viewModel.updateFlags()
-            }
-        }
 
         return binding.root
     }

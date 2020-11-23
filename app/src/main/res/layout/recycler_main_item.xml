@@ -18,14 +18,14 @@
         android:id="@+id/main_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
+        android:layout_margin="@dimen/dp_4"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
         android:longClickable="true"
-        app:cardCornerRadius="4dp"
-        app:strokeColor="@color/colorPrimary"
-        app:strokeWidth="1dp">
+        app:cardCornerRadius="@dimen/dp_4"
+        app:strokeColor="@color/primaryLightColor"
+        app:strokeWidth="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -38,10 +38,10 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="5"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
+                android:paddingStart="@dimen/dp_16"
+                android:paddingTop="@dimen/dp_8"
+                android:paddingEnd="@dimen/dp_16"
+                android:paddingBottom="@dimen/dp_8"
                 android:singleLine="false"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -53,8 +53,8 @@
             <View
                 android:id="@+id/view1"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorPrimary"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/primaryLightColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title_main" />
@@ -65,10 +65,10 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="8"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
+                android:paddingStart="@dimen/dp_16"
+                android:paddingTop="@dimen/dp_8"
+                android:paddingEnd="@dimen/dp_16"
+                android:paddingBottom="@dimen/dp_8"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -78,13 +78,11 @@
             <View
                 android:id="@+id/view2"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorPrimary"
-                android:visibility="gone"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/primaryLightColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/note_main"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toBottomOf="@id/note_main" />
 
             <ImageView
                 android:id="@+id/photo_main"
@@ -102,20 +100,18 @@
             <View
                 android:id="@+id/view3"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorPrimary"
-                android:visibility="gone"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/primaryLightColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/photo_main"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toBottomOf="@id/photo_main" />
 
             <TextView
                 android:id="@+id/date_main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="@dimen/dp_8"
+                android:paddingEnd="@dimen/dp_8"
                 android:textAlignment="viewEnd"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                 app:date="@{note}"

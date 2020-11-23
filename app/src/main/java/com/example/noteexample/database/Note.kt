@@ -31,4 +31,5 @@ data class Flags(
     @ColumnInfo(name = "onlyNotes") var onlyNotes: Boolean = false,
     @ColumnInfo(name = "ascendingOrder") var ascendingOrder: Boolean = false,
     @ColumnInfo(name = "showDate") var showDate: Boolean = true,
+    @ColumnInfo(name = "twoColumns") var twoColumns: Boolean = true
 )
