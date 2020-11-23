@@ -5,12 +5,12 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.RecyclerMainItemBinding
-import com.example.noteexample.utils.adapter.NoteDiffCallBack
 
 class NoteAdapter :
     ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
@@ -47,6 +47,16 @@ class NoteAdapter :
             binding.mainCard.isChecked = note.isChecked
             binding.executePendingBindings()
         }
+    }
+}
+
+class NoteDiffCallBack : DiffUtil.ItemCallback<Note>(){
+    override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+        return oldItem == newItem
     }
 }
 

@@ -1,7 +1,6 @@
 package com.example.noteexample.allNotes
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.databinding.RecyclerMainItemBinding
@@ -122,12 +123,10 @@ class AllNotesFragment : Fragment() {
         viewModel.flags.observe(viewLifecycleOwner, {
             if (it != null) {
                 viewModel.flagsObj = it
-                lifecycleScope.launch {
-                    if (it.ascendingOrder) {
-                        viewModel.getASCNotes(it.onlyNotes, it.onlyPhotos)
-                    } else {
-                        viewModel.getDESCNotes(it.onlyNotes, it.onlyPhotos)
-                    }
+                if (it.ascendingOrder) {
+                    viewModel.getASCNotes(it.onlyNotes, it.onlyPhotos)
+                } else {
+                    viewModel.getDESCNotes(it.onlyNotes, it.onlyPhotos)
                 }
                 noteAdapter.notifyDataSetChanged()
             }
@@ -139,9 +138,9 @@ class AllNotesFragment : Fragment() {
          *  from ViewModel and makes it equal to notes [NoteAdapter.getCurrentList] from adapter
          */
 
-        viewModel.allSortedNotes.observe(viewLifecycleOwner, { list ->
-            list?.let {
-                lifecycleScope.launch (Dispatchers.Default){
+        viewModel.allSortedNotes.observe(viewLifecycleOwner, {
+            if (it != null) {
+                lifecycleScope.launch(Dispatchers.Default) {
                     viewModel.noteList = mutableListOf()
                     viewModel.noteList.addAll(it)
                     viewModel.deleteUnused()
@@ -180,9 +179,11 @@ class AllNotesFragment : Fragment() {
             val noteMain = holder.binding.noteMain
             val date = holder.binding.dateMain
 
-            img.visibility = View.GONE
             noteMain.visibility = View.GONE
+            img.visibility = View.GONE
             date.visibility = View.GONE
+            view1.visibility = View.GONE
+            view2.visibility = View.GONE
             view3.visibility = View.GONE
 
             viewModel.flagsObj?.let {
@@ -195,7 +196,7 @@ class AllNotesFragment : Fragment() {
             val contentList = viewModel.noteContentList.filter {
                 it.noteId == noteAdapter.currentList[holder.adapterPosition].id
             }
-            Log.e("contentList", contentList.size.toString())
+
             noteAdapter.currentList[holder.adapterPosition]?.let { current ->
 
                 /**
@@ -301,7 +302,7 @@ class AllNotesFragment : Fragment() {
             this.findNavController()
                 .navigate(
                     AllNotesFragmentDirections
-                        .actionNoteFragmentToInsertNoteFragment()
+                        .actionAllNotesFragmentToEditNoteFragment()
                 )
             viewModel.onDoneSearch()
         }

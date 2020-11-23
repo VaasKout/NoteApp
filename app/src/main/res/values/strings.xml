@@ -4,7 +4,6 @@
     <string name="note">Заметка</string>
     <string name="save">Сохранить</string>
     <string name="delete_all">Удалить все</string>
-    <string name="update">Редактировать</string>
     <string name="delete">Delete</string>
     <string name="photo">photo</string>
     <string name="camera_error">Произошла ошибка при попытке открыть камеру</string>

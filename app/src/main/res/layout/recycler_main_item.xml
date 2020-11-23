@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="note"
             type="com.example.noteexample.database.Note" />
@@ -56,11 +55,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/colorPrimary"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title_main"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toBottomOf="@id/title_main" />
 
             <TextView
                 android:id="@+id/note_main"
@@ -76,8 +73,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/view1"
-                android:visibility="gone"
-                tools:visibility="visible"
                 tools:text="Note" />
 
             <View

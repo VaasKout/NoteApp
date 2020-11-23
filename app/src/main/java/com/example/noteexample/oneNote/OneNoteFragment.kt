@@ -67,7 +67,7 @@ class OneNoteFragment : Fragment() {
                     this.findNavController()
                         .navigate(
                             OneNoteFragmentDirections
-                                .actionOneNoteFragmentToUpdateNoteFragment(args.noteID)
+                                .actionOneNoteFragmentToEditNoteFragment(args.noteID)
                         )
                     true
                 }

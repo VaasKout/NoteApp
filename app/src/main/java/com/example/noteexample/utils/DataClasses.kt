@@ -1,4 +1,4 @@
-package com.example.noteexample.utils.dataClasses
+package com.example.noteexample.utils
 
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent

@@ -10,7 +10,6 @@ import android.provider.MediaStore
 import android.view.View
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
-import com.example.noteexample.utils.dataClasses.GalleryData
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.IOException

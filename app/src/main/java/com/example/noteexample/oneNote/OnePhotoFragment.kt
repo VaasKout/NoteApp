@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -50,7 +49,7 @@ class OnePhotoFragment : Fragment() {
                     this.findNavController()
                         .navigate(
                             OnePhotoFragmentDirections
-                                .actionOnePhotoFragmentToUpdateNoteFragment(args.noteID)
+                                .actionOnePhotoFragmentToEditNoteFragment(args.noteID)
                         )
                     true
                 }

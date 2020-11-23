@@ -5,13 +5,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
-import com.example.noteexample.utils.dataClasses.GalleryData
-import kotlinx.coroutines.launch
+import com.example.noteexample.utils.GalleryData
 
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
 
