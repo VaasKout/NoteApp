@@ -6,6 +6,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 

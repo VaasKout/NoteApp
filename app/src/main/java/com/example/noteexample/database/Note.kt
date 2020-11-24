@@ -27,9 +27,8 @@ data class NoteContent(
 @Entity(tableName = "flags")
 data class Flags(
     @PrimaryKey val id: Int = 0,
-    @ColumnInfo(name = "onlyPhotos") var onlyPhotos: Boolean = false,
-    @ColumnInfo(name = "onlyNotes") var onlyNotes: Boolean = false,
+    @ColumnInfo(name = "filter") var filter: Int = 0,
     @ColumnInfo(name = "ascendingOrder") var ascendingOrder: Boolean = false,
     @ColumnInfo(name = "showDate") var showDate: Boolean = true,
-    @ColumnInfo(name = "twoColumns") var twoColumns: Boolean = true
+    @ColumnInfo(name = "columns") var columns: Int = 2,
 )

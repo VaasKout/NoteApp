@@ -8,6 +8,7 @@
         android:id="@+id/gallery_motion"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:theme="@style/GalleryTheme"
         app:layoutDescription="@xml/fragment_gallery_xml_gallery_layout_scene">
 
         <ImageView
@@ -40,8 +41,8 @@
             android:id="@+id/gallery_menu_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/gallery"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+            android:text="@string/gallery" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/gallery_recycler_view"
@@ -49,7 +50,7 @@
             android:layout_height="wrap_content"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="3"
-            tools:listitem="@layout/gallery_recycler_item"/>
+            tools:listitem="@layout/gallery_recycler_item" />
 
     </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

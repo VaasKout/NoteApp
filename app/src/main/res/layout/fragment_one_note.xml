@@ -2,20 +2,22 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_one_note"
                 android:layout_width="match_parent"
                 app:navigationIcon="@drawable/ic_back_arrow"
                 android:layout_height="?attr/actionBarSize"
-                style="@style/Widget.AppCompat.Toolbar"
-                android:background="@color/primaryColor"
-                app:menu="@menu/note_view_menu"/>
+                style="@style/ToolbarStyle"
+                app:menu="@menu/note_view_menu" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout

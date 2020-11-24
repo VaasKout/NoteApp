@@ -10,6 +10,11 @@ import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentSettingsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
+const val ALL = 0
+const val TEXT_ONLY = 1
+const val PHOTOS_ONLY = 2
+
+
 class SettingsFragment : BottomSheetDialogFragment() {
 
     override fun onCreateView(
@@ -46,9 +51,9 @@ class SettingsFragment : BottomSheetDialogFragment() {
                 binding.switchDate.isChecked = true
             }
 
-            if (it.twoColumns){
+            if (it.columns == 2){
                 binding.twoColumns.isChecked = true
-            } else{
+            } else {
                 binding.oneColumn.isChecked = true
             }
 
@@ -57,15 +62,15 @@ class SettingsFragment : BottomSheetDialogFragment() {
             } else {
                 binding.sortDESC.isChecked = true
             }
-            when {
-                it.onlyPhotos -> {
-                    binding.filterOnlyPhotos.isChecked = true
-                }
-                it.onlyNotes -> {
-                    binding.filterOnlyNotes.isChecked = true
-                }
-                else -> {
+            when(it.filter) {
+                ALL -> {
                     binding.filterAll.isChecked = true
+                }
+                TEXT_ONLY -> {
+                    binding.filterTextOnly.isChecked = true
+                }
+                PHOTOS_ONLY -> {
+                    binding.filterPhotosOnly.isChecked = true
                 }
             }
         })
@@ -82,14 +87,14 @@ class SettingsFragment : BottomSheetDialogFragment() {
 
         binding.oneColumn.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.twoColumns = false
+                viewModel.flagsObj?.columns = 1
                 viewModel.updateFlags()
             }
         }
 
         binding.twoColumns.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked){
-                viewModel.flagsObj?.twoColumns = true
+                viewModel.flagsObj?.columns = 2
                 viewModel.updateFlags()
             }
         }
@@ -110,28 +115,24 @@ class SettingsFragment : BottomSheetDialogFragment() {
 
         binding.filterAll.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.onlyNotes = false
-                viewModel.flagsObj?.onlyPhotos = false
+                viewModel.flagsObj?.filter = ALL
                 viewModel.updateFlags()
             }
         }
 
-        binding.filterOnlyPhotos.setOnCheckedChangeListener { _, isChecked ->
+        binding.filterTextOnly.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.onlyPhotos = true
-                viewModel.flagsObj?.onlyNotes = false
+                viewModel.flagsObj?.filter = TEXT_ONLY
                 viewModel.updateFlags()
             }
         }
 
-        binding.filterOnlyNotes.setOnCheckedChangeListener { _, isChecked ->
+        binding.filterPhotosOnly.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.onlyNotes = true
-                viewModel.flagsObj?.onlyPhotos = false
+                viewModel.flagsObj?.filter = PHOTOS_ONLY
                 viewModel.updateFlags()
             }
         }
-
 
         return binding.root
     }

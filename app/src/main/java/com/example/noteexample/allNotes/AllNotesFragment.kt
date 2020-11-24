@@ -92,18 +92,22 @@ class AllNotesFragment : Fragment() {
         }
 
         binding.searchEdit.addTextChangedListener {
-            val noteContentList = viewModel.noteContentList.filter { item ->
-                item.note.contains(it.toString())
-            }
-            val noteList = viewModel.noteList.filter { item ->
-                item.title.contains(it.toString()) ||
-                        item.firstNote.contains(it.toString()) ||
-                        noteContentList.any { content -> content.noteId == item.id }
-            }
-            if (it.toString().isEmpty()) {
-                noteAdapter.submitList(viewModel.noteList)
-            } else {
-                noteAdapter.submitList(noteList)
+            lifecycleScope.launch(Dispatchers.Default){
+                val noteContentList = viewModel.noteContentList.filter { item ->
+                    item.note.contains(it.toString())
+                }
+                val noteList = viewModel.noteList.filter { item ->
+                    item.title.contains(it.toString()) ||
+                            item.firstNote.contains(it.toString()) ||
+                            noteContentList.any { content -> content.noteId == item.id }
+                }
+                withContext(Dispatchers.Main){
+                    if (it.toString().isEmpty()) {
+                        noteAdapter.submitList(viewModel.noteList)
+                    } else {
+                        noteAdapter.submitList(noteList)
+                    }
+                }
             }
         }
 
@@ -124,11 +128,11 @@ class AllNotesFragment : Fragment() {
             if (it != null) {
                 viewModel.flagsObj = it
                 if (it.ascendingOrder) {
-                    viewModel.getASCNotes(it.onlyNotes, it.onlyPhotos)
+                    viewModel.getASCNotes(it.filter)
                 } else {
-                    viewModel.getDESCNotes(it.onlyNotes, it.onlyPhotos)
+                    viewModel.getDESCNotes(it.filter)
                 }
-                if (it.twoColumns) {
+                if (it.columns == 2) {
                     binding.recyclerView.layoutManager =
                         StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
                 } else {

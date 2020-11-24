@@ -31,6 +31,6 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/gallery_photos"
             android:scaleType="centerCrop"
-            tools:src="@tools:sample/backgrounds/scenic" />
+            tools:src="@tools:sample/backgrounds/scenic"/>
     </com.google.android.material.card.MaterialCardView>
 </layout>

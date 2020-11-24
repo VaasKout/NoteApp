@@ -86,9 +86,20 @@ class EditNoteViewModel(
                 it.firstNote = firstNote
                 it.pos = size
                 it.date = time
-                if (noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }) {
-                    it.hasNoteContent = true
-                }
+                it.hasNoteContent =
+                    noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }
+                repository.updateNote(it)
+            }
+        }
+    }
+
+    fun updateCurrentNoteUpdateFr(title: String, firstNote: String) {
+        viewModelScope.launch {
+            currentNote?.let {
+                it.title = title
+                it.firstNote = firstNote
+                it.hasNoteContent =
+                    noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }
                 repository.updateNote(it)
             }
         }
@@ -104,8 +115,8 @@ class EditNoteViewModel(
     }
 
     //Dao functions
-   suspend fun getNote() {
-        if (!noteInit){
+    suspend fun getNote() {
+        if (!noteInit) {
             currentNote = repository.getNote(noteID)
             currentNote?.let {
                 title = it.title
@@ -144,18 +155,7 @@ class EditNoteViewModel(
         }
     }
 
-    fun updateCurrentNoteUpdateFr(title: String, firstNote: String) {
-        viewModelScope.launch {
-            currentNote?.let {
-                it.title = title
-                it.firstNote = firstNote
-                if (noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }) {
-                    it.hasNoteContent = true
-                }
-                repository.updateNote(it)
-            }
-        }
-    }
+
 
     fun updateNoteContentList(noteContent: List<NoteContent>) {
         viewModelScope.launch {
@@ -177,7 +177,7 @@ class EditNoteViewModel(
         }
     }
 
-        fun deleteNoteContent(noteContent: NoteContent) {
+    fun deleteNoteContent(noteContent: NoteContent) {
         viewModelScope.launch {
             repository.deleteNoteContent(noteContent)
         }

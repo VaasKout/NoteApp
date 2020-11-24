@@ -13,10 +13,9 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_note_main"
-                style="@style/Widget.AppCompat.Toolbar"
+                style="@style/ToolbarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/primaryColor"
                 app:menu="@menu/note_main_menu"
                 app:title="@string/app_name" />
         </com.google.android.material.appbar.AppBarLayout>
@@ -37,12 +36,12 @@
                 android:layout_marginEnd="@dimen/dp_8"
                 android:autofillHints="@string/search"
                 android:hint="@string/search"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:imeOptions="actionDone"
                 tools:ignore="LabelFor"
                 tools:visibility="visible" />
 

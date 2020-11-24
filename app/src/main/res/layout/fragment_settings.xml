@@ -8,7 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        tools:background="@color/grey_material"
         android:theme="@style/AppTheme"
         tools:context=".settings.SettingsFragment">
 
@@ -166,14 +165,14 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
             <RadioButton
-                android:id="@+id/filter_only_notes"
+                android:id="@+id/filter_text_only"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/only_notes"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
             <RadioButton
-                android:id="@+id/filter_only_photos"
+                android:id="@+id/filter_photos_only"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/only_photos"

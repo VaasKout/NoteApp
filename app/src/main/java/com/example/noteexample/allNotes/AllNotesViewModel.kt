@@ -14,6 +14,10 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.settings.ALL
+import com.example.noteexample.settings.PHOTOS_ONLY
+import com.example.noteexample.settings.SettingsFragment
+import com.example.noteexample.settings.TEXT_ONLY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -52,37 +56,37 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * Coroutine functions
      */
 
-    fun getASCNotes(onlyNotes: Boolean, onlyPhotos: Boolean) {
+    fun getASCNotes(filter: Int) {
         viewModelScope.launch {
-            when {
-                onlyNotes -> {
+            when (filter) {
+                ALL -> {
+                    _allSortedNotes.value = repository.allASCSortedNotes()
+                }
+                TEXT_ONLY -> {
                     _allSortedNotes.value =
                         repository.allASCSortedNotes().filter { !it.hasNoteContent }
                 }
-                onlyPhotos -> {
+                PHOTOS_ONLY -> {
                     _allSortedNotes.value =
                         repository.allASCSortedNotes().filter { it.hasNoteContent }
-                }
-                else -> {
-                    _allSortedNotes.value = repository.allASCSortedNotes()
                 }
             }
         }
     }
 
-    fun getDESCNotes(onlyNotes: Boolean, onlyPhotos: Boolean) {
+    fun getDESCNotes(filter: Int) {
         viewModelScope.launch {
-            when {
-                onlyNotes -> {
+            when (filter) {
+                ALL -> {
+                    _allSortedNotes.value = repository.allDESCSortedNotes()
+                }
+                TEXT_ONLY -> {
                     _allSortedNotes.value =
                         repository.allDESCSortedNotes().filter { !it.hasNoteContent }
                 }
-                onlyPhotos -> {
+                PHOTOS_ONLY -> {
                     _allSortedNotes.value =
                         repository.allDESCSortedNotes().filter { it.hasNoteContent }
-                }
-                else -> {
-                    _allSortedNotes.value = repository.allDESCSortedNotes()
                 }
             }
         }

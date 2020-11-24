@@ -25,12 +25,11 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_one_photo"
-                style="@style/Widget.AppCompat.Toolbar"
-                android:background="@color/primaryColor"
+                style="@style/ToolbarStyle"
                 android:layout_width="match_parent"
-                app:navigationIcon="@drawable/ic_back_arrow"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/note_view_menu"/>
+                app:menu="@menu/note_view_menu"
+                app:navigationIcon="@drawable/ic_back_arrow" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.constraintlayout.motion.widget.MotionLayout
@@ -63,8 +62,8 @@
                 android:paddingTop="@dimen/dp_8"
                 android:paddingEnd="@dimen/dp_16"
                 android:paddingBottom="@dimen/dp_8"
-                android:textColor="@color/primaryTextColor"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                android:textColor="@color/primaryTextColor"
                 app:titleText="@{note}"
                 tools:text="@string/title" />
 
@@ -77,8 +76,8 @@
                 android:paddingTop="@dimen/dp_4"
                 android:paddingEnd="@dimen/dp_16"
                 android:paddingBottom="@dimen/dp_8"
-                android:textColor="@color/primaryTextColor"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@color/primaryTextColor"
                 app:firstNoteText="@{note}"
                 tools:text="Заметка" />
 
@@ -93,8 +92,8 @@
                 android:paddingEnd="@dimen/dp_16"
                 android:paddingBottom="@dimen/dp_12"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:photoNoteText="@{data}"
                 android:textColor="@color/primaryTextColor"
+                app:photoNoteText="@{data}"
                 tools:text="Note" />
         </androidx.constraintlayout.motion.widget.MotionLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
