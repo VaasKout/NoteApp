@@ -23,15 +23,18 @@ import kotlinx.coroutines.withContext
 class GalleryFragment : BottomSheetDialogFragment() {
 
     private val args by navArgs<GalleryFragmentArgs>()
+    val viewModel by lazy {
+        ViewModelProvider(this).get(GalleryViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         val binding: FragmentGalleryBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_gallery, container, false)
-        val viewModel = ViewModelProvider(this).get(GalleryViewModel::class.java)
+
         val galleryAdapter = GalleryAdapter()
         val camera = Camera(requireActivity())
 
@@ -55,18 +58,6 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 }
 
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
-//                    when (slideOffset) {
-//                        1f -> {
-//                            binding.lineGallery.visibility = View.GONE
-//                            binding.galleryMenuTitle.visibility = View.VISIBLE
-//                            binding.galleryBackButton.visibility = View.VISIBLE
-//                        }
-//                        else -> {
-//                            binding.lineGallery.visibility = View.VISIBLE
-//                            binding.galleryMenuTitle.visibility = View.GONE
-//                            binding.galleryBackButton.visibility = View.GONE
-//                        }
-//                    }
                 }
             }
             bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
@@ -154,5 +145,10 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
         binding.lifecycleOwner = this
         return binding.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.updateContentList()
     }
 }

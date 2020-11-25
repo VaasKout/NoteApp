@@ -24,6 +24,7 @@ import com.example.noteexample.R
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.utils.Camera
+import com.example.noteexample.utils.DataItem
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +47,7 @@ class EditNoteFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         val camera = Camera(requireActivity())
 
@@ -60,13 +61,14 @@ class EditNoteFragment : Fragment() {
             adapter = noteAdapter
             setHasFixedSize(true)
         }
+        viewModel.helper.attachToRecyclerView(binding.editRecycler)
 
         requestPermissionLauncher =
             registerForActivityResult(
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
-                    if (args.noteID > -1){
+                    if (args.noteID > -1) {
                         this.findNavController()
                             .navigate(
                                 EditNoteFragmentDirections
@@ -98,6 +100,7 @@ class EditNoteFragment : Fragment() {
             ) {
                 if (it.resultCode == Activity.RESULT_OK) {
                     viewModel.insertCameraPhoto(camera.currentPhotoPath)
+                    viewModel.itemListInit = false
                     noteAdapter.notifyDataSetChanged()
                 }
             }
@@ -110,7 +113,6 @@ class EditNoteFragment : Fragment() {
         binding.toolbarNoteEdit.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
                     val items = camera.dialogList
                     MaterialAlertDialogBuilder(requireContext())
                         .setItems(items) { _, index ->
@@ -126,21 +128,26 @@ class EditNoteFragment : Fragment() {
                                             Manifest.permission.READ_EXTERNAL_STORAGE
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        if (args.noteID > -1){
+                                        if (args.noteID > -1) {
                                             this.findNavController()
                                                 .navigate(
                                                     EditNoteFragmentDirections
-                                                        .actionEditNoteFragmentToGalleryFragment(args.noteID)
+                                                        .actionEditNoteFragmentToGalleryFragment(
+                                                            args.noteID
+                                                        )
                                                 )
                                         } else {
-                                            viewModel.currentNote?.let {note ->
+                                            viewModel.currentNote?.let { note ->
                                                 this.findNavController()
                                                     .navigate(
                                                         EditNoteFragmentDirections
-                                                            .actionEditNoteFragmentToGalleryFragment(note.id)
+                                                            .actionEditNoteFragmentToGalleryFragment(
+                                                                note.id
+                                                            )
                                                     )
                                             }
                                         }
+                                        viewModel.itemListInit = false
                                     } else {
                                         requestPermissionLauncher.launch(
                                             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -224,26 +231,41 @@ class EditNoteFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.Default) {
                     viewModel.getNote()
                     if (it != null) {
-                        viewModel.noteContentList = it.filter { list -> list.noteId == args.noteID }
-                        if (!viewModel.startListInit) {
-                            viewModel.noteContentList.forEach { element ->
-                                val noteContent = NoteContent(
-                                    id = element.id,
-                                    noteId = element.noteId,
-                                    note = element.note,
-                                    photoPath = element.photoPath,
-                                )
-                                viewModel.startNoteContentList.add(noteContent)
+                        viewModel.noteContentList = mutableListOf()
+                        viewModel.noteContentList
+                            .addAll(it.filter { list -> list.noteId == args.noteID })
+                    }
+                    if (!viewModel.itemListInit) {
+                        viewModel.dataItemList = mutableListOf()
+                        viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
+                        viewModel.noteContentList.forEach {
+                            viewModel.dataItemList.add(DataItem(noteContent = it))
+                        }
+                        viewModel.itemListInit = true
+                    } else {
+                        viewModel.dataItemList.forEachIndexed { index, dataItem ->
+                            if (index > 0) {
+                                dataItem.noteContent = viewModel.noteContentList[index - 1]
                             }
-                            viewModel.startListInit = true
                         }
                     }
-                        withContext(Dispatchers.Main) {
-                            noteAdapter.addHeaderAndSubmitList(
-                                viewModel.currentNote,
-                                viewModel.noteContentList
+
+                    withContext(Dispatchers.Main) {
+                        noteAdapter.submitList(viewModel.dataItemList)
+                    }
+
+                    if (!viewModel.startListInit) {
+                        viewModel.noteContentList.forEach { element ->
+                            val noteContent = NoteContent(
+                                id = element.id,
+                                noteId = element.noteId,
+                                note = element.note,
+                                photoPath = element.photoPath,
                             )
+                            viewModel.startNoteContentList.add(noteContent)
                         }
+                        viewModel.startListInit = true
+                    }
                 }
             })
 
@@ -295,6 +317,7 @@ class EditNoteFragment : Fragment() {
                                     .setPositiveButton("Да") { _, _ ->
                                         checkEmpty()
                                     }.show()
+                                viewModel.onDoneNavigating()
                             } else {
                                 this.findNavController().popBackStack()
                                 viewModel.onDoneNavigating()
@@ -306,24 +329,42 @@ class EditNoteFragment : Fragment() {
                     }
                 }
             })
+
         } else {
 
+
+
+
             viewModel.allNotes.observe(viewLifecycleOwner, {
-                viewModel.size = it.size - 1
+                viewModel.lastIndex = it.size - 1
             })
+
 
             viewModel.allNoteContent.observe(viewLifecycleOwner, {
                 lifecycleScope.launch(Dispatchers.Default) {
                     viewModel.insertNote()
                     if (it != null) {
-                        viewModel.noteContentList =
-                            it.filter { list -> list.noteId == viewModel.currentNote?.id }
-                        withContext(Dispatchers.Main) {
-                            noteAdapter.addHeaderAndSubmitList(
-                                viewModel.currentNote,
-                                viewModel.noteContentList
-                            )
+                        viewModel.noteContentList = mutableListOf()
+                        viewModel.noteContentList
+                            .addAll(it.filter { list -> list.noteId == viewModel.currentNote?.id })
+                            }
+
+                    if (!viewModel.itemListInit) {
+                        viewModel.dataItemList = mutableListOf()
+                        viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
+                        viewModel.noteContentList.forEach {
+                            viewModel.dataItemList.add(DataItem(noteContent = it))
                         }
+                        viewModel.itemListInit = true
+                    } else {
+                        viewModel.dataItemList.forEachIndexed { index, dataItem ->
+                            if (index > 0) {
+                                dataItem.noteContent = viewModel.noteContentList[index - 1]
+                            }
+                        }
+                    }
+                    withContext(Dispatchers.Main) {
+                        noteAdapter.submitList(viewModel.dataItemList)
                     }
                 }
             })
@@ -334,9 +375,6 @@ class EditNoteFragment : Fragment() {
                         viewModel.noteContentList.any { item -> item.note.isNotEmpty() }) {
                         viewModel.allHidden = false
                     }
-
-//                    viewModel.updateCurrentNoteInsertFr(viewModel.newTitle, viewModel.newFirstNote)
-//                    viewModel.updateNoteContentList(viewModel.noteContentList)
 
                     when {
                         (viewModel.noteContentList.isEmpty() ||

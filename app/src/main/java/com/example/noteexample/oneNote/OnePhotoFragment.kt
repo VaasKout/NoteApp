@@ -11,6 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOnePhotoBinding
+import com.example.noteexample.utils.OnSwipeTouchListener
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class OnePhotoFragment : Fragment() {
@@ -19,7 +21,7 @@ class OnePhotoFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val args by navArgs<OnePhotoFragmentArgs>()
         val binding: FragmentOnePhotoBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_one_photo, container, false)
@@ -57,14 +59,39 @@ class OnePhotoFragment : Fragment() {
             }
         }
 
-        binding.imgOnePhoto.setOnClickListener {
-            if (!viewModel.imgClicked) {
-                viewModel.imgClicked = true
-                binding.motionOnePhoto.transitionToEnd()
-            } else {
-                viewModel.imgClicked = false
-                binding.motionOnePhoto.transitionToStart()
+
+        binding.imgOnePhoto.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
+            override fun onSwipeTop() {
+                if (!binding.imgOnePhoto.isZoomed){
+                    lifecycleScope.launch {
+                        binding.titleViewOnePhoto.visibility = View.INVISIBLE
+                        binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                        binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                        binding.motionOnePhoto.setTransition(R.id.start, R.id.endUp)
+                        binding.motionOnePhoto.transitionToEnd()
+                        delay(250)
+                        this@OnePhotoFragment.findNavController().popBackStack()
+                    }
+                }
             }
+
+            override fun onSwipeBottom() {
+                if (!binding.imgOnePhoto.isZoomed){
+                    lifecycleScope.launch {
+                        binding.titleViewOnePhoto.visibility = View.INVISIBLE
+                        binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                        binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                        binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
+                        binding.motionOnePhoto.transitionToEnd()
+                        delay(400)
+                        this@OnePhotoFragment.findNavController().popBackStack()
+                    }
+                }
+            }
+        })
+
+        binding.imgOnePhoto.setOnClickListener {
+            binding.motionOnePhoto.setTransition(R.id.start, R.id.endHide)
         }
 
         return binding.root

@@ -5,10 +5,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.utils.DataItem
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,21 +28,19 @@ class EditNoteViewModel(
     var textChanged = false
     var sizeChanged = false
     var startListInit = false
+    var itemListInit = false
     private var noteInit = false
 
     //Variables
     var currentNote: Note? = null
-    var size = 0
+    var lastIndex = 0
     var title = ""
     var firstNote = ""
     var newTitle = ""
     var newFirstNote = ""
     var startNoteContentList = mutableListOf<NoteContent>()
-    var noteContentList = listOf<NoteContent>()
-
-
-    //Live Data
-    val allNotes: LiveData<List<Note>>
+    var noteContentList = mutableListOf<NoteContent>()
+    var dataItemList = mutableListOf<DataItem>()
 
     /**
      * This list is needed to reflect changes in [UpdateNoteFragment]
@@ -50,6 +51,7 @@ class EditNoteViewModel(
 
 
     //LiveData
+    val allNotes: LiveData<List<Note>>
     val allNoteContent: LiveData<List<NoteContent>>
     private val _navigateBack = MutableLiveData<Boolean>()
     val navigateBack: LiveData<Boolean> = _navigateBack
@@ -61,9 +63,53 @@ class EditNoteViewModel(
         allNotes = repository.allNotes
     }
 
+    val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
+                ItemTouchHelper.DOWN or ItemTouchHelper.UP,
+        0
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val from = viewHolder.adapterPosition - 1
+            val to = target.adapterPosition - 1
+
+            if (from >= 0 && to >= 0) {
+                swap(from, to)
+                recyclerView.adapter?.notifyItemMoved(from + 1, to + 1)
+            }
+            return true
+        }
+
+        override fun clearView(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ) {
+            super.clearView(recyclerView, viewHolder)
+            updateNoteContentList(noteContentList)
+        }
+
+        override fun onSwiped(
+            viewHolder: RecyclerView.ViewHolder,
+            direction: Int
+        ) {
+        }
+
+    })
+
     /**
      * Coroutine methods
      */
+
+    fun swap(from: Int, to: Int) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val tmpID = noteContentList[from].id
+            noteContentList[from].id = noteContentList[to].id
+            noteContentList[to].id = tmpID
+        }
+    }
 
     suspend fun insertNote() {
         if (!noteInserted) {
@@ -84,7 +130,7 @@ class EditNoteViewModel(
             currentNote?.let {
                 it.title = title
                 it.firstNote = firstNote
-                it.pos = size
+                it.pos = lastIndex
                 it.date = time
                 it.hasNoteContent =
                     noteContentList.isNotEmpty() && noteContentList.any { item -> !item.hidden }
@@ -154,7 +200,6 @@ class EditNoteViewModel(
             repository.insertNoteContentList(noteContent)
         }
     }
-
 
 
     fun updateNoteContentList(noteContent: List<NoteContent>) {

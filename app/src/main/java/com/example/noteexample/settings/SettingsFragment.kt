@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.noteexample.R
+import com.example.noteexample.allNotes.NoteAdapter
 import com.example.noteexample.databinding.FragmentSettingsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -20,7 +21,7 @@ class SettingsFragment : BottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding: FragmentSettingsBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
         binding.lifecycleOwner = this

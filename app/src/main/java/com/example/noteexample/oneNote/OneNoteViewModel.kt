@@ -9,6 +9,7 @@ import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.utils.DataItem
 
 class OneNoteViewModel(
     application: Application,
@@ -20,7 +21,7 @@ class OneNoteViewModel(
     val allNoteContent: LiveData<List<NoteContent>>
     var currentNote: Note? = null
     var currentNoteContent: NoteContent? = null
-    var imgClicked = false
+    var scrollPosition: Int = 0
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()

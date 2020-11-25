@@ -17,7 +17,7 @@ data class Note(
 
 @Entity(tableName = "note_content")
 data class NoteContent(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name = "note_id") var noteId: Int,
     @ColumnInfo(name = "note") var note: String = "",
     @ColumnInfo(name = "photoPath") var photoPath: String,

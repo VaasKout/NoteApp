@@ -5,11 +5,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.noteexample.database.NoteContent
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
 import com.example.noteexample.utils.GalleryData
+import kotlinx.coroutines.launch
 
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -67,6 +69,12 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                 newNoteContentList.add(noteContent)
             }
             repository.insertNoteContentList(newNoteContentList)
+            repository.updateNoteContentList(currentNoteContentList)
+        }
+    }
+
+    fun updateContentList(){
+        viewModelScope.launch {
             repository.updateNoteContentList(currentNoteContentList)
         }
     }

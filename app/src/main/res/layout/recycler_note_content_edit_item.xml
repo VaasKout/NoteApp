@@ -5,74 +5,88 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="data"
             type="com.example.noteexample.database.NoteContent" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/edit_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:checkable="true"
+        android:clickable="true"
+        android:focusable="true"
+        android:longClickable="true"
+        app:cardCornerRadius="@dimen/dp_4"
+        app:strokeColor="@color/primaryLightColor"
+        app:strokeWidth="2dp"
+        android:layout_marginBottom="@dimen/dp_4">
 
-        <ImageView
-            android:id="@+id/photo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/photo"
-            android:scaleType="fitCenter"
-            app:imageEditUrl="@{data.photoPath}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/backgrounds/scenic" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/delete_circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_16"
-            android:layout_marginEnd="@dimen/dp_16"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/circle"
-            android:src="@drawable/circle"/>
+            <ImageView
+                android:id="@+id/photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/photo"
+                android:scaleType="fitCenter"
+                app:imageEditUrl="@{data.photoPath}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/backgrounds/scenic" />
 
-        <ImageView
-            android:id="@+id/delete_circle_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="@+id/delete_circle"
-            app:layout_constraintTop_toTopOf="@id/delete_circle"
-            android:contentDescription="@string/clear"
-            android:src="@drawable/ic_clear" />
+            <ImageView
+                android:id="@+id/delete_circle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:layout_marginEnd="@dimen/dp_16"
+                android:contentDescription="@string/circle"
+                android:src="@drawable/circle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/restore_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/restore"
-            android:textColor="#FFFFFF"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/photo"
-            tools:visibility="visible" />
+            <ImageView
+                android:id="@+id/delete_circle_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/clear"
+                android:src="@drawable/ic_clear"
+                app:layout_constraintEnd_toEndOf="@+id/delete_circle"
+                app:layout_constraintTop_toTopOf="@id/delete_circle" />
 
-        <EditText
-            android:id="@+id/note_editText_first"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:autofillHints="@string/note"
-            android:background="@android:color/transparent"
-            android:hint="@string/note"
-            android:inputType="textMultiLine|text"
-            android:padding="@dimen/dp_16"
-            app:photoNoteText="@{data}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/restore_button" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/restore_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/restore"
+                android:textColor="#FFFFFF"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/photo"
+                tools:visibility="visible" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <EditText
+                android:id="@+id/note_editText_first"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autofillHints="@string/note"
+                android:background="@android:color/transparent"
+                android:hint="@string/note"
+                android:inputType="textMultiLine|text"
+                android:padding="@dimen/dp_16"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/restore_button"
+                app:photoNoteText="@{data}" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 </layout>

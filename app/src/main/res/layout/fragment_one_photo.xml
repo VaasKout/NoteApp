@@ -20,6 +20,7 @@
         tools:context=".oneNote.OnePhotoFragment">
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -47,10 +48,6 @@
                 android:contentDescription="@string/one_photo"
                 android:scaleType="fitCenter"
                 app:imageViewUrl="@{data.photoPath}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
             <TextView

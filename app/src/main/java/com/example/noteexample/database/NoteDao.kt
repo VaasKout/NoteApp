@@ -40,6 +40,14 @@ interface NoteDao {
     suspend fun deleteNoteList(noteList: List<Note>)
 
 
+    @Query("SELECT * from note_content ORDER BY id ASC")
+    fun getAllNoteContent(): LiveData<List<NoteContent>>
+
+    @Query("SELECT * from note_content")
+    suspend fun getAllNoteContentSimpleList(): List<NoteContent>
+
+    @Query("SELECT * from note_content WHERE id = :key")
+    suspend fun getNoteContent(key: Int): NoteContent
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertNoteContent(noteContent: NoteContent)
@@ -61,16 +69,6 @@ interface NoteDao {
 
     @Query("DELETE FROM note_content")
     suspend fun deleteAllNoteContent()
-
-    @Query("SELECT * from note_content")
-    fun getAllNoteContent(): LiveData<List<NoteContent>>
-
-    @Query("SELECT * from note_content")
-    suspend fun getAllNoteContentSimpleList(): List<NoteContent>
-
-    @Query("SELECT * from note_content WHERE id = :key")
-    suspend fun getNoteContent(key: Int): NoteContent
-
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

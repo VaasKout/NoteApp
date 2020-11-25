@@ -31,10 +31,10 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     var noteContentList = listOf<NoteContent>()
     var noteList = mutableListOf<Note>()
+    var scrollPosition: Int? = null
     var flagsObj: Flags? = null
 
-    val flags: LiveData<Flags>
-
+    var flags: LiveData<Flags>
     private val repository: NoteRepository
 
     init {
@@ -57,39 +57,39 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     fun getASCNotes(filter: Int) {
-        viewModelScope.launch {
-            when (filter) {
-                ALL -> {
-                    _allSortedNotes.value = repository.allASCSortedNotes()
-                }
-                TEXT_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allASCSortedNotes().filter { !it.hasNoteContent }
-                }
-                PHOTOS_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allASCSortedNotes().filter { it.hasNoteContent }
+            viewModelScope.launch {
+                when (filter) {
+                    ALL -> {
+                        _allSortedNotes.value = repository.allASCSortedNotes()
+                    }
+                    TEXT_ONLY -> {
+                        _allSortedNotes.value =
+                            repository.allASCSortedNotes().filter { !it.hasNoteContent }
+                    }
+                    PHOTOS_ONLY -> {
+                        _allSortedNotes.value =
+                            repository.allASCSortedNotes().filter { it.hasNoteContent }
+                    }
                 }
             }
-        }
     }
 
     fun getDESCNotes(filter: Int) {
-        viewModelScope.launch {
-            when (filter) {
-                ALL -> {
-                    _allSortedNotes.value = repository.allDESCSortedNotes()
-                }
-                TEXT_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allDESCSortedNotes().filter { !it.hasNoteContent }
-                }
-                PHOTOS_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allDESCSortedNotes().filter { it.hasNoteContent }
+            viewModelScope.launch {
+                when (filter) {
+                    ALL -> {
+                        _allSortedNotes.value = repository.allDESCSortedNotes()
+                    }
+                    TEXT_ONLY -> {
+                        _allSortedNotes.value =
+                            repository.allDESCSortedNotes().filter { !it.hasNoteContent }
+                    }
+                    PHOTOS_ONLY -> {
+                        _allSortedNotes.value =
+                            repository.allDESCSortedNotes().filter { it.hasNoteContent }
+                    }
                 }
             }
-        }
     }
 
     fun onDeleteSelected() {

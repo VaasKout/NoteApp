@@ -32,22 +32,19 @@ class OneNoteEditAdapter :
     private val _noteContentHolder = MutableLiveData<NoteContentEditHolder>()
     val noteContentHolder: LiveData<NoteContentEditHolder> = _noteContentHolder
 
-    private val adapterScope = CoroutineScope(Dispatchers.Default)
-
-    fun addHeaderAndSubmitList(note: Note?, noteContent: List<NoteContent>){
-        adapterScope.launch {
-            val list = mutableListOf<DataItem>()
-            list.add(0, DataItem(note = note))
-            noteContent.forEach {
-                list.add(DataItem(noteContent = it))
-            }
-            withContext(Dispatchers.Main){
-                if (list.isNotEmpty()){
-                    submitList(list)
-                }
-            }
-        }
-    }
+//    private val adapterScope = CoroutineScope(Dispatchers.Default)
+//    fun addHeaderAndSubmitList(note: Note?, noteContent: List<NoteContent>) {
+//        adapterScope.launch {
+//            val list = mutableListOf<DataItem>()
+//            list.add(0, DataItem(note = note))
+//            noteContent.forEach {
+//                list.add(DataItem(noteContent = it))
+//            }
+//            withContext(Dispatchers.Main) {
+//                submitList(list)
+//            }
+//        }
+//    }
 
     override fun getItemViewType(position: Int): Int {
         return if (getItem(position).noteContent == null && getItem(position).note != null) {

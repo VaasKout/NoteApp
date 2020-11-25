@@ -21,6 +21,7 @@ import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -34,12 +35,11 @@ class AllNotesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val viewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
         val cards = mutableListOf<MaterialCardView>()
         val binding: FragmentNoteMainBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
-
 
         /**
          * initialize and set adapter options
@@ -49,10 +49,8 @@ class AllNotesFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-//            layoutManager =
-//                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-//            layoutManager = LinearLayoutManager(requireContext())
         }
+        var layoutManager: RecyclerView.LayoutManager? = null
 
         viewModel.helper.attachToRecyclerView(binding.recyclerView)
 
@@ -92,16 +90,16 @@ class AllNotesFragment : Fragment() {
         }
 
         binding.searchEdit.addTextChangedListener {
-            lifecycleScope.launch(Dispatchers.Default){
+            lifecycleScope.launch(Dispatchers.Default) {
                 val noteContentList = viewModel.noteContentList.filter { item ->
-                    item.note.contains(it.toString())
+                    item.note.contains(it.toString(), true)
                 }
                 val noteList = viewModel.noteList.filter { item ->
                     item.title.contains(it.toString()) ||
                             item.firstNote.contains(it.toString()) ||
                             noteContentList.any { content -> content.noteId == item.id }
                 }
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     if (it.toString().isEmpty()) {
                         noteAdapter.submitList(viewModel.noteList)
                     } else {
@@ -129,17 +127,30 @@ class AllNotesFragment : Fragment() {
                 viewModel.flagsObj = it
                 if (it.ascendingOrder) {
                     viewModel.getASCNotes(it.filter)
+
                 } else {
                     viewModel.getDESCNotes(it.filter)
                 }
-                if (it.columns == 2) {
-                    binding.recyclerView.layoutManager =
-                        StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-                } else {
-                    binding.recyclerView.layoutManager =
-                        LinearLayoutManager(requireContext())
+
+                if (it.columns == 2 &&
+                    layoutManager !is StaggeredGridLayoutManager
+                ) {
+                    layoutManager = StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+                    binding.recyclerView.layoutManager = layoutManager
+                } else if (it.columns == 1 &&
+                    layoutManager !is LinearLayoutManager
+                ) {
+                    layoutManager = LinearLayoutManager(requireContext())
+                    binding.recyclerView.layoutManager = layoutManager
                 }
-                noteAdapter.notifyDataSetChanged()
+                lifecycleScope.launch {
+                    delay(32)
+                    viewModel.scrollPosition?.let { pos ->
+                        binding.recyclerView.layoutManager?.scrollToPosition(pos)
+                    }
+                    viewModel.scrollPosition = null
+                    noteAdapter.notifyDataSetChanged()
+                }
             }
         })
 
@@ -155,11 +166,11 @@ class AllNotesFragment : Fragment() {
                     viewModel.noteList = mutableListOf()
                     viewModel.noteList.addAll(it)
                     viewModel.deleteUnused()
-                    withContext(Dispatchers.Main) {
-                        noteAdapter.submitList(viewModel.noteList)
-                    }
                     if (viewModel.noteList.any { item -> item.isChecked }) {
                         viewModel.onStartActionMode(requireActivity())
+                    }
+                    withContext(Dispatchers.Main) {
+                        noteAdapter.submitList(viewModel.noteList)
                     }
                 }
             }
@@ -283,7 +294,7 @@ class AllNotesFragment : Fragment() {
                         viewModel.onDestroyActionMode()
                     }
                 } else if (!viewModel.actionModeStarted) {
-
+                    viewModel.scrollPosition = holder.adapterPosition
                     if (contentList.size == 1 && contentList[0].photoPath.isNotEmpty()) {
                         this.findNavController()
                             .navigate(
@@ -310,6 +321,14 @@ class AllNotesFragment : Fragment() {
          * listen to fab click
          */
         binding.fabToInsert.setOnClickListener {
+            viewModel.flagsObj?.let {
+                if (it.ascendingOrder) {
+                    viewModel.scrollPosition = viewModel.noteList.size
+                } else {
+                    viewModel.scrollPosition = 0
+                }
+            }
+
             this.findNavController()
                 .navigate(
                     AllNotesFragmentDirections
