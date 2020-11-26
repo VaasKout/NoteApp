@@ -24,7 +24,7 @@
         android:focusable="true"
         android:longClickable="true"
         app:cardCornerRadius="@dimen/dp_4"
-        app:strokeColor="@color/primaryLightColor"
+        app:strokeColor="@color/primaryDarkColor"
         app:strokeWidth="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,7 +54,7 @@
                 android:id="@+id/view1"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryLightColor"
+                android:background="@color/primaryDarkColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title_main" />
@@ -79,7 +79,7 @@
                 android:id="@+id/view2"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryLightColor"
+                android:background="@color/primaryDarkColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/note_main" />
@@ -101,7 +101,7 @@
                 android:id="@+id/view3"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryLightColor"
+                android:background="@color/primaryDarkColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/photo_main" />

@@ -42,13 +42,8 @@ class EditNoteViewModel(
     var noteContentList = mutableListOf<NoteContent>()
     var dataItemList = mutableListOf<DataItem>()
 
-    /**
-     * This list is needed to reflect changes in [UpdateNoteFragment]
-     */
-
     //Repository
     private val repository: NoteRepository
-
 
     //LiveData
     val allNotes: LiveData<List<Note>>

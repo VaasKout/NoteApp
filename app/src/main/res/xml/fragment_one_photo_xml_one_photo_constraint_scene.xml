@@ -5,16 +5,18 @@
     <Transition
         motion:constraintSetEnd="@+id/endUp"
         motion:constraintSetStart="@id/start"
-        motion:duration="250">
-        <OnSwipe motion:dragDirection="dragUp"
-            motion:touchAnchorId="@id/img_one_photo"/>
+        motion:duration="200">
+        <OnSwipe
+            motion:dragDirection="dragUp"
+            motion:touchAnchorId="@id/img_one_photo" />
     </Transition>
     <Transition
         motion:constraintSetEnd="@+id/endDown"
         motion:constraintSetStart="@id/start"
-        motion:duration="250">
-        <OnSwipe motion:dragDirection="dragDown"
-            motion:touchAnchorId="@id/img_one_photo"/>
+        motion:duration="200">
+        <OnSwipe
+            motion:dragDirection="dragDown"
+            motion:touchAnchorId="@id/img_one_photo" />
     </Transition>
 
     <Transition
@@ -26,14 +28,13 @@
 
     <ConstraintSet android:id="@+id/start">
         <Constraint
-            android:id="@+id/img_one_photo"
-            android:layout_width="wrap_content"
+            android:id="@+id/toolbar_one_photo"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            motion:layout_constraintBottom_toBottomOf="parent"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintTop_toTopOf="parent" />
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:visibilityMode="ignore"/>
 
         <Constraint
             android:id="@+id/title_view_one_photo"
@@ -41,7 +42,7 @@
             android:layout_height="wrap_content"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/toolbar_one_photo"
             motion:visibilityMode="ignore" />
         <Constraint
             android:id="@+id/first_note_view_one_photo"
@@ -51,6 +52,17 @@
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintTop_toBottomOf="@+id/title_view_one_photo"
             motion:visibilityMode="ignore" />
+
+        <Constraint
+            android:id="@+id/img_one_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+
         <Constraint
             android:id="@id/note_view_one_photo"
             android:layout_width="match_parent"
@@ -64,11 +76,21 @@
 
     <ConstraintSet android:id="@+id/endHide">
         <Constraint
+            android:id="@+id/toolbar_one_photo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintBottom_toTopOf="@id/title_view_one_photo"
+            android:visibility="invisible"
+            motion:visibilityMode="normal" />
+
+        <Constraint
             android:id="@+id/title_view_one_photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            motion:layout_constraintBottom_toTopOf="@id/first_note_view_one_photo"
+            motion:layout_constraintBottom_toTopOf="parent"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             motion:visibilityMode="normal" />
@@ -98,7 +120,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            motion:layout_constraintBottom_toTopOf="parent" />
+            motion:layout_constraintBottom_toTopOf="parent"
+            motion:visibilityMode="normal" />
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/endDown">
@@ -107,6 +130,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            motion:layout_constraintTop_toBottomOf="parent" />
+            motion:layout_constraintTop_toBottomOf="parent"
+            motion:visibilityMode="normal" />
     </ConstraintSet>
 </MotionScene>

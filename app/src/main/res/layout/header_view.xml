@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="note"
             type="com.example.noteexample.database.Note" />
@@ -17,31 +18,43 @@
             android:id="@+id/title_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/dp_16"
-            android:paddingEnd="@dimen/dp_16"
             android:paddingStart="@dimen/dp_16"
             android:paddingTop="@dimen/dp_12"
+            android:paddingEnd="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_12"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/title"
-            app:titleText="@{note}"/>
+            app:titleText="@{note}"
+            tools:text="@string/title" />
+
+        <View
+            android:id="@+id/header_view"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/primaryDarkColor"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_view"
+            app:viewHeader="@{note}"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/first_note_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/dp_16"
-            android:paddingEnd="@dimen/dp_16"
-            android:paddingBottom="@dimen/dp_16"
             android:paddingTop="@dimen/dp_8"
+            android:paddingEnd="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_8"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            app:firstNoteText="@{note}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title_view"
-            tools:text="Заметка"
-            app:firstNoteText="@{note}"/>
+            app:layout_constraintTop_toBottomOf="@+id/header_view"
+            tools:text="Заметка" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

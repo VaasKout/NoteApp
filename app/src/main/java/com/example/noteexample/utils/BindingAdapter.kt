@@ -6,13 +6,30 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.example.noteexample.R
 import com.example.noteexample.database.Note
 import com.example.noteexample.database.NoteContent
 
 //@GlideModule
 //class GlideAppModule : AppGlideModule()
+
+@BindingAdapter("viewHeader")
+fun View.setImgViewAppearance(note: Note?){
+    note?.let {
+        if (it.firstNote.isNotEmpty() && it.title.isNotEmpty()){
+            visibility = View.VISIBLE
+        }
+    }
+}
+
+@BindingAdapter("viewNote")
+fun View.setNoteViewAppearance(data: NoteContent?){
+    data?.let {
+        if (it.note.isNotEmpty()){
+            visibility = View.VISIBLE
+        }
+    }
+}
+
 
 @BindingAdapter("titleText")
 fun TextView.titleText(note: Note?) {

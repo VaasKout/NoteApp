@@ -16,7 +16,6 @@
                 style="@style/ToolbarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/primaryColor"
                 app:menu="@menu/note_edit_menu"
                 app:navigationIcon="@drawable/ic_back_arrow" />
         </com.google.android.material.appbar.AppBarLayout>

@@ -83,7 +83,7 @@ class EditNoteFragment : Fragment() {
                                 )
                         }
                     }
-
+                viewModel.itemListInit = false
                 } else {
                     Snackbar.make(
                         binding.editRecycler,

@@ -1,10 +1,9 @@
 package com.example.noteexample.allNotes
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -44,6 +43,9 @@ class AllNotesFragment : Fragment() {
         /**
          * initialize and set adapter options
          */
+
+        requireActivity().window
+            .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
         val noteAdapter = NoteAdapter()
         binding.recyclerView.apply {
@@ -167,7 +169,7 @@ class AllNotesFragment : Fragment() {
                     viewModel.noteList.addAll(it)
                     viewModel.deleteUnused()
                     if (viewModel.noteList.any { item -> item.isChecked }) {
-                        viewModel.onStartActionMode(requireActivity())
+                        viewModel.onStartActionMode(requireActivity(), requireContext())
                     }
                     withContext(Dispatchers.Main) {
                         noteAdapter.submitList(viewModel.noteList)
@@ -182,11 +184,15 @@ class AllNotesFragment : Fragment() {
         viewModel.actionMode.observe(viewLifecycleOwner, {
             if (it != null) {
                 binding.fabToInsert.visibility = View.GONE
+                requireActivity().window.statusBarColor =
+                    ContextCompat.getColor(requireActivity(), R.color.grey_material)
             } else {
                 binding.fabToInsert.visibility = View.VISIBLE
                 cards.forEach { card ->
                     card.isChecked = false
                 }
+                requireActivity().window.statusBarColor =
+                    ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
             }
         })
 
@@ -271,7 +277,7 @@ class AllNotesFragment : Fragment() {
                 noteAdapter.currentList[holder.adapterPosition].isChecked =
                     card.isChecked
                 if (!viewModel.actionModeStarted) {
-                    viewModel.onStartActionMode(requireActivity())
+                    viewModel.onStartActionMode(requireActivity(), requireContext())
                 } else {
                     viewModel.onResumeActionMode()
                     if (viewModel.noteList.none { it.isChecked }) {

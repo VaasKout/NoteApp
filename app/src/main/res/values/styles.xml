@@ -4,12 +4,13 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/secondaryColor</item>
+        <item name="colorAccent">@color/secondaryLightColor</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
         <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
-        <item name="colorControlNormal">@android:color/white</item>
+        <item name="android:windowBackground">#d1c4e9</item>
+        <item name="colorControlNormal">@android:color/black</item>
     </style>
 
     <style name="Widget.App.ActionMode" parent="Widget.AppCompat.ActionMode">
@@ -29,11 +30,14 @@
 
     <style name="ToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
         <item name="android:background">@color/primaryColor</item>
-        <item name="titleTextColor">@android:color/white</item>
+        <item name="titleTextColor">@android:color/black</item>
     </style>
 
     <style name="GalleryTheme" parent="AppTheme">
         <item name="colorControlNormal">@android:color/black</item>
+    </style>
+    <style name="OnePhoto" parent="AppTheme">
+        <item name="colorControlNormal">@android:color/white</item>
     </style>
 
 </resources>

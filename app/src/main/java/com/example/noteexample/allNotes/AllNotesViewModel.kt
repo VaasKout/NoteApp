@@ -1,6 +1,7 @@
 package com.example.noteexample.allNotes
 
 import android.app.Application
+import android.content.Context
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -16,10 +17,11 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.settings.ALL
 import com.example.noteexample.settings.PHOTOS_ONLY
-import com.example.noteexample.settings.SettingsFragment
 import com.example.noteexample.settings.TEXT_ONLY
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -33,6 +35,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     var noteList = mutableListOf<Note>()
     var scrollPosition: Int? = null
     var flagsObj: Flags? = null
+    var contextFragment: Context? = null
 
     var flags: LiveData<Flags>
     private val repository: NoteRepository
@@ -92,7 +95,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
-    fun onDeleteSelected() {
+    suspend fun onDeleteSelected() {
         val noteContentListToDelete = mutableListOf<NoteContent>()
         val noteListToDelete =
             noteList.filter { it.isChecked }
@@ -100,11 +103,12 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             noteContentListToDelete.addAll(noteContentList
                 .filter { it.noteId == note.id })
         }
-        viewModelScope.launch {
+        withContext(Dispatchers.IO){
             repository.deleteNoteList(noteListToDelete)
             repository.deleteNoteContentList(noteContentListToDelete)
             flagsObj?.let { repository.updateFlags(it) }
         }
+
     }
 
     suspend fun deleteUnused() {
@@ -186,8 +190,20 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             return when (item?.itemId) {
                 R.id.delete_action -> {
-                    onDeleteSelected()
-                    mode?.finish()
+                    contextFragment?.let {
+                        MaterialAlertDialogBuilder(it)
+                            .setMessage("Удалить выбранное?")
+                            .setNegativeButton("Нет") { _, _ ->
+                            }
+                            .setPositiveButton("Да") { _, _ ->
+                                viewModelScope.launch(Dispatchers.Default) {
+                                    onDeleteSelected()
+                                    withContext(Dispatchers.Main){
+                                        mode?.finish()
+                                    }
+                                }
+                            }.show()
+                    }
                     true
                 }
                 else -> false
@@ -200,9 +216,9 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                     noteList.forEach { it.isChecked = false }
                 }
             }
-
             _actionMode.value = null
             actionModeStarted = false
+            contextFragment = null
         }
     }
 
@@ -262,12 +278,12 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * Action mode lifecycle functions
      */
 
-    fun onStartActionMode(activity: FragmentActivity) {
+    fun onStartActionMode(activity: FragmentActivity, context: Context) {
         _actionMode.value = activity.startActionMode(actionModeController)
         _actionMode.value?.title =
             "${noteList.filter { it.isChecked }.size}"
         actionModeStarted = true
-
+        contextFragment = context
     }
 
     fun onResumeActionMode() {

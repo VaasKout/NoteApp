@@ -20,7 +20,7 @@
         android:focusable="true"
         android:longClickable="true"
         app:cardCornerRadius="@dimen/dp_4"
-        app:strokeColor="@color/primaryLightColor"
+        app:strokeColor="@color/primaryDarkColor"
         app:strokeWidth="2dp"
         android:layout_marginBottom="@dimen/dp_4">
 
@@ -66,7 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/restore"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/primaryTextColor"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -3,6 +3,7 @@ package com.example.noteexample.oneNote
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +16,7 @@ import com.example.noteexample.utils.OnSwipeTouchListener
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
 class OnePhotoFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
@@ -26,6 +28,14 @@ class OnePhotoFragment : Fragment() {
         val binding: FragmentOnePhotoBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_one_photo, container, false)
         binding.lifecycleOwner = this
+
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+
+
+// finally change the color
+        requireActivity().window.statusBarColor =
+            ContextCompat.getColor(requireActivity(), R.color.grey_material)
 
         val application = requireNotNull(this.activity).application
         val viewModelFactory = OneNoteViewModelFactory(application, args.noteID, args.noteContentID)
@@ -62,39 +72,47 @@ class OnePhotoFragment : Fragment() {
 
         binding.imgOnePhoto.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
             override fun onSwipeTop() {
-                if (!binding.imgOnePhoto.isZoomed){
+                if (!binding.imgOnePhoto.isZoomed) {
                     lifecycleScope.launch {
                         binding.titleViewOnePhoto.visibility = View.INVISIBLE
                         binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
                         binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                        binding.toolbarOnePhoto.visibility = View.INVISIBLE
                         binding.motionOnePhoto.setTransition(R.id.start, R.id.endUp)
                         binding.motionOnePhoto.transitionToEnd()
-                        delay(250)
+                        delay(200)
                         this@OnePhotoFragment.findNavController().popBackStack()
                     }
                 }
             }
 
             override fun onSwipeBottom() {
-                if (!binding.imgOnePhoto.isZoomed){
+                if (!binding.imgOnePhoto.isZoomed) {
                     lifecycleScope.launch {
                         binding.titleViewOnePhoto.visibility = View.INVISIBLE
                         binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
                         binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                        binding.toolbarOnePhoto.visibility = View.GONE
                         binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
                         binding.motionOnePhoto.transitionToEnd()
-                        delay(400)
+                        delay(200)
                         this@OnePhotoFragment.findNavController().popBackStack()
                     }
                 }
             }
         })
 
-        binding.imgOnePhoto.setOnClickListener {
-            binding.motionOnePhoto.setTransition(R.id.start, R.id.endHide)
-        }
-
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        requireActivity().window
+            .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+
+        requireActivity().window.statusBarColor =
+            ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
     }
 }
 
