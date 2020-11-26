@@ -83,7 +83,6 @@ class EditNoteFragment : Fragment() {
                                 )
                         }
                     }
-                viewModel.itemListInit = false
                 } else {
                     Snackbar.make(
                         binding.editRecycler,
@@ -100,7 +99,6 @@ class EditNoteFragment : Fragment() {
             ) {
                 if (it.resultCode == Activity.RESULT_OK) {
                     viewModel.insertCameraPhoto(camera.currentPhotoPath)
-                    viewModel.itemListInit = false
                     noteAdapter.notifyDataSetChanged()
                 }
             }
@@ -147,7 +145,6 @@ class EditNoteFragment : Fragment() {
                                                     )
                                             }
                                         }
-                                        viewModel.itemListInit = false
                                     } else {
                                         requestPermissionLauncher.launch(
                                             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -224,8 +221,8 @@ class EditNoteFragment : Fragment() {
             viewModel.allNoteContent.observe(viewLifecycleOwner, {
                 /**
                  * Here, I have to do new objects for each [EditNoteViewModel.startNoteContentList]
-                 * because if it equals to this list, [NoteContent.note] and [NoteContent.photoPath] will
-                 * reflect changes in [EditNoteViewModel.startNoteContentList],
+                 * because if it equals to this list, [NoteContent.note] and [NoteContent.photoPath]
+                 * will reflect changes in [EditNoteViewModel.startNoteContentList],
                  * it's caused by var fields in [NoteContent]
                  */
                 lifecycleScope.launch(Dispatchers.Default) {
@@ -235,19 +232,19 @@ class EditNoteFragment : Fragment() {
                         viewModel.noteContentList
                             .addAll(it.filter { list -> list.noteId == args.noteID })
                     }
-                    if (!viewModel.itemListInit) {
+                    if (!viewModel.itemListSame) {
                         viewModel.dataItemList = mutableListOf()
                         viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
                         viewModel.noteContentList.forEach {
                             viewModel.dataItemList.add(DataItem(noteContent = it))
                         }
-                        viewModel.itemListInit = true
                     } else {
                         viewModel.dataItemList.forEachIndexed { index, dataItem ->
                             if (index > 0) {
                                 dataItem.noteContent = viewModel.noteContentList[index - 1]
                             }
                         }
+                        viewModel.itemListSame = false
                     }
 
                     withContext(Dispatchers.Main) {
@@ -332,9 +329,6 @@ class EditNoteFragment : Fragment() {
 
         } else {
 
-
-
-
             viewModel.allNotes.observe(viewLifecycleOwner, {
                 viewModel.lastIndex = it.size - 1
             })
@@ -347,21 +341,21 @@ class EditNoteFragment : Fragment() {
                         viewModel.noteContentList = mutableListOf()
                         viewModel.noteContentList
                             .addAll(it.filter { list -> list.noteId == viewModel.currentNote?.id })
-                            }
+                    }
 
-                    if (!viewModel.itemListInit) {
+                    if (!viewModel.itemListSame) {
                         viewModel.dataItemList = mutableListOf()
                         viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
                         viewModel.noteContentList.forEach {
                             viewModel.dataItemList.add(DataItem(noteContent = it))
                         }
-                        viewModel.itemListInit = true
                     } else {
                         viewModel.dataItemList.forEachIndexed { index, dataItem ->
                             if (index > 0) {
                                 dataItem.noteContent = viewModel.noteContentList[index - 1]
                             }
                         }
+                        viewModel.itemListSame = false
                     }
                     withContext(Dispatchers.Main) {
                         noteAdapter.submitList(viewModel.dataItemList)

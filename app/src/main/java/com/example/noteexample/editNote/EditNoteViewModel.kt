@@ -28,7 +28,7 @@ class EditNoteViewModel(
     var textChanged = false
     var sizeChanged = false
     var startListInit = false
-    var itemListInit = false
+    var itemListSame = false
     private var noteInit = false
 
     //Variables
@@ -99,6 +99,9 @@ class EditNoteViewModel(
      */
 
     fun swap(from: Int, to: Int) {
+        if(!itemListSame){
+            itemListSame = true
+        }
         viewModelScope.launch(Dispatchers.Default) {
             val tmpID = noteContentList[from].id
             noteContentList[from].id = noteContentList[to].id

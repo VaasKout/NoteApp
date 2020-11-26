@@ -69,6 +69,11 @@ class OnePhotoFragment : Fragment() {
             }
         }
 
+//        binding.imgOnePhoto.setOnClickListener {
+//            binding.motionOnePhoto.setTransition(R.id.start, R.id.endHide)
+//
+//        }
+
 
         binding.imgOnePhoto.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
             override fun onSwipeTop() {
@@ -92,7 +97,7 @@ class OnePhotoFragment : Fragment() {
                         binding.titleViewOnePhoto.visibility = View.INVISIBLE
                         binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
                         binding.noteViewOnePhoto.visibility = View.INVISIBLE
-                        binding.toolbarOnePhoto.visibility = View.GONE
+                        binding.toolbarOnePhoto.visibility = View.INVISIBLE
                         binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
                         binding.motionOnePhoto.transitionToEnd()
                         delay(200)

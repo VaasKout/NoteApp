@@ -168,10 +168,8 @@ class AllNotesFragment : Fragment() {
                     viewModel.noteList = mutableListOf()
                     viewModel.noteList.addAll(it)
                     viewModel.deleteUnused()
-                    if (viewModel.noteList.any { item -> item.isChecked }) {
-                        viewModel.onStartActionMode(requireActivity(), requireContext())
-                    }
                     withContext(Dispatchers.Main) {
+                        viewModel.onDestroyActionMode()
                         noteAdapter.submitList(viewModel.noteList)
                     }
                 }

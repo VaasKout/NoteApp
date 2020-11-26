@@ -13,18 +13,18 @@ import com.example.noteexample.database.NoteContent
 //class GlideAppModule : AppGlideModule()
 
 @BindingAdapter("viewHeader")
-fun View.setImgViewAppearance(note: Note?){
+fun View.setImgViewAppearance(note: Note?) {
     note?.let {
-        if (it.firstNote.isNotEmpty() && it.title.isNotEmpty()){
+        if (it.firstNote.isNotEmpty() && it.title.isNotEmpty()) {
             visibility = View.VISIBLE
         }
     }
 }
 
 @BindingAdapter("viewNote")
-fun View.setNoteViewAppearance(data: NoteContent?){
+fun View.setNoteViewAppearance(data: NoteContent?) {
     data?.let {
-        if (it.note.isNotEmpty()){
+        if (it.note.isNotEmpty()) {
             visibility = View.VISIBLE
         }
     }
@@ -35,10 +35,10 @@ fun View.setNoteViewAppearance(data: NoteContent?){
 fun TextView.titleText(note: Note?) {
     note?.let {
         when {
-            this is EditText -> {
+            this is EditText && it.title.isNotEmpty() -> {
                 setText(it.title)
             }
-            it.title.isEmpty() -> {
+            this !is EditText && it.title.isEmpty() -> {
                 visibility = View.GONE
             }
             else -> {
@@ -54,10 +54,10 @@ fun TextView.titleText(note: Note?) {
 fun TextView.firstNoteText(note: Note?) {
     note?.let {
         when {
-            this is EditText -> {
+            this is EditText && it.firstNote.isNotEmpty() -> {
                 setText(it.firstNote)
             }
-            it.firstNote.isEmpty() -> {
+            this !is EditText && it.firstNote.isEmpty() -> {
                 visibility = View.GONE
             }
             else -> {
@@ -89,7 +89,7 @@ fun TextView.photoNoteText(data: NoteContent?) {
 }
 
 @BindingAdapter("date")
-fun TextView.setDate(note: Note?){
+fun TextView.setDate(note: Note?) {
     note?.let {
         text = note.date
     }
