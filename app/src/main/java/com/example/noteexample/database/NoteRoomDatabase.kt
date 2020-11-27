@@ -9,7 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Note::class, NoteContent::class, Flags::class],
+    entities = [Note::class, Images::class, Flags::class],
     version = 1,
     exportSchema = false
 )

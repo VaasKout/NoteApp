@@ -1,34 +1,51 @@
 package com.example.noteexample.database
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
-@Entity(tableName = "note_table")
+@Entity
 data class Note(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val noteID: Long = 0,
     @ColumnInfo(name = "position") var pos: Int = 0,
     @ColumnInfo(name = "title") var title: String = "",
-    @ColumnInfo(name = "firstNote") var firstNote: String = "",
+    @ColumnInfo(name = "note") var firstNote: String = "",
     @ColumnInfo(name = "date") var date: String = "",
     @ColumnInfo(name = "hasNoteContent") var hasNoteContent: Boolean = false,
     var isChecked: Boolean = false,
 )
 
-@Entity(tableName = "note_content")
-data class NoteContent(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
-    @ColumnInfo(name = "note_id") var noteId: Int,
-    @ColumnInfo(name = "note") var note: String = "",
-    @ColumnInfo(name = "photoPath") var photoPath: String,
-    @ColumnInfo(name = "hidden") var hidden: Boolean = false,
+@Entity
+data class Images(
+    @PrimaryKey(autoGenerate = true) var imgID: Long = 0,
+    var signature: String = "",
+    var photoPath: String,
+    var hidden: Boolean = false,
 )
 
-@Entity(tableName = "flags")
+@Entity
 data class Flags(
-    @PrimaryKey val id: Int = 0,
-    @ColumnInfo(name = "filter") var filter: Int = 0,
-    @ColumnInfo(name = "ascendingOrder") var ascendingOrder: Boolean = false,
-    @ColumnInfo(name = "showDate") var showDate: Boolean = true,
-    @ColumnInfo(name = "columns") var columns: Int = 2,
+    @PrimaryKey val id: Long = 0,
+    var filter: Int = 0,
+    var ascendingOrder: Boolean = false,
+    var showDate: Boolean = true,
+    var columns: Int = 2,
+)
+
+@Entity(primaryKeys = ["noteID, imgID"])
+data class NoteWithImagesCrossRef(
+    val noteID: Long,
+    val imgID: Long,
+)
+
+data class NoteWithImages(
+    @Embedded val note: Note,
+    @Relation(
+        parentColumn = "noteID",
+        entityColumn = "imgID",
+        associateBy = Junction(NoteWithImagesCrossRef::class)
+    )
+    val images: Images
+)
+
+data class OrderedNotes(
+    @Embedded val flags: Flags,
 )

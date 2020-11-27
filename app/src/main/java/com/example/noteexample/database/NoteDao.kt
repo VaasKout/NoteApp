@@ -6,7 +6,7 @@ import androidx.room.*
 @Dao
 interface NoteDao {
 
-    @Query("DELETE FROM note_table")
+    @Query("DELETE FROM note")
     suspend fun deleteAllNotes()
 
     @Query("SELECT * from note_table")
