@@ -43,4 +43,6 @@ abstract class NoteRoomDatabase : RoomDatabase() {
             }
         }
     }
+
+    //TODO Read about @Embedded in Room
 }

@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:autofillHints="@string/note"
                 android:background="@android:color/transparent"
-                android:hint="@string/note"
+                android:hint="@string/sign"
                 android:inputType="textMultiLine|text"
                 android:padding="@dimen/dp_16"
                 app:layout_constraintEnd_toEndOf="parent"

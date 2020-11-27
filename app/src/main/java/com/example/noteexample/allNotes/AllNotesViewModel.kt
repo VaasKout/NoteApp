@@ -17,6 +17,7 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.settings.ALL
 import com.example.noteexample.settings.PHOTOS_ONLY
+import com.example.noteexample.settings.SettingsFragment
 import com.example.noteexample.settings.TEXT_ONLY
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

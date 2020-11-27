@@ -55,7 +55,7 @@ class OneNoteFragment : Fragment() {
             }
         })
 
-//        viewModel.scrollPosition = null
+
 
         oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             oneNoteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->

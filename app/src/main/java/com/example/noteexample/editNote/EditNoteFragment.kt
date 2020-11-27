@@ -21,7 +21,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
-import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.utils.Camera
 import com.example.noteexample.utils.DataItem
@@ -50,7 +49,6 @@ class EditNoteFragment : Fragment() {
     ): View {
 
         val camera = Camera(requireActivity())
-
         //binding for EditNoteFragment
         val binding: FragmentEditNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note, container, false)
@@ -217,75 +215,72 @@ class EditNoteFragment : Fragment() {
 
 
 
-        if (args.noteID > -1) {
-            viewModel.allNoteContent.observe(viewLifecycleOwner, {
-                /**
-                 * Here, I have to do new objects for each [EditNoteViewModel.startNoteContentList]
-                 * because if it equals to this list, [NoteContent.note] and [NoteContent.photoPath]
-                 * will reflect changes in [EditNoteViewModel.startNoteContentList],
-                 * it's caused by var fields in [NoteContent]
-                 */
-                lifecycleScope.launch(Dispatchers.Default) {
+        viewModel.allNotes.observe(viewLifecycleOwner, {
+            viewModel.lastIndex = it.size - 1
+        })
+
+        viewModel.allNoteContent.observe(viewLifecycleOwner, {
+
+            lifecycleScope.launch(Dispatchers.Default) {
+                if (args.noteID > -1) {
                     viewModel.getNote()
-                    if (it != null) {
-                        viewModel.noteContentList = mutableListOf()
-                        viewModel.noteContentList
-                            .addAll(it.filter { list -> list.noteId == args.noteID })
-                    }
-                    if (!viewModel.itemListSame) {
-                        viewModel.dataItemList = mutableListOf()
-                        viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
-                        viewModel.noteContentList.forEach {
-                            viewModel.dataItemList.add(DataItem(noteContent = it))
-                        }
-                    } else {
-                        viewModel.dataItemList.forEachIndexed { index, dataItem ->
-                            if (index > 0) {
-                                dataItem.noteContent = viewModel.noteContentList[index - 1]
-                            }
-                        }
-                        viewModel.itemListSame = false
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        noteAdapter.submitList(viewModel.dataItemList)
-                    }
-
                     if (!viewModel.startListInit) {
                         viewModel.noteContentList.forEach { element ->
-                            val noteContent = NoteContent(
-                                id = element.id,
-                                noteId = element.noteId,
-                                note = element.note,
-                                photoPath = element.photoPath,
-                            )
-                            viewModel.startNoteContentList.add(noteContent)
+                            viewModel.startNoteContentList.add(element.copy())
                         }
                         viewModel.startListInit = true
                     }
+                } else {
+                    viewModel.insertNote()
                 }
-            })
 
-            fun checkEmpty() {
-                viewModel.updateCurrentNoteUpdateFr(viewModel.newTitle, viewModel.newFirstNote)
-                if (viewModel.noteContentList.isNotEmpty()) {
-                    viewModel.updateNoteContentList(viewModel.noteContentList)
-                } else if (viewModel.noteContentList.isEmpty() &&
-                    viewModel.newTitle.isEmpty() &&
-                    viewModel.newFirstNote.isEmpty()
-                ) {
-                    viewModel.deleteUnused()
+                if (it != null) {
+                    viewModel.noteContentList = mutableListOf()
+                    viewModel.noteContentList
+                        .addAll(it.filter { list -> list.noteId == viewModel.currentNote?.id })
                 }
-                this.findNavController()
-                    .navigate(
-                        EditNoteFragmentDirections.actionEditNoteFragmentToAllNotesFragment()
-                    )
-                viewModel.onDoneNavigating()
+
+                if (!viewModel.itemListSame) {
+                    viewModel.dataItemList = mutableListOf()
+                    viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
+                    viewModel.noteContentList.forEach {
+                        viewModel.dataItemList.add(DataItem(noteContent = it))
+                    }
+                } else {
+                    viewModel.dataItemList.forEachIndexed { index, dataItem ->
+                        if (index > 0) {
+                            dataItem.noteContent = viewModel.noteContentList[index - 1]
+                        }
+                    }
+                    viewModel.itemListSame = false
+                }
+
+                withContext(Dispatchers.Main) {
+                    noteAdapter.submitList(viewModel.dataItemList)
+                }
             }
+        })
 
-            viewModel.navigateBack.observe(viewLifecycleOwner, {
-                if (it == true) {
+        fun checkEmpty() {
+            viewModel.updateCurrentNoteUpdateFr(viewModel.newTitle, viewModel.newFirstNote)
+            if (viewModel.noteContentList.isNotEmpty()) {
+                viewModel.updateNoteContentList(viewModel.noteContentList)
+            } else if (viewModel.noteContentList.isEmpty() &&
+                viewModel.newTitle.isEmpty() &&
+                viewModel.newFirstNote.isEmpty()
+            ) {
+                viewModel.deleteUnused()
+            }
+            this.findNavController()
+                .navigate(
+                    EditNoteFragmentDirections.actionEditNoteFragmentToAllNotesFragment()
+                )
+            viewModel.onDoneNavigating()
+        }
 
+        viewModel.navigateBack.observe(viewLifecycleOwner, {
+            if (it == true) {
+                if (args.noteID > -1) {
                     if (viewModel.startNoteContentList.size == viewModel.noteContentList.size) {
                         viewModel.noteContentList.forEachIndexed { index, noteContent ->
                             if (noteContent != viewModel.startNoteContentList[index]) {
@@ -324,47 +319,7 @@ class EditNoteFragment : Fragment() {
                             checkEmpty()
                         }
                     }
-                }
-            })
-
-        } else {
-
-            viewModel.allNotes.observe(viewLifecycleOwner, {
-                viewModel.lastIndex = it.size - 1
-            })
-
-
-            viewModel.allNoteContent.observe(viewLifecycleOwner, {
-                lifecycleScope.launch(Dispatchers.Default) {
-                    viewModel.insertNote()
-                    if (it != null) {
-                        viewModel.noteContentList = mutableListOf()
-                        viewModel.noteContentList
-                            .addAll(it.filter { list -> list.noteId == viewModel.currentNote?.id })
-                    }
-
-                    if (!viewModel.itemListSame) {
-                        viewModel.dataItemList = mutableListOf()
-                        viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
-                        viewModel.noteContentList.forEach {
-                            viewModel.dataItemList.add(DataItem(noteContent = it))
-                        }
-                    } else {
-                        viewModel.dataItemList.forEachIndexed { index, dataItem ->
-                            if (index > 0) {
-                                dataItem.noteContent = viewModel.noteContentList[index - 1]
-                            }
-                        }
-                        viewModel.itemListSame = false
-                    }
-                    withContext(Dispatchers.Main) {
-                        noteAdapter.submitList(viewModel.dataItemList)
-                    }
-                }
-            })
-
-            viewModel.navigateBack.observe(viewLifecycleOwner, {
-                if (it == true) {
+                } else {
                     if (viewModel.noteContentList.any { item -> !item.hidden } ||
                         viewModel.noteContentList.any { item -> item.note.isNotEmpty() }) {
                         viewModel.allHidden = false
@@ -400,8 +355,8 @@ class EditNoteFragment : Fragment() {
                         }
                     }
                 }
-            })
-        }
+            }
+        })
         return binding.root
     }
 

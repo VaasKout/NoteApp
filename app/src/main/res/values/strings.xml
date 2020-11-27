@@ -33,4 +33,5 @@
     <string name="columns">Расположение</string>
     <string name="one_column">1 колонка</string>
     <string name="two_columns">2 колонки</string>
+    <string name="sign">Подпись</string>
 </resources>

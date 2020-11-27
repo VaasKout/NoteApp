@@ -33,7 +33,7 @@ class OnePhotoFragment : Fragment() {
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
 
-// finally change the color
+        // finally change the color
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireActivity(), R.color.grey_material)
 

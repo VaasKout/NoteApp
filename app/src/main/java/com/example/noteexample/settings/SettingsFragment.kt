@@ -16,7 +16,6 @@ const val PHOTOS_ONLY = 2
 
 
 class SettingsFragment : BottomSheetDialogFragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -25,25 +24,6 @@ class SettingsFragment : BottomSheetDialogFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
         binding.lifecycleOwner = this
         val viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
-
-//        dialog?.let {
-//            val bottomSheetBehavior = (dialog as BottomSheetDialog).behavior
-//
-//            val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
-//                override fun onStateChanged(bottomSheet: View, newState: Int) {
-//                    when (newState) {
-//                        BottomSheetBehavior.STATE_EXPANDED -> {
-//                        }
-//                        else -> {
-//                        }
-//                    }
-//                }
-//                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-//                }
-//            }
-////            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-//            bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
-//        }
 
         viewModel.flags.observe(viewLifecycleOwner, {
             viewModel.flagsObj = it
