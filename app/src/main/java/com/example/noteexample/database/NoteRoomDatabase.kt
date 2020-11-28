@@ -9,7 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Note::class, Images::class, Flags::class],
+    entities = [Note::class, Image::class, Flags::class],
     version = 1,
     exportSchema = false
 )
@@ -43,6 +43,4 @@ abstract class NoteRoomDatabase : RoomDatabase() {
             }
         }
     }
-
-    //TODO Read about @Embedded in Room
 }

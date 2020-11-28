@@ -6,7 +6,7 @@
     <data>
         <variable
            name="data"
-            type="com.example.noteexample.utils.GalleryData"/>
+            type="com.example.noteexample.gallery.GalleryData"/>
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -25,7 +25,7 @@
 
         <ImageView
             android:id="@+id/gallery_image"
-            imageEditUrl="@{data.imgSrcUrl}"
+            app:imageUrl="@{data.imgSrcUrl}"
             android:layout_width="match_parent"
             android:layout_height="@dimen/small_img_height"
             android:adjustViewBounds="true"

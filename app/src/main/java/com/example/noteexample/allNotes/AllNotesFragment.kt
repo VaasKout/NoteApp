@@ -10,13 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.bumptech.glide.Glide
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteMainBinding
-import com.example.noteexample.databinding.RecyclerMainItemBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -31,11 +31,98 @@ class AllNotesFragment : Fragment() {
      *  Define viewModel for NoteFragment
      */
 
+    private val viewModel by lazy {
+        ViewModelProvider(this).get(AllNotesViewModel::class.java)
+    }
+
+    private val actionModeController = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.action_menu, menu)
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            return when (item?.itemId) {
+                R.id.delete_action -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage("Удалить выбранное?")
+                        .setNegativeButton("Нет") { _, _ ->
+                        }
+                        .setPositiveButton("Да") { _, _ ->
+                            lifecycleScope.launch(Dispatchers.Default) {
+                                viewModel.onDeleteSelected()
+                                withContext(Dispatchers.Main) {
+                                    mode?.finish()
+                                }
+                            }
+                        }.show()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            lifecycleScope.launch(Dispatchers.Default) {
+                if (viewModel.noteList.any { it.note.isChecked }) {
+                    viewModel.noteList.forEach { it.note.isChecked = false }
+                }
+            }
+            viewModel.actionModeStarted = false
+        }
+    }
+
+    private val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
+                ItemTouchHelper.DOWN or ItemTouchHelper.UP,
+        0
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            if (viewModel.actionModeStarted) {
+                viewModel.onDestroyActionMode()
+            }
+            val from = viewHolder.adapterPosition
+            val to = target.adapterPosition
+
+            if (from >= 0 && to >= 0) {
+                viewModel.swap(from, to)
+                recyclerView.adapter?.notifyItemMoved(from, to)
+                viewModel.startedMove = true
+            }
+            return true
+        }
+
+        override fun clearView(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ) {
+            super.clearView(recyclerView, viewHolder)
+            if (viewModel.startedMove) {
+                viewModel.startedMove = false
+                viewModel.updateNoteList()
+            }
+        }
+
+        override fun onSwiped(
+            viewHolder: RecyclerView.ViewHolder,
+            direction: Int
+        ) {
+        }
+
+    })
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val viewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
+
         val cards = mutableListOf<MaterialCardView>()
         val binding: FragmentNoteMainBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
@@ -53,8 +140,7 @@ class AllNotesFragment : Fragment() {
             setHasFixedSize(true)
         }
         var layoutManager: RecyclerView.LayoutManager? = null
-
-        viewModel.helper.attachToRecyclerView(binding.recyclerView)
+        helper.attachToRecyclerView(binding.recyclerView)
 
 
         binding.toolbarNoteMain.setOnMenuItemClickListener {
@@ -93,13 +179,10 @@ class AllNotesFragment : Fragment() {
 
         binding.searchEdit.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.Default) {
-                val noteContentList = viewModel.noteContentList.filter { item ->
-                    item.note.contains(it.toString(), true)
-                }
                 val noteList = viewModel.noteList.filter { item ->
-                    item.title.contains(it.toString()) ||
-                            item.firstNote.contains(it.toString()) ||
-                            noteContentList.any { content -> content.noteId == item.id }
+                    item.note.title.contains(it.toString()) ||
+                            item.note.text.contains(it.toString()) ||
+                            item.images.any { image -> image.signature == it.toString() }
                 }
                 withContext(Dispatchers.Main) {
                     if (it.toString().isEmpty()) {
@@ -197,20 +280,51 @@ class AllNotesFragment : Fragment() {
 
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             cards.add(holder.binding.mainCard)
+
+            val item = noteAdapter.currentList[holder.adapterPosition]
             val card = holder.binding.mainCard
             val img = holder.binding.photoMain
+            val text = holder.binding.noteMain
             val view1 = holder.binding.view1
             val view2 = holder.binding.view2
             val view3 = holder.binding.view3
-            val noteMain = holder.binding.noteMain
             val date = holder.binding.dateMain
 
-            noteMain.visibility = View.GONE
-            img.visibility = View.GONE
-            date.visibility = View.GONE
             view1.visibility = View.GONE
             view2.visibility = View.GONE
             view3.visibility = View.GONE
+            date.visibility = View.GONE
+            img.visibility = View.GONE
+
+            if (item.images.isNotEmpty()) {
+                var photoInserted = false
+                for (content in item.images) {
+                    if (content.photoPath.isNotEmpty()) {
+                        img.visibility = View.VISIBLE
+                        Glide.with(requireContext())
+                            .load(content.photoPath)
+                            .into(img)
+                        photoInserted = true
+                        break
+                    }
+                }
+                if (!photoInserted &&
+                    item.note.text.isEmpty() &&
+                    item.images[0].signature.isNotEmpty()
+                ) {
+                    text.text = item.images[0].signature
+                    text.visibility = View.VISIBLE
+                }
+            }
+
+            if (item.note.title.isNotEmpty() && item.note.text.isNotEmpty()) {
+                view1.visibility = View.VISIBLE
+            }
+            if ((item.note.text.isNotEmpty() || item.note.title.isNotEmpty()) &&
+                img.visibility == View.VISIBLE
+            ) {
+                view2.visibility = View.VISIBLE
+            }
 
             viewModel.flagsObj?.let {
                 if (it.showDate) {
@@ -219,52 +333,6 @@ class AllNotesFragment : Fragment() {
                 }
             }
 
-            val contentList = viewModel.noteContentList.filter {
-                it.noteId == noteAdapter.currentList[holder.adapterPosition].id
-            }
-
-            noteAdapter.currentList[holder.adapterPosition]?.let { current ->
-
-                /**
-                 * Set [View.GONE] visibility for [RecyclerMainItemBinding.photoMain] to prevent
-                 * bug in [ListAdapter]
-                 */
-
-                if (contentList.isNotEmpty()) {
-                    for (content in contentList) {
-                        if (content.photoPath.isNotEmpty()) {
-                            holder.binding.data = content
-                            img.visibility = View.VISIBLE
-                            break
-                        }
-                    }
-                }
-
-                if (current.firstNote.isNotEmpty()) {
-                    noteMain.visibility = View.VISIBLE
-                    noteMain.text = current.firstNote
-                }
-
-                if (img.visibility == View.GONE
-                    && current.firstNote.isEmpty()
-                    && contentList.isNotEmpty()
-                ) {
-                    noteMain.text = contentList[0].note
-                    noteMain.visibility = View.VISIBLE
-                    if (current.title.isNotEmpty()) {
-                        view1.visibility = View.VISIBLE
-                    }
-                }
-
-                if (current.title.isNotEmpty() && current.firstNote.isNotEmpty()) {
-                    view1.visibility = View.VISIBLE
-                }
-                if ((current.firstNote.isNotEmpty() || current.title.isNotEmpty()) &&
-                    img.visibility == View.VISIBLE
-                ) {
-                    view2.visibility = View.VISIBLE
-                }
-            }
 
 
             card.setOnLongClickListener {
@@ -272,13 +340,13 @@ class AllNotesFragment : Fragment() {
                     viewModel.onDoneSearch()
                 }
                 card.isChecked = !card.isChecked
-                noteAdapter.currentList[holder.adapterPosition].isChecked =
+                noteAdapter.currentList[holder.adapterPosition].note.isChecked =
                     card.isChecked
                 if (!viewModel.actionModeStarted) {
-                    viewModel.onStartActionMode(requireActivity(), requireContext())
+                    viewModel.onStartActionMode(requireActivity(), actionModeController)
                 } else {
                     viewModel.onResumeActionMode()
-                    if (viewModel.noteList.none { it.isChecked }) {
+                    if (viewModel.noteList.none { it.note.isChecked }) {
                         viewModel.onDestroyActionMode()
                     }
                 }
@@ -291,31 +359,30 @@ class AllNotesFragment : Fragment() {
                 }
                 if (viewModel.actionModeStarted) {
                     card.isChecked = !card.isChecked
-                    noteAdapter.currentList[holder.adapterPosition].isChecked =
+                    noteAdapter.currentList[holder.adapterPosition].note.isChecked =
                         card.isChecked
                     viewModel.onResumeActionMode()
-                    if (viewModel.noteList.none { it.isChecked }) {
+                    if (viewModel.noteList.none { it.note.isChecked }) {
                         viewModel.onDestroyActionMode()
                     }
                 } else if (!viewModel.actionModeStarted) {
                     viewModel.scrollPosition = holder.adapterPosition
-                    if (contentList.size == 1 && contentList[0].photoPath.isNotEmpty()) {
-                        this.findNavController()
-                            .navigate(
-                                AllNotesFragmentDirections
-                                    .actionAllNotesFragmentToOnePhotoFragment
-                                        (
-                                        noteAdapter.currentList[holder.adapterPosition].id,
-                                        contentList[0].id
-                                    )
-                            )
-                    } else {
-                        this.findNavController()
-                            .navigate(
-                                AllNotesFragmentDirections
-                                    .actionAllNotesFragmentToOneNoteFragment
-                                        (noteAdapter.currentList[holder.adapterPosition].id)
-                            )
+                    noteAdapter.currentList[holder.adapterPosition].apply {
+                        if (images.size == 1 && images[0].photoPath.isNotEmpty()) {
+                            this@AllNotesFragment.findNavController()
+                                .navigate(
+                                    AllNotesFragmentDirections
+                                        .actionAllNotesFragmentToOnePhotoFragment
+                                            (note.noteID, images[0].imgID)
+                                )
+                        } else {
+                            this@AllNotesFragment.findNavController()
+                                .navigate(
+                                    AllNotesFragmentDirections
+                                        .actionAllNotesFragmentToOneNoteFragment
+                                            (noteAdapter.currentList[holder.adapterPosition].note.noteID)
+                                )
+                        }
                     }
                 }
             }

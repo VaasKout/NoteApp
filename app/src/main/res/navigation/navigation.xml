@@ -28,15 +28,15 @@
         android:name="com.example.noteexample.oneNote.OneNoteFragment"
         android:label="OneNoteFragment"
         tools:layout="@layout/fragment_one_note">
-        <argument
-            android:name="noteID"
-            app:argType="integer" />
         <action
             android:id="@+id/action_oneNoteFragment_to_onePhotoFragment"
             app:destination="@id/onePhotoFragment" />
         <action
             android:id="@+id/action_oneNoteFragment_to_editNoteFragment"
             app:destination="@id/editNoteFragment" />
+        <argument
+            android:name="noteID"
+            app:argType="long" />
     </fragment>
     <dialog
         android:id="@+id/galleryFragment"
@@ -44,23 +44,23 @@
         android:label="GalleryFragment"
         tools:layout="@layout/fragment_gallery">
         <argument
-            android:name="noteId"
-            app:argType="integer" />
+            android:name="noteID"
+            app:argType="long" />
     </dialog>
     <fragment
         android:id="@+id/onePhotoFragment"
         android:name="com.example.noteexample.oneNote.OnePhotoFragment"
         android:label="OnePhotoFragment"
         tools:layout="@layout/fragment_one_photo">
-        <argument
-            android:name="noteID"
-            app:argType="integer"/>
-        <argument
-            android:name="noteContentID"
-            app:argType="integer" />
         <action
             android:id="@+id/action_onePhotoFragment_to_editNoteFragment"
             app:destination="@id/editNoteFragment" />
+        <argument
+            android:name="noteID"
+            app:argType="long" />
+        <argument
+            android:name="imgID"
+            app:argType="long" />
     </fragment>
     <dialog
         android:id="@+id/settingsFragment"
@@ -72,15 +72,15 @@
         android:name="com.example.noteexample.editNote.EditNoteFragment"
         android:label="EditNoteFragment"
         tools:layout="@layout/fragment_edit_note">
-        <argument
-            android:name="noteID"
-            app:argType="integer"
-            android:defaultValue="-1" />
         <action
             android:id="@+id/action_editNoteFragment_to_galleryFragment"
             app:destination="@id/galleryFragment" />
         <action
             android:id="@+id/action_editNoteFragment_to_allNotesFragment"
             app:destination="@id/allNotesFragment" />
+        <argument
+            android:name="noteID"
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
 </navigation>

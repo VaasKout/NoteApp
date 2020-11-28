@@ -1,5 +1,6 @@
 package com.example.noteexample.gallery
 
+import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,8 +24,10 @@ import kotlinx.coroutines.withContext
 class GalleryFragment : BottomSheetDialogFragment() {
 
     private val args by navArgs<GalleryFragmentArgs>()
-    val viewModel by lazy {
-        ViewModelProvider(this).get(GalleryViewModel::class.java)
+    private val viewModel by lazy {
+        val application: Application = requireNotNull(this.activity).application
+        val galleryViewModelFactory = GalleryViewModelFactory(args.noteID, application)
+        ViewModelProvider(this, galleryViewModelFactory).get(GalleryViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -84,10 +87,6 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
         }
 
-        viewModel.allNoteContent.observe(viewLifecycleOwner, {
-            viewModel.currentNoteContentList = it.filter { list -> list.noteId == args.noteId }
-        })
-
         viewModel.actionMode.observe(viewLifecycleOwner, {
             if (it == true) {
                 viewModel.actionModeStarted = true
@@ -135,7 +134,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
         binding.acceptSelectedPhotos.setOnClickListener {
             lifecycleScope.launch(Dispatchers.Default) {
-                viewModel.insertImages(args.noteId)
+                viewModel.insertImages()
                 withContext(Dispatchers.Main){
                     this@GalleryFragment.findNavController().popBackStack()
                     viewModel.onDoneActionMode()
@@ -147,8 +146,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.updateContentList()
-    }
+//    override fun onPause() {
+//        super.onPause()
+//    }
 }

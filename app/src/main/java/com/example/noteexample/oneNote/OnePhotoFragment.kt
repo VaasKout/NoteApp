@@ -38,14 +38,26 @@ class OnePhotoFragment : Fragment() {
             ContextCompat.getColor(requireActivity(), R.color.grey_material)
 
         val application = requireNotNull(this.activity).application
-        val viewModelFactory = OneNoteViewModelFactory(application, args.noteID, args.noteContentID)
+        val viewModelFactory = OneNoteViewModelFactory(application, args.noteID)
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
-        lifecycleScope.launch {
-            viewModel.getNote()
-            binding.note = viewModel.currentNote
-            binding.data = viewModel.currentNoteContent
-        }
+
+        viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
+            binding.note = it.note
+            if (it.note.title.isNotEmpty()) {
+                binding.titleViewOnePhoto.visibility = View.VISIBLE
+            }
+            if (it.note.text.isNotEmpty()) {
+                binding.firstNoteViewOnePhoto.visibility = View.VISIBLE
+            }
+            if (it.images.isNotEmpty()) {
+                val img = it.images.filter { item -> item.imgID == args.imgID }[0]
+                binding.data = img
+                if (img.signature.isNotEmpty()) {
+                    binding.noteViewOnePhoto.visibility = View.VISIBLE
+                }
+            }
+        })
 
         /**
          * Menu onClickListener

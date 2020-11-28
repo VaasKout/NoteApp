@@ -23,7 +23,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.utils.Camera
-import com.example.noteexample.utils.DataItem
+import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -66,20 +66,14 @@ class EditNoteFragment : Fragment() {
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
-                    if (args.noteID > -1) {
+                    viewModel.startNote?.note?.let { item ->
                         this.findNavController()
                             .navigate(
                                 EditNoteFragmentDirections
-                                    .actionEditNoteFragmentToGalleryFragment(args.noteID)
+                                    .actionEditNoteFragmentToGalleryFragment(
+                                        item.noteID
+                                    )
                             )
-                    } else {
-                        viewModel.currentNote?.let {
-                            this.findNavController()
-                                .navigate(
-                                    EditNoteFragmentDirections
-                                        .actionEditNoteFragmentToGalleryFragment(it.id)
-                                )
-                        }
                     }
                 } else {
                     Snackbar.make(
@@ -124,25 +118,16 @@ class EditNoteFragment : Fragment() {
                                             Manifest.permission.READ_EXTERNAL_STORAGE
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        if (args.noteID > -1) {
+                                        viewModel.startNote?.note?.let { item ->
                                             this.findNavController()
                                                 .navigate(
                                                     EditNoteFragmentDirections
                                                         .actionEditNoteFragmentToGalleryFragment(
-                                                            args.noteID
+                                                            item.noteID
                                                         )
                                                 )
-                                        } else {
-                                            viewModel.currentNote?.let { note ->
-                                                this.findNavController()
-                                                    .navigate(
-                                                        EditNoteFragmentDirections
-                                                            .actionEditNoteFragmentToGalleryFragment(
-                                                                note.id
-                                                            )
-                                                    )
-                                            }
                                         }
+
                                     } else {
                                         requestPermissionLauncher.launch(
                                             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -164,46 +149,46 @@ class EditNoteFragment : Fragment() {
 
         noteAdapter.noteHolder.observe(viewLifecycleOwner) { holder ->
             holder.binding.titleEdit.addTextChangedListener {
-                viewModel.newTitle = it.toString()
+                viewModel.title = it.toString()
             }
             holder.binding.firstNoteEdit.addTextChangedListener {
-                viewModel.newFirstNote = it.toString()
+                viewModel.text = it.toString()
             }
         }
 
         noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
-                if (it.hidden) {
-                    holder.binding.photo.visibility = View.GONE
-                    holder.binding.restoreButton.visibility = View.VISIBLE
-                    holder.binding.deleteCircleIcon.visibility = View.GONE
-                    holder.binding.deleteCircle.visibility = View.GONE
-                } else {
-                    holder.binding.photo.visibility = View.VISIBLE
-                    holder.binding.restoreButton.visibility = View.GONE
-                    holder.binding.deleteCircleIcon.visibility = View.VISIBLE
-                    holder.binding.deleteCircle.visibility = View.VISIBLE
-                }
+
+            if (noteAdapter.currentList[holder.adapterPosition].image?.hidden == true) {
+                holder.binding.photo.visibility = View.GONE
+                holder.binding.restoreButton.visibility = View.VISIBLE
+                holder.binding.deleteCircleIcon.visibility = View.GONE
+                holder.binding.deleteCircle.visibility = View.GONE
+            } else {
+                holder.binding.photo.visibility = View.VISIBLE
+                holder.binding.restoreButton.visibility = View.GONE
+                holder.binding.deleteCircleIcon.visibility = View.VISIBLE
+                holder.binding.deleteCircle.visibility = View.VISIBLE
             }
 
+
             holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                noteAdapter.currentList[holder.adapterPosition].noteContent?.let {
-                    it.note = editable.toString()
-                    if (it.photoPath.isEmpty() && it.note.isEmpty()) {
-                        viewModel.deleteNoteContent(it)
+                noteAdapter.currentList[holder.adapterPosition].image?.let {
+                    it.signature = editable.toString()
+                    if (it.photoPath.isEmpty() && it.signature.isEmpty()) {
+                        viewModel.deleteImage(it)
                     }
                 }
             }
 
             holder.binding.deleteCircle.setOnClickListener {
-                noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = true
-                viewModel.updateNoteContentList(viewModel.noteContentList)
+                noteAdapter.currentList[holder.adapterPosition].image?.hidden = true
+                viewModel.updateCurrentNote()
                 noteAdapter.notifyItemChanged(holder.adapterPosition)
             }
 
             holder.binding.restoreButton.setOnClickListener {
-                noteAdapter.currentList[holder.adapterPosition].noteContent?.hidden = false
-                viewModel.updateNoteContentList(viewModel.noteContentList)
+                noteAdapter.currentList[holder.adapterPosition].image?.hidden = false
+                viewModel.updateCurrentNote()
                 noteAdapter.notifyItemChanged(holder.adapterPosition)
             }
         })
@@ -219,58 +204,46 @@ class EditNoteFragment : Fragment() {
             viewModel.lastIndex = it.size - 1
         })
 
-        viewModel.allNoteContent.observe(viewLifecycleOwner, {
-
-            lifecycleScope.launch(Dispatchers.Default) {
-                if (args.noteID > -1) {
-                    viewModel.getNote()
-                    if (!viewModel.startListInit) {
-                        viewModel.noteContentList.forEach { element ->
-                            viewModel.startNoteContentList.add(element.copy())
+        lifecycleScope.launch {
+            viewModel.getNote()
+            viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
+                viewModel.currentNote = it
+                lifecycleScope.launch(Dispatchers.Default) {
+                    viewModel.currentNote?.let { note ->
+                        if (!viewModel.itemListSame) {
+                            viewModel.dataItemList = mutableListOf()
+                            viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(note.note))
+                            note.images.forEach { image ->
+                                viewModel.dataItemList.add(NoteWithImagesRecyclerItems(image = image))
+                            }
+                        } else {
+                            viewModel.dataItemList.forEachIndexed { index, dataItem ->
+                                if (index > 0) {
+                                    dataItem.image = note.images[index - 1]
+                                }
+                            }
+                            viewModel.itemListSame = false
                         }
-                        viewModel.startListInit = true
-                    }
-                } else {
-                    viewModel.insertNote()
-                }
 
-                if (it != null) {
-                    viewModel.noteContentList = mutableListOf()
-                    viewModel.noteContentList
-                        .addAll(it.filter { list -> list.noteId == viewModel.currentNote?.id })
-                }
-
-                if (!viewModel.itemListSame) {
-                    viewModel.dataItemList = mutableListOf()
-                    viewModel.dataItemList.add(0, DataItem(note = viewModel.currentNote))
-                    viewModel.noteContentList.forEach {
-                        viewModel.dataItemList.add(DataItem(noteContent = it))
-                    }
-                } else {
-                    viewModel.dataItemList.forEachIndexed { index, dataItem ->
-                        if (index > 0) {
-                            dataItem.noteContent = viewModel.noteContentList[index - 1]
+                        withContext(Dispatchers.Main) {
+                            noteAdapter.submitList(viewModel.dataItemList)
                         }
                     }
-                    viewModel.itemListSame = false
                 }
-
-                withContext(Dispatchers.Main) {
-                    noteAdapter.submitList(viewModel.dataItemList)
-                }
-            }
-        })
+            })
+        }
 
         fun checkEmpty() {
-            viewModel.updateCurrentNoteUpdateFr(viewModel.newTitle, viewModel.newFirstNote)
-            if (viewModel.noteContentList.isNotEmpty()) {
-                viewModel.updateNoteContentList(viewModel.noteContentList)
-            } else if (viewModel.noteContentList.isEmpty() &&
-                viewModel.newTitle.isEmpty() &&
-                viewModel.newFirstNote.isEmpty()
-            ) {
-                viewModel.deleteUnused()
+            viewModel.updateCurrentNote()
+            viewModel.currentNote?.let {
+                if (it.images.isEmpty() &&
+                    viewModel.title.isEmpty() &&
+                    viewModel.text.isEmpty()
+                ) {
+                    viewModel.deleteUnused()
+                }
             }
+
             this.findNavController()
                 .navigate(
                     EditNoteFragmentDirections.actionEditNoteFragmentToAllNotesFragment()
@@ -280,29 +253,16 @@ class EditNoteFragment : Fragment() {
 
         viewModel.navigateBack.observe(viewLifecycleOwner, {
             if (it == true) {
+                viewModel.updateCurrentNote()
                 if (args.noteID > -1) {
-                    if (viewModel.startNoteContentList.size == viewModel.noteContentList.size) {
-                        viewModel.noteContentList.forEachIndexed { index, noteContent ->
-                            if (noteContent != viewModel.startNoteContentList[index]) {
-                                viewModel.textChanged = true
-                            }
-                        }
-                    } else {
-                        viewModel.sizeChanged = true
-                    }
-
                     when {
                         viewModel.backPressed -> {
-                            if (viewModel.sizeChanged ||
-                                viewModel.textChanged ||
-                                viewModel.title != viewModel.newTitle ||
-                                viewModel.firstNote != viewModel.newFirstNote
-                            ) {
+                            if (viewModel.startNote != viewModel.currentNote) {
                                 MaterialAlertDialogBuilder(requireContext())
                                     .setMessage("Сохранить изменения?")
                                     .setNegativeButton("Нет") { _, _ ->
-                                        viewModel.deleteNoteContentList(viewModel.noteContentList)
-                                        viewModel.insertNoteContentList(viewModel.startNoteContentList)
+                                        viewModel.deleteNote(viewModel.currentNote)
+                                        viewModel.insertNoteWithImages(viewModel.startNote)
                                         this.findNavController().popBackStack()
                                         viewModel.onDoneNavigating()
                                     }
@@ -320,38 +280,40 @@ class EditNoteFragment : Fragment() {
                         }
                     }
                 } else {
-                    if (viewModel.noteContentList.any { item -> !item.hidden } ||
-                        viewModel.noteContentList.any { item -> item.note.isNotEmpty() }) {
-                        viewModel.allHidden = false
-                    }
+                    viewModel.currentNote?.let { noteWithImages ->
+                        if (noteWithImages.images.any { item -> !item.hidden } ||
+                            noteWithImages.images.any { item -> item.signature.isNotEmpty() }) {
+                            viewModel.allHidden = false
+                        }
 
-                    when {
-                        (viewModel.noteContentList.isEmpty() ||
-                                viewModel.allHidden) &&
-                                viewModel.newTitle.isEmpty() &&
-                                viewModel.newFirstNote.isEmpty()
-                        -> {
-                            this.findNavController().popBackStack()
-                            viewModel.deleteUnused()
-                            viewModel.onDoneNavigating()
-                        }
-                        viewModel.backPressed -> {
-                            MaterialAlertDialogBuilder(requireContext())
-                                .setMessage("Сохранить изменения?")
-                                .setNegativeButton("Нет") { _, _ ->
-                                    viewModel.deleteUnused()
-                                    this.findNavController().popBackStack()
-                                    viewModel.onDoneNavigating()
-                                }
-                                .setPositiveButton("Да") { _, _ ->
-                                    this.findNavController().popBackStack()
-                                    viewModel.onDoneNavigating()
-                                }.show()
-                            viewModel.onDoneNavigating()
-                        }
-                        !viewModel.backPressed -> {
-                            this.findNavController().popBackStack()
-                            viewModel.onDoneNavigating()
+                        when {
+                            (noteWithImages.images.isEmpty() ||
+                                    viewModel.allHidden) &&
+                                    viewModel.text.isEmpty() &&
+                                    viewModel.title.isEmpty()
+                            -> {
+                                this.findNavController().popBackStack()
+                                viewModel.deleteUnused()
+                                viewModel.onDoneNavigating()
+                            }
+                            viewModel.backPressed -> {
+                                MaterialAlertDialogBuilder(requireContext())
+                                    .setMessage("Сохранить изменения?")
+                                    .setNegativeButton("Нет") { _, _ ->
+                                        viewModel.deleteUnused()
+                                        this.findNavController().popBackStack()
+                                        viewModel.onDoneNavigating()
+                                    }
+                                    .setPositiveButton("Да") { _, _ ->
+                                        this.findNavController().popBackStack()
+                                        viewModel.onDoneNavigating()
+                                    }.show()
+                                viewModel.onDoneNavigating()
+                            }
+                            !viewModel.backPressed -> {
+                                this.findNavController().popBackStack()
+                                viewModel.onDoneNavigating()
+                            }
                         }
                     }
                 }
@@ -362,9 +324,8 @@ class EditNoteFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        if (args.noteID == -1) {
-            viewModel.updateNoteContentList(viewModel.noteContentList)
-            viewModel.updateCurrentNoteInsertFr(viewModel.newTitle, viewModel.newFirstNote)
+        if (args.noteID == -1L) {
+            viewModel.updateCurrentNote()
         }
     }
 }

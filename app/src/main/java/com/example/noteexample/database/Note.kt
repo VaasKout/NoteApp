@@ -2,26 +2,15 @@ package com.example.noteexample.database
 
 import androidx.room.*
 
-@Entity
-data class Note(
-    @PrimaryKey(autoGenerate = true) val noteID: Long = 0,
-    @ColumnInfo(name = "position") var pos: Int = 0,
-    @ColumnInfo(name = "title") var title: String = "",
-    @ColumnInfo(name = "note") var firstNote: String = "",
-    @ColumnInfo(name = "date") var date: String = "",
-    @ColumnInfo(name = "hasNoteContent") var hasNoteContent: Boolean = false,
-    var isChecked: Boolean = false,
-)
+/**
+ * Caution: Querying data with nested relationships requires Room to manipulate a large volume
+ * of data and can affect performance.
+ * Use as few nested relationships as possible in your queries.
+ * [https://developer.android.com/training/data-storage/room/relationships#nested-relationships]
+ */
 
-@Entity
-data class Images(
-    @PrimaryKey(autoGenerate = true) var imgID: Long = 0,
-    var signature: String = "",
-    var photoPath: String,
-    var hidden: Boolean = false,
-)
 
-@Entity
+@Entity(tableName = "flags_table")
 data class Flags(
     @PrimaryKey val id: Long = 0,
     var filter: Int = 0,
@@ -30,22 +19,32 @@ data class Flags(
     var columns: Int = 2,
 )
 
-@Entity(primaryKeys = ["noteID, imgID"])
-data class NoteWithImagesCrossRef(
-    val noteID: Long,
-    val imgID: Long,
+@Entity(tableName = "note_table")
+data class Note(
+    @PrimaryKey(autoGenerate = true) val noteID: Long = 0,
+    @ColumnInfo(name = "position") var pos: Int = 0,
+    var title: String = "",
+    var text: String = "",
+    var date: String = "",
+    var hasNoteContent: Boolean = false,
+    var isChecked: Boolean = false,
 )
+
+@Entity(tableName = "image_table")
+data class Image(
+    @PrimaryKey(autoGenerate = true) var imgID: Long = 0,
+    val parentNoteID: Long,
+    var signature: String = "",
+    var photoPath: String,
+    var hidden: Boolean = false,
+)
+
 
 data class NoteWithImages(
     @Embedded val note: Note,
     @Relation(
         parentColumn = "noteID",
-        entityColumn = "imgID",
-        associateBy = Junction(NoteWithImagesCrossRef::class)
+        entityColumn = "parentNoteID",
     )
-    val images: Images
-)
-
-data class OrderedNotes(
-    @Embedded val flags: Flags,
+    val images: List<Image>
 )

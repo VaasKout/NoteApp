@@ -9,18 +9,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
+import com.example.noteexample.database.Image
 import com.example.noteexample.database.Note
-import com.example.noteexample.database.NoteContent
 import com.example.noteexample.databinding.HeaderEditBinding
 import com.example.noteexample.databinding.RecyclerNoteContentEditItemBinding
 import com.example.noteexample.utils.DataDiffCallBack
-import com.example.noteexample.utils.DataItem
+import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
 
 class OneNoteEditAdapter :
-    ListAdapter<DataItem, RecyclerView.ViewHolder>(DataDiffCallBack()) {
+    ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(DataDiffCallBack()) {
 
     private val _noteHolder = MutableLiveData<NoteEditHolder>()
     val noteHolder: LiveData<NoteEditHolder> = _noteHolder
@@ -43,7 +43,7 @@ class OneNoteEditAdapter :
 //    }
 
     override fun getItemViewType(position: Int): Int {
-        return if (getItem(position).noteContent == null && getItem(position).note != null) {
+        return if (position == 0) {
             ITEM_VIEW_TYPE_HEADER
         } else {
             ITEM_VIEW_TYPE_ITEM
@@ -53,10 +53,10 @@ class OneNoteEditAdapter :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is NoteEditHolder -> {
-                holder.bind(getItem(position).note)
+                getItem(position).note?.let { holder.bind(it) }
             }
             is NoteContentEditHolder -> {
-                holder.bind(getItem(position).noteContent)
+                getItem(position).image?.let { holder.bind(it) }
             }
         }
     }
@@ -91,21 +91,19 @@ class OneNoteEditAdapter :
     inner class NoteContentEditHolder(val binding: RecyclerNoteContentEditItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(noteContent: NoteContent?) {
+        fun bind(images: Image) {
             _noteContentHolder.value = this
-            binding.data = noteContent
-            noteContent?.let {
-                if (it.photoPath.isEmpty()) {
+            binding.data = images
+                if (images.photoPath.isEmpty()) {
                     binding.deleteCircle.visibility = View.GONE
                     binding.deleteCircleIcon.visibility = View.GONE
                 }
-            }
         }
     }
 
     inner class NoteEditHolder(val binding: HeaderEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(note: Note?) {
+        fun bind(note: Note) {
             _noteHolder.value = this
             binding.note = note
         }

@@ -7,12 +7,11 @@ import androidx.lifecycle.ViewModelProvider
 @Suppress("UNCHECKED_CAST")
 class OneNoteViewModelFactory (
     private val application: Application,
-    private val noteID: Int = -1,
-    private val noteContentID: Int = -1
+    private val noteID: Long,
 ): ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OneNoteViewModel::class.java)){
-            return OneNoteViewModel(application, noteID, noteContentID) as T
+            return OneNoteViewModel(application, noteID) as T
         }
         throw IllegalArgumentException("Unknown class in OneNoteViewModelFactory")
     }

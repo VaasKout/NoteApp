@@ -6,23 +6,37 @@ import androidx.room.*
 @Dao
 interface NoteDao {
 
-    @Query("DELETE FROM note")
-    suspend fun deleteAllNotes()
-
+    @Transaction
     @Query("SELECT * from note_table")
-    fun getAllNotes(): LiveData<List<Note>>
+    fun getAllNotes(): LiveData<List<NoteWithImages>>
 
+    @Transaction
     @Query("SELECT * from note_table ORDER BY position DESC")
-    suspend fun getAllDESCSortedNotes(): List<Note>
+    suspend fun getAllDESCSortedNotes(): List<NoteWithImages>
 
+    @Transaction
     @Query("SELECT * from note_table ORDER BY position ASC")
-    suspend fun getAllASCSortedNotes(): List<Note>
+    suspend fun getAllASCSortedNotes(): List<NoteWithImages>
 
-    @Query("SELECT * from note_table WHERE id = :key")
-    suspend fun getNote(key: Int): Note
+    @Transaction
+    @Query("SELECT * from note_table ORDER BY noteID DESC LIMIT 1")
+    suspend fun getLastNote(): NoteWithImages
 
-    @Query("SELECT * FROM note_table ORDER BY id DESC LIMIT 1")
-    suspend fun getLastNote(): Note
+    @Transaction
+    @Query("SELECT * from note_table ORDER BY noteID DESC LIMIT 1")
+    fun getLastNoteLiveData(): LiveData<NoteWithImages>
+
+    @Transaction
+    @Query("SELECT * from note_table WHERE noteID = :key")
+    suspend fun getNote(key: Long): NoteWithImages
+
+    @Transaction
+    @Query("SELECT * from note_table WHERE noteID = :key")
+    fun getNoteLiveData(key: Long): LiveData<NoteWithImages>
+
+    @Transaction
+    @Query("DELETE FROM note_table")
+    suspend fun deleteAllNotes()
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertNote(note: Note)
@@ -40,43 +54,35 @@ interface NoteDao {
     suspend fun deleteNoteList(noteList: List<Note>)
 
 
-    @Query("SELECT * from note_content ORDER BY id ASC")
-    fun getAllNoteContent(): LiveData<List<NoteContent>>
+    @Insert
+    suspend fun insertImages(images: List<Image>)
 
-    @Query("SELECT * from note_content")
-    suspend fun getAllNoteContentSimpleList(): List<NoteContent>
+    @Insert
+    suspend fun insertImage(image: Image)
 
-    @Query("SELECT * from note_content WHERE id = :key")
-    suspend fun getNoteContent(key: Int): NoteContent
+    @Update
+    suspend fun updateImages(images: List<Image>)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertNoteContent(noteContent: NoteContent)
+    @Update
+    suspend fun updateImage(image: Image)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertNoteContentList(noteContentList: List<NoteContent>)
-
-    @Update(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun updateNoteContent(noteContent: NoteContent)
-
-    @Update(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun updateNoteContentList(noteContent: List<NoteContent>)
+    @Transaction
+    @Query("DELETE FROM image_table")
+    suspend fun deleteAllImages()
 
     @Delete
-    suspend fun deleteNoteContentList(noteContentList: List<NoteContent>)
+    suspend fun deleteImage(image: Image)
 
     @Delete
-    suspend fun deleteNoteContent(noteContent: NoteContent)
-
-    @Query("DELETE FROM note_content")
-    suspend fun deleteAllNoteContent()
+    suspend fun deleteImages(images: List<Image>)
 
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertFlags(flags: Flags)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun updateFlags(flags: Flags)
 
-    @Query("SELECT * from flags WHERE id = 0")
+    @Query("SELECT * from flags_table WHERE id = 0")
     fun getFlags(): LiveData<Flags>
 }

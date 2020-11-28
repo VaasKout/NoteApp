@@ -14,6 +14,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOneNoteBinding
+import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,13 +42,16 @@ class OneNoteFragment : Fragment() {
             setHasFixedSize(true)
         }
 
-        viewModel.allNoteContent.observe(viewLifecycleOwner, { allContent ->
+        viewModel.currentNoteLiveData.observe(viewLifecycleOwner, { current ->
             lifecycleScope.launch(Dispatchers.Default) {
-                viewModel.getNote()
-                val list = allContent.filter { list -> list.noteId == args.noteID }
-                withContext(Dispatchers.Main){
-                    oneNoteAdapter.addHeaderAndSubmitList(viewModel.currentNote, list)
-                        //bug when scroll position
+                val dataItemList = mutableListOf<NoteWithImagesRecyclerItems>()
+                dataItemList.add(0, NoteWithImagesRecyclerItems(current.note))
+                current.images.forEach { image ->
+                    dataItemList.add(NoteWithImagesRecyclerItems(image = image))
+                }
+                withContext(Dispatchers.Main) {
+                    oneNoteAdapter.submitList(dataItemList)
+                    //bug when scroll position
                     delay(16)
                     binding.recyclerOneNote
                         .layoutManager?.scrollToPosition(viewModel.scrollPosition)
@@ -58,16 +62,20 @@ class OneNoteFragment : Fragment() {
 
 
         oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
-            oneNoteAdapter.currentList[holder.adapterPosition].noteContent?.let { current ->
-                holder.binding.photoOneNote.setOnClickListener {
-                    viewModel.scrollPosition = holder.adapterPosition
-                    Log.e("holder.pos", holder.adapterPosition.toString())
+            holder.binding.photoOneNote.setOnClickListener {
+                viewModel.scrollPosition = holder.adapterPosition
+                Log.e("holder.pos", holder.adapterPosition.toString())
+                oneNoteAdapter.currentList[holder.adapterPosition].image?.let {
                     this.findNavController()
                         .navigate(
                             OneNoteFragmentDirections
-                                .actionOneNoteFragmentToOnePhotoFragment(args.noteID, current.id)
+                                .actionOneNoteFragmentToOnePhotoFragment(
+                                    args.noteID,
+                                    it.imgID
+                                )
                         )
                 }
+
             }
         })
 

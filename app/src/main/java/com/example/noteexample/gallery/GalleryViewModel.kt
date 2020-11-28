@@ -6,18 +6,19 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.noteexample.database.NoteContent
+import com.example.noteexample.database.Image
 import com.example.noteexample.database.NoteRoomDatabase
+import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
-import com.example.noteexample.utils.GalleryData
 import kotlinx.coroutines.launch
 
-class GalleryViewModel(application: Application) : AndroidViewModel(application) {
+class GalleryViewModel(val noteID: Long,
+                       application: Application) : AndroidViewModel(application) {
 
     //Variables
     var galleryList = listOf<GalleryData>()
-    var currentNoteContentList = listOf<NoteContent>()
+    private var currentNote: NoteWithImages? = null
 
     //Flags
     var actionModeStarted = false
@@ -25,7 +26,6 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     var expandedState = false
 
     //LiveData
-    val allNoteContent: LiveData<List<NoteContent>>
     private val _actionMode = MutableLiveData<Boolean>()
     val actionMode: LiveData<Boolean> = _actionMode
 
@@ -34,7 +34,9 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-        allNoteContent = repository.allNoteContent
+        viewModelScope.launch {
+            currentNote = repository.getNote(noteID)
+        }
     }
 
     fun getData(camera: Camera) {
@@ -47,35 +49,32 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    suspend fun insertImages(noteId: Int) {
+    suspend fun insertImages() {
         val photoList = mutableListOf<GalleryData>()
-        val newNoteContentList = mutableListOf<NoteContent>()
+        val newNoteContentList = mutableListOf<Image>()
         photoList.addAll(galleryList.filter { list -> list.isChecked })
         if (photoList.isNotEmpty()) {
-            currentNoteContentList.forEach {
-                if (it.hidden || it.photoPath.isEmpty()) {
-                    it.photoPath = photoList[0].imgSrcUrl
-                    it.hidden = false
-                    photoList.removeAt(0)
-                } else {
-                    return@forEach
-                }
-            }
-            photoList.forEach { photo ->
-                val noteContent = NoteContent(
-                    noteId = noteId,
-                    photoPath = photo.imgSrcUrl
-                )
-                newNoteContentList.add(noteContent)
-            }
-            repository.insertNoteContentList(newNoteContentList)
-            repository.updateNoteContentList(currentNoteContentList)
-        }
-    }
+            currentNote?.let { current ->
+                current.images.forEach {
+                        if (it.hidden || it.photoPath.isEmpty()) {
+                            it.photoPath = photoList[0].imgSrcUrl
+                            it.hidden = false
+                            photoList.removeAt(0)
+                        } else {
+                            return@forEach
+                        }
+                    }
+                    photoList.forEach { photo ->
+                        val image = Image(
+                            parentNoteID = noteID,
+                            photoPath = photo.imgSrcUrl
+                        )
+                        newNoteContentList.add(image)
+                    }
 
-    fun updateContentList(){
-        viewModelScope.launch {
-            repository.updateNoteContentList(currentNoteContentList)
+                repository.insertImages(newNoteContentList)
+                repository.updateNoteWithImages(current)
+            }
         }
     }
 
@@ -86,11 +85,4 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     fun onDoneActionMode() {
         _actionMode.value = false
     }
-
-
-//    fun loadImg(camera: Camera, adapter: GalleryAdapter){
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val list = camera.loadImagesFromStorage()
-//        }
-//    }
 }

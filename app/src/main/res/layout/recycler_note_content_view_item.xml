@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="com.example.noteexample.database.NoteContent" />
+            type="com.example.noteexample.database.Image" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,7 +30,7 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/photo"
             android:scaleType="fitCenter"
-            app:imageViewUrl="@{data.photoPath}"
+            app:imageUrl="@{data.photoPath}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_img_item"
@@ -45,7 +45,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/photo_one_note"
-            app:viewNote="@{data}"
             tools:visibility="visible" />
 
         <TextView

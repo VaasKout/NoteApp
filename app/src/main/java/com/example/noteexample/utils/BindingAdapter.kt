@@ -6,44 +6,27 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.example.noteexample.database.Image
 import com.example.noteexample.database.Note
-import com.example.noteexample.database.NoteContent
 
 //@GlideModule
 //class GlideAppModule : AppGlideModule()
 
-@BindingAdapter("viewHeader")
-fun View.setImgViewAppearance(note: Note?) {
-    note?.let {
-        if (it.firstNote.isNotEmpty() && it.title.isNotEmpty()) {
-            visibility = View.VISIBLE
-        }
-    }
-}
-
-@BindingAdapter("viewNote")
-fun View.setNoteViewAppearance(data: NoteContent?) {
-    data?.let {
-        if (it.note.isNotEmpty()) {
-            visibility = View.VISIBLE
-        }
-    }
-}
-
 
 @BindingAdapter("titleText")
 fun TextView.titleText(note: Note?) {
+
     note?.let {
         when {
             this is EditText && it.title.isNotEmpty() -> {
                 setText(it.title)
             }
-            this !is EditText && it.title.isEmpty() -> {
-                visibility = View.GONE
-            }
-            else -> {
+            this !is EditText && it.title.isNotEmpty() -> {
                 visibility = View.VISIBLE
                 text = it.title
+            }
+            this !is EditText && it.text.isEmpty() ->{
+                visibility = View.GONE
             }
         }
     }
@@ -54,35 +37,33 @@ fun TextView.titleText(note: Note?) {
 fun TextView.firstNoteText(note: Note?) {
     note?.let {
         when {
-            this is EditText && it.firstNote.isNotEmpty() -> {
-                setText(it.firstNote)
+            this is EditText && it.text.isNotEmpty() -> {
+                setText(it.text)
             }
-            this !is EditText && it.firstNote.isEmpty() -> {
-                visibility = View.GONE
-            }
-            else -> {
+            this !is EditText && it.text.isNotEmpty() -> {
                 visibility = View.VISIBLE
-                text = it.firstNote
+                text = it.text
+            }
+            this !is EditText && it.text.isEmpty() ->{
+                visibility = View.GONE
             }
         }
     }
 }
 
 @BindingAdapter("photoNoteText")
-fun TextView.photoNoteText(data: NoteContent?) {
-    if (data == null) {
-        visibility = View.GONE
-    } else {
+fun TextView.photoNoteText(data: Image?) {
+    data?.let {
         when {
             this is EditText -> {
-                setText(data.note)
+                setText(data.signature)
             }
-            data.note.isEmpty() -> {
-                visibility = View.GONE
-            }
-            else -> {
+            this !is EditText && data.signature.isNotEmpty() -> {
                 visibility = View.VISIBLE
-                text = data.note
+                text = data.signature
+            }
+            this !is EditText && data.signature.isEmpty() ->{
+                visibility = View.GONE
             }
         }
     }
@@ -91,25 +72,16 @@ fun TextView.photoNoteText(data: NoteContent?) {
 @BindingAdapter("date")
 fun TextView.setDate(note: Note?) {
     note?.let {
-        text = note.date
+        text = it.date
     }
 }
 
-@BindingAdapter("imageEditUrl")
-fun ImageView.bindEditImage(imgUrl: String?) {
-    if (!imgUrl.isNullOrEmpty()) {
-        Glide.with(this.context)
-            .load(imgUrl)
-            .into(this)
-    }
-}
-
-@BindingAdapter("imageViewUrl")
+@BindingAdapter("imageUrl")
 fun ImageView.bindViewImage(imgUrl: String?) {
     if (!imgUrl.isNullOrEmpty()) {
-        visibility = View.VISIBLE
         Glide.with(this.context)
             .load(imgUrl)
             .into(this)
-    } else visibility = View.GONE
+    }
 }
+

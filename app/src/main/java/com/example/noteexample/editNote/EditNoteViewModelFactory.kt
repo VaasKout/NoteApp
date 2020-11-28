@@ -7,7 +7,7 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class EditNoteViewModelFactory(
-    private val noteId: Int = -1,
+    private val noteId: Long = -1,
     private val application: Application) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(EditNoteViewModel::class.java)){

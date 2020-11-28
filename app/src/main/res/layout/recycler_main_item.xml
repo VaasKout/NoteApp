@@ -8,10 +8,6 @@
         <variable
             name="note"
             type="com.example.noteexample.database.Note" />
-
-        <variable
-            name="data"
-            type="com.example.noteexample.database.NoteContent" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -43,6 +39,8 @@
                 android:paddingEnd="@dimen/dp_16"
                 android:paddingBottom="@dimen/dp_8"
                 android:singleLine="false"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -56,6 +54,8 @@
                 android:layout_height="@dimen/dp_1"
                 android:background="@color/primaryDarkColor"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"
+                tools:visibility="visible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title_main" />
 
@@ -69,6 +69,9 @@
                 android:paddingTop="@dimen/dp_8"
                 android:paddingEnd="@dimen/dp_16"
                 android:paddingBottom="@dimen/dp_8"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:firstNoteText="@{note}"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +94,8 @@
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/photo_main"
                 android:scaleType="centerCrop"
-                app:imageEditUrl="@{data.photoPath}"
+                android:visibility="gone"
+                tools:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/view2"
@@ -115,6 +119,8 @@
                 android:textAlignment="viewEnd"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                 app:date="@{note}"
+                android:visibility="gone"
+                tools:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/view3"

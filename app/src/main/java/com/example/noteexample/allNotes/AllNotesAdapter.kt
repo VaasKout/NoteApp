@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Note
+import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 
 class NoteAdapter :
-    ListAdapter<Note, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
+    ListAdapter<NoteWithImages, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
     /**
      * [holder] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]
      * to set clickListeners for recycler items
@@ -41,23 +42,24 @@ class NoteAdapter :
         /**
          * Checked state of card depends on [Note.isChecked] state
          */
-        fun bind(note: Note) {
+        fun bind(noteWithImages: NoteWithImages) {
             _holder.value = this
-            binding.note = note
-            binding.mainCard.isChecked = note.isChecked
+            binding.note = noteWithImages.note
+            binding.mainCard.isChecked = noteWithImages.note.isChecked
             binding.executePendingBindings()
         }
     }
 }
 
-class NoteDiffCallBack : DiffUtil.ItemCallback<Note>(){
-    override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
+class NoteDiffCallBack : DiffUtil.ItemCallback<NoteWithImages>() {
+    override fun areItemsTheSame(oldItem: NoteWithImages, newItem: NoteWithImages): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+    override fun areContentsTheSame(oldItem: NoteWithImages, newItem: NoteWithImages): Boolean {
         return oldItem == newItem
     }
+
 }
 
 

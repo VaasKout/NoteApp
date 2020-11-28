@@ -8,7 +8,7 @@
 
         <variable
             name="data"
-            type="com.example.noteexample.database.NoteContent" />
+            type="com.example.noteexample.database.Image" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -35,7 +35,7 @@
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/photo"
                 android:scaleType="fitCenter"
-                app:imageEditUrl="@{data.photoPath}"
+                app:imageUrl="@{data.photoPath}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
