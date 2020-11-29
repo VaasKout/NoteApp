@@ -145,8 +145,4 @@ class GalleryFragment : BottomSheetDialogFragment() {
         binding.lifecycleOwner = this
         return binding.root
     }
-
-//    override fun onPause() {
-//        super.onPause()
-//    }
 }

@@ -81,22 +81,22 @@ class OnePhotoFragment : Fragment() {
             }
         }
 
-//        binding.imgOnePhoto.setOnClickListener {
-//            binding.motionOnePhoto.setTransition(R.id.start, R.id.endHide)
-//
-//        }
+        binding.imgOnePhoto.setOnClickListener {
+            binding.motionOnePhoto.setTransition(R.id.start, R.id.endHide)
+
+        }
 
 
         binding.imgOnePhoto.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
             override fun onSwipeTop() {
                 if (!binding.imgOnePhoto.isZoomed) {
-                    lifecycleScope.launch {
                         binding.titleViewOnePhoto.visibility = View.INVISIBLE
                         binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
                         binding.noteViewOnePhoto.visibility = View.INVISIBLE
                         binding.toolbarOnePhoto.visibility = View.INVISIBLE
                         binding.motionOnePhoto.setTransition(R.id.start, R.id.endUp)
                         binding.motionOnePhoto.transitionToEnd()
+                    lifecycleScope.launch {
                         delay(200)
                         this@OnePhotoFragment.findNavController().popBackStack()
                     }
@@ -105,13 +105,13 @@ class OnePhotoFragment : Fragment() {
 
             override fun onSwipeBottom() {
                 if (!binding.imgOnePhoto.isZoomed) {
-                    lifecycleScope.launch {
                         binding.titleViewOnePhoto.visibility = View.INVISIBLE
                         binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
                         binding.noteViewOnePhoto.visibility = View.INVISIBLE
                         binding.toolbarOnePhoto.visibility = View.INVISIBLE
                         binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
                         binding.motionOnePhoto.transitionToEnd()
+                    lifecycleScope.launch {
                         delay(200)
                         this@OnePhotoFragment.findNavController().popBackStack()
                     }

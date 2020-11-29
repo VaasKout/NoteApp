@@ -96,15 +96,15 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     suspend fun deleteUnused() {
         withContext(Dispatchers.Default) {
+            var updateNeeded = false
             for (item in noteList) {
                 if (item.note.title.isEmpty() &&
                     item.note.text.isEmpty() &&
                     (item.images.isEmpty() ||
                             item.images.none { !it.hidden || it.signature.isNotEmpty() })
                 ) {
+                    updateNeeded = true
                     repository.deleteNoteWithImages(item)
-                    flagsObj?.let { repository.updateFlags(it) }
-
                     continue
                 }
                 for (image in item.images) {
@@ -112,11 +112,17 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                         if (image.signature.isNotEmpty()) {
                             image.photoPath = ""
                             image.hidden = false
-                            repository.updateNoteWithImages(item)
+                            repository.updateImage(image)
                         } else {
                             repository.deleteImage(image)
                         }
+                        updateNeeded = true
                     }
+                }
+            }
+            if (updateNeeded){
+                withContext(Dispatchers.IO){
+                    flagsObj?.let { repository.updateFlags(it) }
                 }
             }
         }

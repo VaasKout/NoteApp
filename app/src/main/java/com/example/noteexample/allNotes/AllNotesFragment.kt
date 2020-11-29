@@ -106,6 +106,7 @@ class AllNotesFragment : Fragment() {
             viewHolder: RecyclerView.ViewHolder
         ) {
             super.clearView(recyclerView, viewHolder)
+            //Started move to not destroy action mode
             if (viewModel.startedMove) {
                 viewModel.startedMove = false
                 viewModel.updateNoteList()
@@ -122,6 +123,7 @@ class AllNotesFragment : Fragment() {
 
     //TODO Swipe LEFT, RIGHT
     //TODO Check visibility of img in xml animation for OnePhotoFragment
+    //TODO Trigger LiveData flags
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -140,7 +142,6 @@ class AllNotesFragment : Fragment() {
                 layoutManager = StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
             }
         }
-
 
         requireActivity().window
             .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -185,7 +186,7 @@ class AllNotesFragment : Fragment() {
                     val noteList = viewModel.noteList.filter { item ->
                         item.note.title.contains(it.toString()) ||
                                 item.note.text.contains(it.toString()) ||
-                                item.images.any { image -> image.signature == it.toString() }
+                                item.images.any { image -> image.signature.contains(it.toString())}
                     }
                     withContext(Dispatchers.Main) {
                         if (it.toString().isEmpty()) {
@@ -219,29 +220,22 @@ class AllNotesFragment : Fragment() {
                     } else {
                         viewModel.getDESCNotes(it.filter)
                     }
-
-//                    binding.recyclerView.apply {
-//                        if (adapter == null){
-//                            adapter = noteAdapter
-//                            setHasFixedSize(true)
-//                        }
-//                    }
-
-                    if (it.columns == 2 &&
-                        binding.recyclerView.layoutManager !is StaggeredGridLayoutManager
-                    ) {
-                        binding.recyclerView.layoutManager =
-                            StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-                    } else if (it.columns == 1 &&
-                        binding.recyclerView.layoutManager !is LinearLayoutManager
-                    ) {
-                        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-                    }
                     viewModel.deleteUnused()
-                    viewModel.onStopActionMode()
                     cards = mutableListOf()
                     noteAdapter.submitList(viewModel.noteList)
                     noteAdapter.notifyDataSetChanged()
+                    viewModel.onStopActionMode()
+                }
+
+                if (it.columns == 2 &&
+                    binding.recyclerView.layoutManager !is StaggeredGridLayoutManager
+                ) {
+                    binding.recyclerView.layoutManager =
+                        StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+                } else if (it.columns == 1 &&
+                    binding.recyclerView.layoutManager !is LinearLayoutManager
+                ) {
+                    binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
                 }
             }
         })
@@ -417,4 +411,3 @@ class AllNotesFragment : Fragment() {
         return binding.root
     }
 }
-
