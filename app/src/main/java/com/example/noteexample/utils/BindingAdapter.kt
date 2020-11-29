@@ -6,11 +6,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
 import com.example.noteexample.database.Image
 import com.example.noteexample.database.Note
 
-//@GlideModule
-//class GlideAppModule : AppGlideModule()
+@GlideModule
+class GlideAppModule : AppGlideModule()
 
 
 @BindingAdapter("titleText")
@@ -79,7 +81,7 @@ fun TextView.setDate(note: Note?) {
 @BindingAdapter("imageUrl")
 fun ImageView.bindViewImage(imgUrl: String?) {
     if (!imgUrl.isNullOrEmpty()) {
-        Glide.with(this.context)
+        GlideApp.with(this.context)
             .load(imgUrl)
             .into(this)
     }

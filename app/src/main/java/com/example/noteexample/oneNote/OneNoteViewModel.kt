@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 
 class OneNoteViewModel(
     application: Application,
@@ -16,6 +17,7 @@ class OneNoteViewModel(
     var scrollPosition: Int = 0
 
     val currentNoteLiveData: LiveData<NoteWithImages>
+    val dataItemList = mutableListOf<NoteWithImagesRecyclerItems>()
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()

@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.database.*
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.settings.ALL
@@ -25,14 +26,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     var searchStarted = false
 
     //Variables
-    var scrollPosition: Int? = null
     var flagsObj: Flags? = null
     var noteList = mutableListOf<NoteWithImages>()
 
     //LiveData
     var flags: LiveData<Flags>
-    private val _allSortedNotes = MutableLiveData<List<NoteWithImages>>()
-    val allSortedNotes: LiveData<List<NoteWithImages>> = _allSortedNotes
 
     private val _searchMode = MutableLiveData<Boolean>()
     var searchMode: LiveData<Boolean> = _searchMode
@@ -52,38 +50,37 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * Coroutine functions
      */
 
-    fun getASCNotes(filter: Int) {
-        viewModelScope.launch {
-            when (filter) {
-                ALL -> {
-                    _allSortedNotes.value = repository.allASCSortedNotes()
-                }
-                TEXT_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allASCSortedNotes().filter { !it.note.hasNoteContent }
-                }
-                PHOTOS_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allASCSortedNotes().filter { it.note.hasNoteContent }
-                }
+    suspend fun getASCNotes(filter: Int) {
+        noteList = mutableListOf()
+        when (filter) {
+            ALL -> {
+                noteList.addAll(repository.allASCSortedNotes())
+            }
+            TEXT_ONLY -> {
+                noteList.addAll(repository.allASCSortedNotes()
+                    .filter { !it.note.hasNoteContent })
+            }
+            PHOTOS_ONLY -> {
+                noteList.addAll(
+                    repository.allASCSortedNotes()
+                        .filter { it.note.hasNoteContent })
             }
         }
     }
 
-    fun getDESCNotes(filter: Int) {
-        viewModelScope.launch {
-            when (filter) {
-                ALL -> {
-                    _allSortedNotes.value = repository.allDESCSortedNotes()
-                }
-                TEXT_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allDESCSortedNotes().filter { !it.note.hasNoteContent }
-                }
-                PHOTOS_ONLY -> {
-                    _allSortedNotes.value =
-                        repository.allDESCSortedNotes().filter { it.note.hasNoteContent }
-                }
+    suspend fun getDESCNotes(filter: Int) {
+        noteList = mutableListOf()
+        when (filter) {
+            ALL -> {
+                noteList.addAll(repository.allDESCSortedNotes())
+            }
+            TEXT_ONLY -> {
+                noteList.addAll(
+                    repository.allDESCSortedNotes().filter { !it.note.hasNoteContent })
+            }
+            PHOTOS_ONLY -> {
+                noteList.addAll(
+                    repository.allDESCSortedNotes().filter { it.note.hasNoteContent })
             }
         }
     }
@@ -98,25 +95,27 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     suspend fun deleteUnused() {
-        for (item in noteList) {
-            if (item.note.title.isEmpty() &&
-                item.note.text.isEmpty() &&
-                (item.images.isEmpty() ||
-                        item.images.none { !it.hidden || it.signature.isNotEmpty() })
-            ) {
-                repository.deleteNoteWithImages(item)
-                flagsObj?.let { repository.updateFlags(it) }
+        withContext(Dispatchers.Default) {
+            for (item in noteList) {
+                if (item.note.title.isEmpty() &&
+                    item.note.text.isEmpty() &&
+                    (item.images.isEmpty() ||
+                            item.images.none { !it.hidden || it.signature.isNotEmpty() })
+                ) {
+                    repository.deleteNoteWithImages(item)
+                    flagsObj?.let { repository.updateFlags(it) }
 
-                continue
-            }
-            for (image in item.images) {
-                if (image.hidden) {
-                    if (image.signature.isNotEmpty()) {
-                        image.photoPath = ""
-                        image.hidden = false
-                        repository.updateNoteWithImages(item)
-                    } else {
-                        repository.deleteImage(image)
+                    continue
+                }
+                for (image in item.images) {
+                    if (image.hidden) {
+                        if (image.signature.isNotEmpty()) {
+                            image.photoPath = ""
+                            image.hidden = false
+                            repository.updateNoteWithImages(item)
+                        } else {
+                            repository.deleteImage(image)
+                        }
                     }
                 }
             }
@@ -138,22 +137,20 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun swap(from: Int, to: Int) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val fromItem = noteList[from]
-            if (fromItem.note.pos == from && noteList[to].note.pos == to) {
-                noteList.remove(noteList[from])
-                noteList.add(to, fromItem)
-                noteList.forEachIndexed { index, item ->
-                    item.note.pos = index
-                }
-            } else {
-                noteList.remove(noteList[from])
-                noteList.add(to, fromItem)
-                var pos = noteList.size - 1
-                noteList.forEach {
-                    it.note.pos = pos
-                    pos--
-                }
+        val fromItem = noteList[from]
+        if (fromItem.note.pos == from && noteList[to].note.pos == to) {
+            noteList.remove(noteList[from])
+            noteList.add(to, fromItem)
+            noteList.forEachIndexed { index, item ->
+                item.note.pos = index
+            }
+        } else {
+            noteList.remove(noteList[from])
+            noteList.add(to, fromItem)
+            var pos = noteList.size - 1
+            noteList.forEach {
+                it.note.pos = pos
+                pos--
             }
         }
     }
@@ -185,9 +182,13 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             "${noteList.filter { it.note.isChecked }.size}"
     }
 
+    fun onStopActionMode() {
+        _actionMode.value?.finish()
+
+    }
+
     @SuppressLint("NullSafeMutableLiveData")
     fun onDestroyActionMode() {
-        _actionMode.value?.finish()
         _actionMode.value = null
     }
 }

@@ -14,19 +14,18 @@
         android:id="@+id/main_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/dp_4"
+        android:layout_margin="2dp"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
         android:longClickable="true"
-        app:cardCornerRadius="@dimen/dp_4"
+        app:cardCornerRadius="@dimen/dp_8"
         app:strokeColor="@color/primaryDarkColor"
         app:strokeWidth="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/title_main"
@@ -45,7 +44,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:titleText="@{note}"
                 tools:text="Title" />
 
             <View
@@ -71,7 +69,6 @@
                 android:paddingBottom="@dimen/dp_8"
                 android:visibility="gone"
                 tools:visibility="visible"
-                app:firstNoteText="@{note}"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

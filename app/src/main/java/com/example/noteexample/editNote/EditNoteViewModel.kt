@@ -108,8 +108,6 @@ class EditNoteViewModel(
         }
     }
 
-    //TODO check if LiveData observed
-
     //Dao functions
     suspend fun getNote() {
         if (!noteInit){

@@ -38,28 +38,26 @@ class OneNoteFragment : Fragment() {
         val oneNoteAdapter = OneNoteViewAdapter()
         binding.recyclerOneNote.apply {
             adapter = oneNoteAdapter
-            layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
         }
 
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, { current ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                val dataItemList = mutableListOf<NoteWithImagesRecyclerItems>()
-                dataItemList.add(0, NoteWithImagesRecyclerItems(current.note))
+            if (viewModel.dataItemList.isEmpty()) {
+                viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(current.note))
                 current.images.forEach { image ->
-                    dataItemList.add(NoteWithImagesRecyclerItems(image = image))
-                }
-                withContext(Dispatchers.Main) {
-                    oneNoteAdapter.submitList(dataItemList)
-                    //bug when scroll position
-                    delay(16)
-                    binding.recyclerOneNote
-                        .layoutManager?.scrollToPosition(viewModel.scrollPosition)
+                    viewModel.dataItemList.add(NoteWithImagesRecyclerItems(image = image))
                 }
             }
+
+            oneNoteAdapter.submitList(viewModel.dataItemList)
+            lifecycleScope.launch {
+                delay(2)
+                binding.recyclerOneNote
+                    .layoutManager?.scrollToPosition(viewModel.scrollPosition)
+            }
+            //bug when scroll position
         })
-
-
 
         oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             holder.binding.photoOneNote.setOnClickListener {
