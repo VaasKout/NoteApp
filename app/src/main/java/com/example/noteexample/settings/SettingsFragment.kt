@@ -25,8 +25,8 @@ class SettingsFragment : BottomSheetDialogFragment() {
         binding.lifecycleOwner = this
         val viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
 
-        viewModel.flags.observe(viewLifecycleOwner, {
-            viewModel.flagsObj = it
+        viewModel.flagsLiveData.observe(viewLifecycleOwner, {
+            viewModel.flags = it
             if (it.showDate) {
                 binding.switchDate.isChecked = true
             }
@@ -57,59 +57,59 @@ class SettingsFragment : BottomSheetDialogFragment() {
 
         binding.switchDate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.showDate = true
+                viewModel.flags?.showDate = true
                 viewModel.updateFlags()
             } else {
-                viewModel.flagsObj?.showDate = false
+                viewModel.flags?.showDate = false
                 viewModel.updateFlags()
             }
         }
 
         binding.oneColumn.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.columns = 1
+                viewModel.flags?.columns = 1
                 viewModel.updateFlags()
             }
         }
 
         binding.twoColumns.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked){
-                viewModel.flagsObj?.columns = 2
+                viewModel.flags?.columns = 2
                 viewModel.updateFlags()
             }
         }
 
         binding.sortDESC.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.ascendingOrder = false
+                viewModel.flags?.ascendingOrder = false
                 viewModel.updateFlags()
             }
         }
 
         binding.sortASC.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.ascendingOrder = true
+                viewModel.flags?.ascendingOrder = true
                 viewModel.updateFlags()
             }
         }
 
         binding.filterAll.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.filter = ALL
+                viewModel.flags?.filter = ALL
                 viewModel.updateFlags()
             }
         }
 
         binding.filterTextOnly.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.filter = TEXT_ONLY
+                viewModel.flags?.filter = TEXT_ONLY
                 viewModel.updateFlags()
             }
         }
 
         binding.filterPhotosOnly.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.flagsObj?.filter = PHOTOS_ONLY
+                viewModel.flags?.filter = PHOTOS_ONLY
                 viewModel.updateFlags()
             }
         }

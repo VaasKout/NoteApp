@@ -21,7 +21,7 @@ data class Flags(
 
 @Entity(tableName = "note_table")
 data class Note(
-    @PrimaryKey(autoGenerate = true) val noteID: Long = 0,
+    @PrimaryKey(autoGenerate = true) var noteID: Long = 0,
     @ColumnInfo(name = "position") var pos: Int = 0,
     var title: String = "",
     var text: String = "",

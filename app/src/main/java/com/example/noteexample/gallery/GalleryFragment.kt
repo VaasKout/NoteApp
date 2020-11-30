@@ -40,6 +40,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
         val galleryAdapter = GalleryAdapter()
         val camera = Camera(requireActivity())
+        viewModel.getData(camera)
 
         dialog?.setOnShowListener {
             val bottomSheetBehavior = (dialog as BottomSheetDialog).behavior
@@ -64,11 +65,6 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 }
             }
             bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
-        }
-
-        if (!viewModel.galleryListInit) {
-            viewModel.getData(camera)
-            viewModel.galleryListInit = true
         }
 
         /**

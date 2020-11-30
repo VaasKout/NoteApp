@@ -1,10 +1,7 @@
 package com.example.noteexample.editNote
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.database.Image
@@ -26,10 +23,9 @@ class EditNoteViewModel(
     var allHidden = true
     var backPressed = false
     var itemListSame = false
-    private var noteInit = false
 
     //Variables
-    var lastIndex = 0
+    var position = 0
     var title = ""
     var text = ""
     var startNote: NoteWithImages? = null
@@ -40,9 +36,7 @@ class EditNoteViewModel(
     private val repository: NoteRepository
 
     //LiveData
-    val allNotes: LiveData<List<NoteWithImages>>
-
-    lateinit var currentNoteLiveData: LiveData<NoteWithImages>
+    val currentNoteLiveData: LiveData<NoteWithImages>
 
     private val _navigateBack = MutableLiveData<Boolean>()
     val navigateBack: LiveData<Boolean> = _navigateBack
@@ -50,7 +44,9 @@ class EditNoteViewModel(
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-        allNotes = repository.allNotes
+        currentNoteLiveData = liveData {
+            emitSource(getNote())
+        }
     }
 
     val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
@@ -99,28 +95,24 @@ class EditNoteViewModel(
         if (!itemListSame) {
             itemListSame = true
         }
-        viewModelScope.launch(Dispatchers.Default) {
-            currentNote?.let {
-                val tmpID = it.images[from].imgID
-                it.images[from].imgID = it.images[to].imgID
-                it.images[to].imgID = tmpID
-            }
+        currentNote?.let {
+            val tmpID = it.images[from].imgID
+            it.images[from].imgID = it.images[to].imgID
+            it.images[to].imgID = tmpID
         }
     }
 
     //Dao functions
-    suspend fun getNote() {
-        if (!noteInit){
-            if (noteID > -1) {
-                currentNoteLiveData = repository.getNoteLiveData(noteID)
-                startNote = repository.getNote(noteID)
-            } else {
-                val note = Note()
-                repository.insertNote(note)
-                currentNoteLiveData = repository.getLastLiveData()
-                startNote = repository.getLastNote()
-            }
-            noteInit = true
+    private suspend fun getNote(): LiveData<NoteWithImages> {
+        return if (noteID > -1) {
+            startNote = repository.getNote(noteID)
+            repository.getNoteLiveData(noteID)
+        } else {
+            position = repository.allASCSortedNotes().size
+            val note = Note(pos = position)
+            repository.insertNote(note)
+            startNote = repository.getLastNote()
+            repository.getLastLiveData()
         }
     }
 
@@ -137,11 +129,11 @@ class EditNoteViewModel(
                 }
             } else {
                 val cal = Calendar.getInstance().time
-                val time = SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
+                val time =
+                    SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
                 currentNote?.let {
                     it.note.title = title
                     it.note.text = text
-                    it.note.pos = lastIndex
                     it.note.date = time
                     it.note.hasNoteContent =
                         it.images.isNotEmpty() && it.images.any { item -> !item.hidden }

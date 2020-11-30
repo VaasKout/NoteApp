@@ -22,7 +22,6 @@ class GalleryViewModel(val noteID: Long,
 
     //Flags
     var actionModeStarted = false
-    var galleryListInit = false
     var expandedState = false
 
     //LiveData
@@ -39,9 +38,12 @@ class GalleryViewModel(val noteID: Long,
         }
     }
 
-    fun getData(camera: Camera) {
-        galleryList = camera.loadImagesFromStorage()
-    }
+        fun getData(camera: Camera) {
+            if (galleryList.isEmpty()){
+                galleryList = camera.loadImagesFromStorage()
+            }
+        }
+
 
     fun clearSelected() {
         galleryList.forEach {

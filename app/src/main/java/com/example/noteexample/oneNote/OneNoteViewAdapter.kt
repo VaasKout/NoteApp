@@ -22,9 +22,6 @@ private const val ITEM_VIEW_TYPE_ITEM = 1
 class OneNoteViewAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(DataDiffCallBack()) {
 
-//    private val _noteHolder = MutableLiveData<NoteViewHolder>()
-//    val noteHolder: LiveData<NoteViewHolder> = _noteHolder
-
     private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
     val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder
 
@@ -89,7 +86,6 @@ class OneNoteViewAdapter :
     inner class NoteViewHolder(val binding: HeaderViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(note: Note) {
-//            _noteHolder.value = this
             binding.note = note
             if (note.title.isNotEmpty() && note.text.isNotEmpty()){
                 binding.headerView.visibility = View.VISIBLE
@@ -97,38 +93,3 @@ class OneNoteViewAdapter :
         }
     }
 }
-
-//class NoteAdapter(private val clickListener: NoteListener)
-//        : ListAdapter<Note, NoteAdapter.InsertUpdateViewHolder>(NoteDiffCallBack()){
-//        val checkedList = mutableListOf<Boolean>()
-
-//    inner class InsertUpdateViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
-//        private val titleTextView : TextView = itemView.findViewById(R.id.titleRecyclerItem)
-//        private val noteText : TextView = itemView.findViewById(R.id.noteRecyclerItem)
-//        val materialCard: MaterialCardView = itemView.findViewById(R.id.materialCard)
-//
-//
-//        fun bind(note: Note, clickListener: NoteListener, setChecked: Boolean){
-//            val currentNote = getItem(adapterPosition)
-//            if (currentNote.title.isEmpty()){
-//                titleTextView.visibility = View.GONE
-//            } else titleTextView.text = currentNote.title
-//            if (currentNote.note.isEmpty()){
-//                noteText.visibility = View.GONE
-//            } else noteText.text = currentNote.note
-//
-//        }
-//    }
-//
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InsertUpdateViewHolder {
-//        val layoutInflater = LayoutInflater.from(parent.context)
-//        val view = layoutInflater.
-//        inflate(R.layout.recycler_main_item, parent, false)
-//        return InsertUpdateViewHolder(view)
-//    }
-//
-//
-//    override fun onBindViewHolder(holder: InsertUpdateViewHolder, position: Int) {
-//        holder.bind(getItem(position), clickListener, checkedList[position])
-//    }
-//}

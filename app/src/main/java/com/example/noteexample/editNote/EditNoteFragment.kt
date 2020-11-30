@@ -36,6 +36,8 @@ class EditNoteFragment : Fragment() {
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
 
+
+
     private val viewModel by lazy {
         val application: Application = requireNotNull(this.activity).application
         val updateViewModelFactory = EditNoteViewModelFactory(args.noteID, application)
@@ -198,14 +200,6 @@ class EditNoteFragment : Fragment() {
             viewModel.onStartNavigating()
         }
 
-
-
-        viewModel.allNotes.observe(viewLifecycleOwner, {
-            viewModel.lastIndex = it.size - 1
-        })
-
-        lifecycleScope.launch {
-            viewModel.getNote()
             viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
                 viewModel.currentNote = it
                 lifecycleScope.launch(Dispatchers.Default) {
@@ -231,7 +225,6 @@ class EditNoteFragment : Fragment() {
                     }
                 }
             })
-        }
 
         fun checkEmpty() {
             viewModel.updateCurrentNote()

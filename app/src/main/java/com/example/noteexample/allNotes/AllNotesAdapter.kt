@@ -59,7 +59,6 @@ class NoteDiffCallBack : DiffUtil.ItemCallback<NoteWithImages>() {
     override fun areContentsTheSame(oldItem: NoteWithImages, newItem: NoteWithImages): Boolean {
         return oldItem == newItem
     }
-
 }
 
 

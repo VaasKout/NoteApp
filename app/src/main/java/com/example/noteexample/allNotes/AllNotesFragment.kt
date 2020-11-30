@@ -29,16 +29,19 @@ class AllNotesFragment : Fragment() {
     /**
      *  Define viewModel for NoteFragment
      */
-
+    private var actionMode: ActionMode? = null
     private val noteAdapter = NoteAdapter()
-    var cards = mutableListOf<MaterialCardView>()
+    private var cards = mutableListOf<MaterialCardView>()
     private val viewModel by lazy {
         ViewModelProvider(this).get(AllNotesViewModel::class.java)
     }
 
     private val actionModeController = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            viewModel.onStartActionMode()
             mode?.menuInflater?.inflate(R.menu.action_menu, menu)
+            activity?.window?.statusBarColor =
+                ContextCompat.getColor(requireActivity(), R.color.grey_material)
             return true
         }
 
@@ -51,12 +54,8 @@ class AllNotesFragment : Fragment() {
                         .setNegativeButton("Нет") { _, _ ->
                         }
                         .setPositiveButton("Да") { _, _ ->
-                            lifecycleScope.launch(Dispatchers.Default) {
-                                viewModel.onDeleteSelected()
-                                withContext(Dispatchers.Main) {
-                                    mode?.finish()
-                                }
-                            }
+                            viewModel.onDeleteSelected()
+                            mode?.finish()
                         }.show()
                     true
                 }
@@ -65,15 +64,16 @@ class AllNotesFragment : Fragment() {
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
+            viewModel.onDoneActionMode()
+            actionMode = null
+            activity?.window?.statusBarColor =
+                ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
             if (viewModel.noteList.any { it.note.isChecked }) {
                 viewModel.noteList.forEach { it.note.isChecked = false }
             }
-            viewModel.actionModeStarted = false
-            viewModel.onDestroyActionMode()
             cards.forEach { card ->
                 card.isChecked = false
             }
-
         }
     }
 
@@ -87,8 +87,8 @@ class AllNotesFragment : Fragment() {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            if (viewModel.actionModeStarted) {
-                viewModel.onStopActionMode()
+            if (actionMode != null) {
+                actionMode?.finish()
             }
             val from = viewHolder.adapterPosition
             val to = target.adapterPosition
@@ -118,33 +118,36 @@ class AllNotesFragment : Fragment() {
             direction: Int
         ) {
         }
-
     })
 
+    init {
+        lifecycleScope.launchWhenStarted {
+            requireActivity().window
+                .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+
+
+        }
+    }
+
     //TODO Swipe LEFT, RIGHT
-    //TODO Check visibility of img in xml animation for OnePhotoFragment
-    //TODO Trigger LiveData flags
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        viewModel.onDoneActionMode()
         val binding: FragmentNoteMainBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
-        helper.attachToRecyclerView(binding.recyclerView)
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
-            if (viewModel.flagsObj?.columns == 1) {
+            if (viewModel.flags?.columns == 1) {
                 layoutManager = LinearLayoutManager(requireContext())
-            } else if (viewModel.flagsObj?.columns == 2) {
+            } else if (viewModel.flags?.columns == 2) {
                 layoutManager = StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
             }
         }
-
-        requireActivity().window
-            .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        helper.attachToRecyclerView(binding.recyclerView)
 
         binding.toolbarNoteMain.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -186,7 +189,7 @@ class AllNotesFragment : Fragment() {
                     val noteList = viewModel.noteList.filter { item ->
                         item.note.title.contains(it.toString()) ||
                                 item.note.text.contains(it.toString()) ||
-                                item.images.any { image -> image.signature.contains(it.toString())}
+                                item.images.any { image -> image.signature.contains(it.toString()) }
                     }
                     withContext(Dispatchers.Main) {
                         if (it.toString().isEmpty()) {
@@ -199,7 +202,7 @@ class AllNotesFragment : Fragment() {
             }
         }
 
-        viewModel.searchMode.observe(viewLifecycleOwner, {
+        viewModel.searchModeFlag.observe(viewLifecycleOwner, {
             if (it) {
                 binding.searchEdit.visibility = View.VISIBLE
                 binding.searchEdit.setText("")
@@ -211,10 +214,10 @@ class AllNotesFragment : Fragment() {
             }
         })
 
-        viewModel.flags.observe(viewLifecycleOwner, {
+        viewModel.flagsLiveData.observe(viewLifecycleOwner, {
             if (it != null) {
+                viewModel.flags = it
                 lifecycleScope.launch {
-                    viewModel.flagsObj = it
                     if (it.ascendingOrder) {
                         viewModel.getASCNotes(it.filter)
                     } else {
@@ -224,7 +227,7 @@ class AllNotesFragment : Fragment() {
                     cards = mutableListOf()
                     noteAdapter.submitList(viewModel.noteList)
                     noteAdapter.notifyDataSetChanged()
-                    viewModel.onStopActionMode()
+
                 }
 
                 if (it.columns == 2 &&
@@ -242,17 +245,13 @@ class AllNotesFragment : Fragment() {
 
 
         /**
-         * [AllNotesViewModel.actionModeStarted] checks if action mode needs to be start again
+         * [AllNotesViewModel.actionModeFlag]
          */
-        viewModel.actionMode.observe(viewLifecycleOwner, {
-            if (it != null) {
+        viewModel.actionModeFlag.observe(viewLifecycleOwner, {
+            if (it) {
                 binding.fabToInsert.visibility = View.GONE
-                requireActivity().window.statusBarColor =
-                    ContextCompat.getColor(requireActivity(), R.color.grey_material)
             } else {
                 binding.fabToInsert.visibility = View.VISIBLE
-                requireActivity().window.statusBarColor =
-                    ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
             }
         })
 
@@ -261,7 +260,6 @@ class AllNotesFragment : Fragment() {
             if (holder.adapterPosition >= 0) {
 
                 lifecycleScope.launch {
-
                     cards.add(holder.binding.mainCard)
 
                     val item = noteAdapter.currentList[holder.adapterPosition]
@@ -282,7 +280,6 @@ class AllNotesFragment : Fragment() {
                     img.visibility = View.GONE
                     title.visibility = View.GONE
                     text.visibility = View.GONE
-
 
                     if (item.note.title.isNotEmpty()) {
                         title.visibility = View.VISIBLE
@@ -306,7 +303,6 @@ class AllNotesFragment : Fragment() {
                                 break
                             }
                         }
-
                         if (!photoInserted &&
                             item.note.text.isEmpty() &&
                             item.images[0].signature.isNotEmpty()
@@ -326,12 +322,14 @@ class AllNotesFragment : Fragment() {
                         view2.visibility = View.VISIBLE
                     }
 
-                    viewModel.flagsObj?.let {
+                    viewModel.flags?.let {
                         if (it.showDate) {
                             date.visibility = View.VISIBLE
                             view3.visibility = View.VISIBLE
                         }
                     }
+
+
 
                     card.setOnLongClickListener {
                         if (viewModel.searchStarted) {
@@ -340,12 +338,16 @@ class AllNotesFragment : Fragment() {
                         card.isChecked = !card.isChecked
                         noteAdapter.currentList[holder.adapterPosition].note.isChecked =
                             card.isChecked
-                        if (!viewModel.actionModeStarted) {
-                            viewModel.onStartActionMode(requireActivity(), actionModeController)
+                        if (actionMode == null) {
+                            actionMode =
+                                requireActivity().startActionMode(actionModeController)
+                            actionMode?.title =
+                                "${viewModel.noteList.filter { it.note.isChecked }.size}"
                         } else {
-                            viewModel.onResumeActionMode()
+                            actionMode?.title =
+                                "${viewModel.noteList.filter { it.note.isChecked }.size}"
                             if (viewModel.noteList.none { it.note.isChecked }) {
-                                viewModel.onStopActionMode()
+                                actionMode?.finish()
                             }
                         }
                         true
@@ -355,15 +357,16 @@ class AllNotesFragment : Fragment() {
                         if (viewModel.searchStarted) {
                             viewModel.onDoneSearch()
                         }
-                        if (viewModel.actionModeStarted) {
+                        if (actionMode != null) {
                             card.isChecked = !card.isChecked
                             noteAdapter.currentList[holder.adapterPosition].note.isChecked =
                                 card.isChecked
-                            viewModel.onResumeActionMode()
+                            actionMode?.title =
+                                "${viewModel.noteList.filter { it.note.isChecked }.size}"
                             if (viewModel.noteList.none { it.note.isChecked }) {
-                                viewModel.onStopActionMode()
+                                actionMode?.finish()
                             }
-                        } else if (!viewModel.actionModeStarted) {
+                        } else {
                             noteAdapter.currentList[holder.adapterPosition].apply {
                                 if (images.size == 1 && images[0].photoPath.isNotEmpty()) {
                                     this@AllNotesFragment.findNavController()

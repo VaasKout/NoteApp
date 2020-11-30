@@ -1,7 +1,6 @@
 package com.example.noteexample.oneNote
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,10 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.utils.NoteWithImagesRecyclerItems
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class OneNoteFragment : Fragment() {
     override fun onCreateView(
@@ -49,20 +46,20 @@ class OneNoteFragment : Fragment() {
                     viewModel.dataItemList.add(NoteWithImagesRecyclerItems(image = image))
                 }
             }
-
             oneNoteAdapter.submitList(viewModel.dataItemList)
+
             lifecycleScope.launch {
-                delay(2)
+                delay(8)
                 binding.recyclerOneNote
                     .layoutManager?.scrollToPosition(viewModel.scrollPosition)
             }
+
             //bug when scroll position
         })
 
         oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             holder.binding.photoOneNote.setOnClickListener {
                 viewModel.scrollPosition = holder.adapterPosition
-                Log.e("holder.pos", holder.adapterPosition.toString())
                 oneNoteAdapter.currentList[holder.adapterPosition].image?.let {
                     this.findNavController()
                         .navigate(
@@ -73,7 +70,6 @@ class OneNoteFragment : Fragment() {
                                 )
                         )
                 }
-
             }
         })
 

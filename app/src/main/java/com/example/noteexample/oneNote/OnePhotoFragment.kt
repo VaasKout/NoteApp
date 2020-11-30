@@ -97,7 +97,7 @@ class OnePhotoFragment : Fragment() {
                         binding.motionOnePhoto.setTransition(R.id.start, R.id.endUp)
                         binding.motionOnePhoto.transitionToEnd()
                     lifecycleScope.launch {
-                        delay(200)
+                        delay(150)
                         this@OnePhotoFragment.findNavController().popBackStack()
                     }
                 }
@@ -112,7 +112,7 @@ class OnePhotoFragment : Fragment() {
                         binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
                         binding.motionOnePhoto.transitionToEnd()
                     lifecycleScope.launch {
-                        delay(200)
+                        delay(150)
                         this@OnePhotoFragment.findNavController().popBackStack()
                     }
                 }
@@ -132,6 +132,11 @@ class OnePhotoFragment : Fragment() {
             ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
     }
 }
+
+
+
+
+
 
 
 //            viewModel.currentNoteContent?.let {

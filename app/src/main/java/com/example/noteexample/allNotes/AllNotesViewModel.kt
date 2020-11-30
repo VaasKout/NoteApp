@@ -1,15 +1,13 @@
 package com.example.noteexample.allNotes
 
-import android.annotation.SuppressLint
 import android.app.Application
-import android.view.ActionMode
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.recyclerview.widget.RecyclerView
-import com.example.noteexample.database.*
+import com.example.noteexample.database.Flags
+import com.example.noteexample.database.NoteRoomDatabase
+import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.settings.ALL
 import com.example.noteexample.settings.PHOTOS_ONLY
@@ -21,29 +19,28 @@ import kotlinx.coroutines.withContext
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
     //Flags
-    var actionModeStarted = false
     var startedMove = false
     var searchStarted = false
 
     //Variables
-    var flagsObj: Flags? = null
+    var flags: Flags? = null
     var noteList = mutableListOf<NoteWithImages>()
 
     //LiveData
-    var flags: LiveData<Flags>
+    var flagsLiveData: LiveData<Flags>
 
-    private val _searchMode = MutableLiveData<Boolean>()
-    var searchMode: LiveData<Boolean> = _searchMode
+    private val _searchModeFlag = MutableLiveData<Boolean>()
+    var searchModeFlag: LiveData<Boolean> = _searchModeFlag
 
-    private val _actionMode = MutableLiveData<ActionMode>()
-    var actionMode: LiveData<ActionMode> = _actionMode
+    private val _actionModeFlag = MutableLiveData<Boolean>()
+    var actionModeFlag: LiveData<Boolean> = _actionModeFlag
 
     private val repository: NoteRepository
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
-        flags = repository.flags
+        flagsLiveData = repository.flags
     }
 
     /**
@@ -85,13 +82,14 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    suspend fun onDeleteSelected() {
-        val noteListToDelete =
-            noteList.filter { it.note.isChecked }
-        withContext(Dispatchers.IO) {
+    fun onDeleteSelected() {
+        viewModelScope.launch {
+            val noteListToDelete =
+                noteList.filter { it.note.isChecked }
             repository.deleteNoteWithImagesList(noteListToDelete)
-            flagsObj?.let { repository.updateFlags(it) }
+            flags?.let { repository.updateFlags(it) }
         }
+
     }
 
     suspend fun deleteUnused() {
@@ -120,10 +118,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
                     }
                 }
             }
-            if (updateNeeded){
-                withContext(Dispatchers.IO){
-                    flagsObj?.let { repository.updateFlags(it) }
-                }
+            if (updateNeeded) {
+                flags?.let { repository.updateFlags(it) }
             }
         }
     }
@@ -131,70 +127,49 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     fun updateNoteList() {
         viewModelScope.launch {
             repository.updateNoteWithImagesList(noteList)
-            flagsObj?.let { repository.updateFlags(it) }
+            flags?.let { repository.updateFlags(it) }
         }
     }
 
     fun onClear() {
         viewModelScope.launch {
             repository.deleteAllNotesWithImages()
-            flagsObj?.let { repository.updateFlags(it) }
+            flags?.let { repository.updateFlags(it) }
         }
     }
 
     fun swap(from: Int, to: Int) {
-        val fromItem = noteList[from]
-        if (fromItem.note.pos == from && noteList[to].note.pos == to) {
+        flags?.let {
+            val fromItem = noteList[from]
             noteList.remove(noteList[from])
             noteList.add(to, fromItem)
-            noteList.forEachIndexed { index, item ->
-                item.note.pos = index
-            }
-        } else {
-            noteList.remove(noteList[from])
-            noteList.add(to, fromItem)
-            var pos = noteList.size - 1
-            noteList.forEach {
-                it.note.pos = pos
-                pos--
+            if (it.ascendingOrder) {
+                noteList.forEachIndexed { index, item ->
+                    item.note.pos = index
+                }
+            } else {
+                var pos = noteList.size - 1
+                noteList.forEach { item ->
+                    item.note.pos = pos
+                    pos--
+                }
             }
         }
     }
 
-    //CallBacks
+    fun onStartActionMode(){
+        _actionModeFlag.value = true
+    }
+
+    fun onDoneActionMode(){
+        _actionModeFlag.value = false
+    }
 
     fun onStartSearch() {
-        _searchMode.value = true
+        _searchModeFlag.value = true
     }
 
     fun onDoneSearch() {
-        _searchMode.value = false
-    }
-
-
-    /**
-     * Action mode lifecycle functions
-     */
-
-    fun onStartActionMode(activity: FragmentActivity, actionModeController: ActionMode.Callback) {
-        _actionMode.value = activity.startActionMode(actionModeController)
-        _actionMode.value?.title =
-            "${noteList.filter { it.note.isChecked }.size}"
-        actionModeStarted = true
-    }
-
-    fun onResumeActionMode() {
-        _actionMode.value?.title =
-            "${noteList.filter { it.note.isChecked }.size}"
-    }
-
-    fun onStopActionMode() {
-        _actionMode.value?.finish()
-
-    }
-
-    @SuppressLint("NullSafeMutableLiveData")
-    fun onDestroyActionMode() {
-        _actionMode.value = null
+        _searchModeFlag.value = false
     }
 }
