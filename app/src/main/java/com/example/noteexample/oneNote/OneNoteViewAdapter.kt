@@ -9,8 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
+import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.HeaderViewBinding
 import com.example.noteexample.databinding.RecyclerNoteContentViewItemBinding
 import com.example.noteexample.utils.DataDiffCallBack
@@ -36,7 +36,7 @@ class OneNoteViewAdapter :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is NoteViewHolder -> {
-                getItem(position).note?.let { holder.bind(it) }
+                getItem(position).header?.let { holder.bind(it) }
             }
             is NoteContentViewHolder -> {
                 getItem(position).image?.let { holder.bind(it) }
@@ -85,9 +85,9 @@ class OneNoteViewAdapter :
 
     inner class NoteViewHolder(val binding: HeaderViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(note: Note) {
-            binding.note = note
-            if (note.title.isNotEmpty() && note.text.isNotEmpty()){
+        fun bind(header: Header) {
+            binding.header = header
+            if (header.title.isNotEmpty() && header.text.isNotEmpty()){
                 binding.headerView.visibility = View.VISIBLE
             }
         }

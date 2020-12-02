@@ -41,7 +41,7 @@ class OneNoteFragment : Fragment() {
 
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, { current ->
             if (viewModel.dataItemList.isEmpty()) {
-                viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(current.note))
+                viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(current.header))
                 current.images.forEach { image ->
                     viewModel.dataItemList.add(NoteWithImagesRecyclerItems(image = image))
                 }

@@ -6,8 +6,8 @@
 
     <data>
         <variable
-            name="note"
-            type="com.example.noteexample.database.Note" />
+            name="header"
+            type="com.example.noteexample.database.Header" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -115,7 +115,7 @@
                 android:paddingEnd="@dimen/dp_8"
                 android:textAlignment="viewEnd"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                app:date="@{note}"
+                app:date="@{header}"
                 android:visibility="gone"
                 tools:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"

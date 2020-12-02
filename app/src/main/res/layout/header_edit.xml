@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="note"
-            type="com.example.noteexample.database.Note" />
+            name="header"
+            type="com.example.noteexample.database.Header" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:paddingBottom="@dimen/dp_16"
             android:paddingTop="@dimen/dp_12"
             android:maxLength="200"
-            app:titleText="@{note}"/>
+            app:titleText="@{header}"/>
 
         <EditText
             android:id="@+id/first_note_edit"
@@ -42,7 +42,7 @@
             android:paddingBottom="@dimen/dp_16"
             android:paddingTop="@dimen/dp_8"
             android:maxLength="400"
-            app:firstNoteText="@{note}"
+            app:firstNoteText="@{header}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title_edit" />

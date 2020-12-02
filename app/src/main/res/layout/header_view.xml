@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="note"
-            type="com.example.noteexample.database.Note" />
+            name="header"
+            type="com.example.noteexample.database.Header" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,7 +26,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:titleText="@{note}"
+            app:titleText="@{header}"
             tools:text="@string/title" />
 
         <View
@@ -49,7 +49,7 @@
             android:paddingEnd="@dimen/dp_16"
             android:paddingBottom="@dimen/dp_8"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            app:firstNoteText="@{note}"
+            app:firstNoteText="@{header}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/header_view"

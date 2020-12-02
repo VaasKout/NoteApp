@@ -1,11 +1,12 @@
 package com.example.noteexample.utils
 
 import androidx.recyclerview.widget.DiffUtil
+import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.database.Note
 
+//TODO Make sealed class
 data class NoteWithImagesRecyclerItems(
-    val note: Note? = null,
+    val header: Header? = null,
     var image: Image? = null,
 )
 

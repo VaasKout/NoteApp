@@ -11,10 +11,9 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
-class GalleryViewModel(val noteID: Long,
-                       application: Application) : AndroidViewModel(application) {
+class GalleryViewModel(val noteID: Long, application: Application) : AndroidViewModel(application) {
 
     //Variables
     var galleryList = listOf<GalleryData>()
@@ -38,11 +37,10 @@ class GalleryViewModel(val noteID: Long,
         }
     }
 
-        fun getData(camera: Camera) {
-            if (galleryList.isEmpty()){
-                galleryList = camera.loadImagesFromStorage()
-            }
-        }
+    fun getData(camera: Camera) {
+        runBlocking {  }
+        galleryList = camera.loadImagesFromStorage()
+    }
 
 
     fun clearSelected() {
@@ -58,21 +56,21 @@ class GalleryViewModel(val noteID: Long,
         if (photoList.isNotEmpty()) {
             currentNote?.let { current ->
                 current.images.forEach {
-                        if (it.hidden || it.photoPath.isEmpty()) {
-                            it.photoPath = photoList[0].imgSrcUrl
-                            it.hidden = false
-                            photoList.removeAt(0)
-                        } else {
-                            return@forEach
-                        }
+                    if (it.hidden || it.photoPath.isEmpty()) {
+                        it.photoPath = photoList[0].imgSrcUrl
+                        it.hidden = false
+                        photoList.removeAt(0)
+                    } else {
+                        return@forEach
                     }
-                    photoList.forEach { photo ->
-                        val image = Image(
-                            parentNoteID = noteID,
-                            photoPath = photo.imgSrcUrl
-                        )
-                        newNoteContentList.add(image)
-                    }
+                }
+                photoList.forEach { photo ->
+                    val image = Image(
+                        parentNoteID = noteID,
+                        photoPath = photo.imgSrcUrl
+                    )
+                    newNoteContentList.add(image)
+                }
 
                 repository.insertImages(newNoteContentList)
                 repository.updateNoteWithImages(current)

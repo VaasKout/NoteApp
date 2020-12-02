@@ -43,11 +43,11 @@ class OnePhotoFragment : Fragment() {
             .get(OneNoteViewModel::class.java)
 
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
-            binding.note = it.note
-            if (it.note.title.isNotEmpty()) {
+            binding.header = it.header
+            if (it.header.title.isNotEmpty()) {
                 binding.titleViewOnePhoto.visibility = View.VISIBLE
             }
-            if (it.note.text.isNotEmpty()) {
+            if (it.header.text.isNotEmpty()) {
                 binding.firstNoteViewOnePhoto.visibility = View.VISIBLE
             }
             if (it.images.isNotEmpty()) {

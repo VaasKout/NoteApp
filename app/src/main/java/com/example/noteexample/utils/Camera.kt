@@ -19,6 +19,7 @@ import java.util.*
 
 class Camera(private val activity: Activity) {
     lateinit var currentPhotoPath: String
+    //TODO move it to String.xml
     val dialogList = arrayOf("Фото с камеры", "Фото из галереи")
 
     @Throws(IOException::class)
@@ -69,7 +70,6 @@ class Camera(private val activity: Activity) {
             )
         }
     }
-
 
     fun loadImagesFromStorage(): List<GalleryData> {
 

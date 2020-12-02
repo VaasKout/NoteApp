@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.example.noteexample.database.Image
-import com.example.noteexample.database.Note
-import com.example.noteexample.database.NoteRoomDatabase
-import com.example.noteexample.database.NoteWithImages
+import com.example.noteexample.database.*
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 import kotlinx.coroutines.*
@@ -109,7 +106,7 @@ class EditNoteViewModel(
             repository.getNoteLiveData(noteID)
         } else {
             position = repository.allASCSortedNotes().size
-            val note = Note(pos = position)
+            val note = Header(pos = position)
             repository.insertNote(note)
             startNote = repository.getLastNote()
             repository.getLastLiveData()
@@ -121,9 +118,9 @@ class EditNoteViewModel(
         viewModelScope.launch {
             if (noteID > -1) {
                 currentNote?.let {
-                    it.note.title = title
-                    it.note.text = text
-                    it.note.hasNoteContent =
+                    it.header.title = title
+                    it.header.text = text
+                    it.header.hasNoteContent =
                         it.images.isNotEmpty() && it.images.any { item -> !item.hidden }
                     repository.updateNoteWithImages(it)
                 }
@@ -132,10 +129,10 @@ class EditNoteViewModel(
                 val time =
                     SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
                 currentNote?.let {
-                    it.note.title = title
-                    it.note.text = text
-                    it.note.date = time
-                    it.note.hasNoteContent =
+                    it.header.title = title
+                    it.header.text = text
+                    it.header.date = time
+                    it.header.hasNoteContent =
                         it.images.isNotEmpty() && it.images.any { item -> !item.hidden }
                     repository.updateNoteWithImages(it)
                 }
@@ -158,7 +155,7 @@ class EditNoteViewModel(
                 val localList = it.images.filter { list -> list.hidden }
                 if (localList.isEmpty()) {
                     val image = Image(
-                        parentNoteID = it.note.noteID,
+                        parentNoteID = it.header.noteID,
                         photoPath = path
                     )
                     repository.insertImage(image)

@@ -16,13 +16,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteMainBinding
-import com.example.noteexample.utils.GlideApp
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 
 class AllNotesFragment : Fragment() {
 
@@ -68,8 +66,8 @@ class AllNotesFragment : Fragment() {
             actionMode = null
             activity?.window?.statusBarColor =
                 ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
-            if (viewModel.noteList.any { it.note.isChecked }) {
-                viewModel.noteList.forEach { it.note.isChecked = false }
+            if (viewModel.noteList.any { it.header.isChecked }) {
+                viewModel.noteList.forEach { it.header.isChecked = false }
             }
             cards.forEach { card ->
                 card.isChecked = false
@@ -96,6 +94,18 @@ class AllNotesFragment : Fragment() {
             if (from >= 0 && to >= 0) {
                 viewModel.swap(from, to)
                 noteAdapter.notifyItemMoved(from, to)
+//                if (recyclerView.layoutManager is StaggeredGridLayoutManager){
+//                    (recyclerView.layoutManager as StaggeredGridLayoutManager).gapStrategy =
+//                        StaggeredGridLayoutManager.GAP_HANDLING_NONE
+//                }
+//                lifecycleScope.launch {
+//                    delay(8)
+//                    if (from == 0 || to == 0){
+//                        recyclerView.scrollToPosition(0)
+//                        recyclerView.layoutManager?.scrollToPosition(0)
+//                    }
+//                }
+
                 viewModel.startedMove = true
             }
             return true
@@ -108,6 +118,10 @@ class AllNotesFragment : Fragment() {
             super.clearView(recyclerView, viewHolder)
             //Started move to not destroy action mode
             if (viewModel.startedMove) {
+//                if (recyclerView.layoutManager is StaggeredGridLayoutManager){
+//                    (recyclerView.layoutManager as StaggeredGridLayoutManager).gapStrategy =
+//                        StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+//                }
                 viewModel.startedMove = false
                 viewModel.updateNoteList()
             }
@@ -128,8 +142,6 @@ class AllNotesFragment : Fragment() {
 
         }
     }
-
-    //TODO Swipe LEFT, RIGHT
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -187,8 +199,8 @@ class AllNotesFragment : Fragment() {
             if (viewModel.searchStarted) {
                 lifecycleScope.launch(Dispatchers.Default) {
                     val noteList = viewModel.noteList.filter { item ->
-                        item.note.title.contains(it.toString()) ||
-                                item.note.text.contains(it.toString()) ||
+                        item.header.title.contains(it.toString()) ||
+                                item.header.text.contains(it.toString()) ||
                                 item.images.any { image -> image.signature.contains(it.toString()) }
                     }
                     withContext(Dispatchers.Main) {
@@ -258,95 +270,37 @@ class AllNotesFragment : Fragment() {
 
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             if (holder.adapterPosition >= 0) {
-
                 lifecycleScope.launch {
                     cards.add(holder.binding.mainCard)
-
-                    val item = noteAdapter.currentList[holder.adapterPosition]
                     val card = holder.binding.mainCard
-                    val img = holder.binding.photoMain
-                    val title = holder.binding.titleMain
-                    val text = holder.binding.noteMain
-                    val view1 = holder.binding.view1
-                    val view2 = holder.binding.view2
-                    val view3 = holder.binding.view3
                     val date = holder.binding.dateMain
-
-                    card.isChecked = false
-                    view1.visibility = View.GONE
-                    view2.visibility = View.GONE
-                    view3.visibility = View.GONE
-                    date.visibility = View.GONE
-                    img.visibility = View.GONE
-                    title.visibility = View.GONE
-                    text.visibility = View.GONE
-
-                    if (item.note.title.isNotEmpty()) {
-                        title.visibility = View.VISIBLE
-                        title.text = item.note.title
-                    }
-
-                    if (item.note.text.isNotEmpty()) {
-                        text.visibility = View.VISIBLE
-                        text.text = item.note.text
-                    }
-
-                    if (item.images.isNotEmpty()) {
-                        var photoInserted = false
-                        for (content in item.images) {
-                            if (content.photoPath.isNotEmpty()) {
-                                img.visibility = View.VISIBLE
-                                GlideApp.with(requireContext())
-                                    .load(content.photoPath)
-                                    .into(img)
-                                photoInserted = true
-                                break
-                            }
-                        }
-                        if (!photoInserted &&
-                            item.note.text.isEmpty() &&
-                            item.images[0].signature.isNotEmpty()
-                        ) {
-                            text.text = item.images[0].signature
-                            text.visibility = View.VISIBLE
-                        }
-
-                    }
-
-                    if (item.note.title.isNotEmpty() && item.note.text.isNotEmpty()) {
-                        view1.visibility = View.VISIBLE
-                    }
-                    if ((item.note.text.isNotEmpty() || item.note.title.isNotEmpty()) &&
-                        img.visibility == View.VISIBLE
-                    ) {
-                        view2.visibility = View.VISIBLE
-                    }
+                    val view3 = holder.binding.view3
 
                     viewModel.flags?.let {
                         if (it.showDate) {
                             date.visibility = View.VISIBLE
                             view3.visibility = View.VISIBLE
+                        } else{
+                            date.visibility = View.GONE
                         }
                     }
-
-
 
                     card.setOnLongClickListener {
                         if (viewModel.searchStarted) {
                             viewModel.onDoneSearch()
                         }
                         card.isChecked = !card.isChecked
-                        noteAdapter.currentList[holder.adapterPosition].note.isChecked =
+                        noteAdapter.currentList[holder.adapterPosition].header.isChecked =
                             card.isChecked
                         if (actionMode == null) {
                             actionMode =
                                 requireActivity().startActionMode(actionModeController)
                             actionMode?.title =
-                                "${viewModel.noteList.filter { it.note.isChecked }.size}"
+                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
                         } else {
                             actionMode?.title =
-                                "${viewModel.noteList.filter { it.note.isChecked }.size}"
-                            if (viewModel.noteList.none { it.note.isChecked }) {
+                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
+                            if (viewModel.noteList.none { it.header.isChecked }) {
                                 actionMode?.finish()
                             }
                         }
@@ -359,11 +313,11 @@ class AllNotesFragment : Fragment() {
                         }
                         if (actionMode != null) {
                             card.isChecked = !card.isChecked
-                            noteAdapter.currentList[holder.adapterPosition].note.isChecked =
+                            noteAdapter.currentList[holder.adapterPosition].header.isChecked =
                                 card.isChecked
                             actionMode?.title =
-                                "${viewModel.noteList.filter { it.note.isChecked }.size}"
-                            if (viewModel.noteList.none { it.note.isChecked }) {
+                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
+                            if (viewModel.noteList.none { it.header.isChecked }) {
                                 actionMode?.finish()
                             }
                         } else {
@@ -373,14 +327,14 @@ class AllNotesFragment : Fragment() {
                                         .navigate(
                                             AllNotesFragmentDirections
                                                 .actionAllNotesFragmentToOnePhotoFragment
-                                                    (note.noteID, images[0].imgID)
+                                                    (header.noteID, images[0].imgID)
                                         )
                                 } else {
                                     this@AllNotesFragment.findNavController()
                                         .navigate(
                                             AllNotesFragmentDirections
                                                 .actionAllNotesFragmentToOneNoteFragment
-                                                    (note.noteID)
+                                                    (header.noteID)
                                         )
                                 }
                             }

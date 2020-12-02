@@ -38,10 +38,6 @@ class GalleryFragment : BottomSheetDialogFragment() {
         val binding: FragmentGalleryBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_gallery, container, false)
 
-        val galleryAdapter = GalleryAdapter()
-        val camera = Camera(requireActivity())
-        viewModel.getData(camera)
-
         dialog?.setOnShowListener {
             val bottomSheetBehavior = (dialog as BottomSheetDialog).behavior
 
@@ -71,6 +67,9 @@ class GalleryFragment : BottomSheetDialogFragment() {
          * RecyclerView options
          */
 
+        val galleryAdapter = GalleryAdapter()
+        val camera = Camera(requireActivity())
+        viewModel.getData(camera)
         binding.galleryRecyclerView.apply {
             galleryAdapter.submitList(viewModel.galleryList)
             adapter = galleryAdapter

@@ -7,51 +7,51 @@ import androidx.room.*
 interface NoteDao {
 
     @Transaction
-    @Query("SELECT * from note_table")
+    @Query("SELECT * from header_table")
     fun getAllNotes(): LiveData<List<NoteWithImages>>
 
     @Transaction
-    @Query("SELECT * from note_table ORDER BY position DESC")
+    @Query("SELECT * from header_table ORDER BY position DESC")
     suspend fun getAllDESCSortedNotes(): List<NoteWithImages>
 
     @Transaction
-    @Query("SELECT * from note_table ORDER BY position ASC")
+    @Query("SELECT * from header_table ORDER BY position ASC")
     suspend fun getAllASCSortedNotes(): List<NoteWithImages>
 
     @Transaction
-    @Query("SELECT * from note_table ORDER BY noteID DESC LIMIT 1")
+    @Query("SELECT * from header_table ORDER BY noteID DESC LIMIT 1")
     suspend fun getLastNote(): NoteWithImages
 
     @Transaction
-    @Query("SELECT * from note_table ORDER BY noteID DESC LIMIT 1")
+    @Query("SELECT * from header_table ORDER BY noteID DESC LIMIT 1")
     fun getLastNoteLiveData(): LiveData<NoteWithImages>
 
     @Transaction
-    @Query("SELECT * from note_table WHERE noteID = :key")
+    @Query("SELECT * from header_table WHERE noteID = :key")
     suspend fun getNote(key: Long): NoteWithImages
 
     @Transaction
-    @Query("SELECT * from note_table WHERE noteID = :key")
+    @Query("SELECT * from header_table WHERE noteID = :key")
     fun getNoteLiveData(key: Long): LiveData<NoteWithImages>
 
     @Transaction
-    @Query("DELETE FROM note_table")
+    @Query("DELETE FROM header_table")
     suspend fun deleteAllNotes()
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertNote(note: Note)
+    suspend fun insertNote(header: Header)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun updateNote(note: Note)
+    suspend fun updateNote(header: Header)
 
     @Update
-    suspend fun updateNoteList(noteList: List<Note>)
+    suspend fun updateNoteList(noteList: List<Header>)
 
     @Delete
-    suspend fun deleteNote(note: Note)
+    suspend fun deleteNote(header: Header)
 
     @Delete
-    suspend fun deleteNoteList(noteList: List<Note>)
+    suspend fun deleteNoteList(headerList: List<Header>)
 
 
     @Insert

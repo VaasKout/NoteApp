@@ -7,17 +7,16 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule
+import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.database.Note
 
 @GlideModule
 class GlideAppModule : AppGlideModule()
 
 
 @BindingAdapter("titleText")
-fun TextView.titleText(note: Note?) {
-
-    note?.let {
+fun TextView.titleText(header: Header?) {
+    header?.let {
         when {
             this is EditText && it.title.isNotEmpty() -> {
                 setText(it.title)
@@ -35,8 +34,8 @@ fun TextView.titleText(note: Note?) {
 
 
 @BindingAdapter("firstNoteText")
-fun TextView.firstNoteText(note: Note?) {
-    note?.let {
+fun TextView.firstNoteText(header: Header?) {
+    header?.let {
         when {
             this is EditText && it.text.isNotEmpty() -> {
                 setText(it.text)
@@ -71,8 +70,8 @@ fun TextView.photoNoteText(data: Image?) {
 }
 
 @BindingAdapter("date")
-fun TextView.setDate(note: Note?) {
-    note?.let {
+fun TextView.setDate(header: Header?) {
+    header?.let {
         text = it.date
     }
 }

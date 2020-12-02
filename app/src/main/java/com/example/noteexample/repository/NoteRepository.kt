@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 
 class NoteRepository(private val noteDao: NoteDao) {
 
-    val allNotes = noteDao.getAllNotes()
+//    val allNotes = noteDao.getAllNotes()
     fun getNoteLiveData(id: Long): LiveData<NoteWithImages> = noteDao.getNoteLiveData(id)
     fun getLastLiveData(): LiveData<NoteWithImages> = noteDao.getLastNoteLiveData()
     suspend fun getLastNote() = withContext(Dispatchers.IO) { noteDao.getLastNote() }
@@ -21,15 +21,15 @@ class NoteRepository(private val noteDao: NoteDao) {
     suspend fun getNote(key: Long): NoteWithImages =
         withContext(Dispatchers.IO) { noteDao.getNote(key) }
 
-    suspend fun insertNote(note:Note){
-        withContext(Dispatchers.IO){
-            noteDao.insertNote(note)
+    suspend fun insertNote(header: Header) {
+        withContext(Dispatchers.IO) {
+            noteDao.insertNote(header)
         }
     }
 
     suspend fun insertNoteWithImages(note: NoteWithImages) {
         withContext(Dispatchers.IO) {
-            noteDao.insertNote(note.note)
+            noteDao.insertNote(note.header)
             noteDao.insertImages(note.images)
         }
     }
@@ -42,11 +42,11 @@ class NoteRepository(private val noteDao: NoteDao) {
     }
 
     suspend fun deleteNoteWithImagesList(noteList: List<NoteWithImages>) {
-        val notes = mutableListOf<Note>()
+        val notes = mutableListOf<Header>()
         val images = mutableListOf<Image>()
-        withContext(Dispatchers.Default){
+        withContext(Dispatchers.Default) {
             noteList.forEach {
-                notes.add(it.note)
+                notes.add(it.header)
                 images.addAll(it.images)
             }
         }
@@ -58,24 +58,24 @@ class NoteRepository(private val noteDao: NoteDao) {
 
     suspend fun deleteNoteWithImages(item: NoteWithImages) {
         withContext(Dispatchers.IO) {
-            noteDao.deleteNote(item.note)
+            noteDao.deleteNote(item.header)
             noteDao.deleteImages(item.images)
         }
     }
 
     suspend fun updateNoteWithImages(item: NoteWithImages) {
         withContext(Dispatchers.IO) {
-            noteDao.updateNote(item.note)
+            noteDao.updateNote(item.header)
             noteDao.updateImages(item.images)
         }
     }
 
     suspend fun updateNoteWithImagesList(noteList: List<NoteWithImages>) {
-        val notes = mutableListOf<Note>()
+        val notes = mutableListOf<Header>()
         val images = mutableListOf<Image>()
-        withContext(Dispatchers.Default){
+        withContext(Dispatchers.Default) {
             noteList.forEach {
-                notes.add(it.note)
+                notes.add(it.header)
                 images.addAll(it.images)
             }
         }
@@ -92,14 +92,14 @@ class NoteRepository(private val noteDao: NoteDao) {
         }
     }
 
-    suspend fun insertImage(image: Image){
-        withContext(Dispatchers.IO){
+    suspend fun insertImage(image: Image) {
+        withContext(Dispatchers.IO) {
             noteDao.insertImage(image)
         }
     }
 
-    suspend fun updateImage(image: Image){
-        withContext(Dispatchers.IO){
+    suspend fun updateImage(image: Image) {
+        withContext(Dispatchers.IO) {
             noteDao.updateImage(image)
         }
     }

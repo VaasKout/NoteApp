@@ -9,8 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
+import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.database.Note
 import com.example.noteexample.databinding.HeaderEditBinding
 import com.example.noteexample.databinding.RecyclerNoteContentEditItemBinding
 import com.example.noteexample.utils.DataDiffCallBack
@@ -53,7 +53,7 @@ class OneNoteEditAdapter :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is NoteEditHolder -> {
-                getItem(position).note?.let { holder.bind(it) }
+                getItem(position).header?.let { holder.bind(it) }
             }
             is NoteContentEditHolder -> {
                 getItem(position).image?.let { holder.bind(it) }
@@ -103,9 +103,9 @@ class OneNoteEditAdapter :
 
     inner class NoteEditHolder(val binding: HeaderEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(note: Note) {
+        fun bind(header: Header) {
             _noteHolder.value = this
-            binding.note = note
+            binding.header = header
         }
     }
 }

@@ -68,7 +68,7 @@ class EditNoteFragment : Fragment() {
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
-                    viewModel.startNote?.note?.let { item ->
+                    viewModel.startNote?.header?.let { item ->
                         this.findNavController()
                             .navigate(
                                 EditNoteFragmentDirections
@@ -120,7 +120,7 @@ class EditNoteFragment : Fragment() {
                                             Manifest.permission.READ_EXTERNAL_STORAGE
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        viewModel.startNote?.note?.let { item ->
+                                        viewModel.startNote?.header?.let { item ->
                                             this.findNavController()
                                                 .navigate(
                                                     EditNoteFragmentDirections
@@ -206,7 +206,7 @@ class EditNoteFragment : Fragment() {
                     viewModel.currentNote?.let { note ->
                         if (!viewModel.itemListSame) {
                             viewModel.dataItemList = mutableListOf()
-                            viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(note.note))
+                            viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(note.header))
                             note.images.forEach { image ->
                                 viewModel.dataItemList.add(NoteWithImagesRecyclerItems(image = image))
                             }

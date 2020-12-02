@@ -12,9 +12,7 @@ import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.settings.ALL
 import com.example.noteexample.settings.PHOTOS_ONLY
 import com.example.noteexample.settings.TEXT_ONLY
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -24,7 +22,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     //Variables
     var flags: Flags? = null
-    var noteList = mutableListOf<NoteWithImages>()
+    var noteList = listOf<NoteWithImages>()
 
     //LiveData
     var flagsLiveData: LiveData<Flags>
@@ -48,36 +46,34 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      */
 
     suspend fun getASCNotes(filter: Int) {
-        noteList = mutableListOf()
         when (filter) {
             ALL -> {
-                noteList.addAll(repository.allASCSortedNotes())
+                noteList = repository.allASCSortedNotes()
             }
             TEXT_ONLY -> {
-                noteList.addAll(repository.allASCSortedNotes()
-                    .filter { !it.note.hasNoteContent })
+                noteList = repository.allASCSortedNotes()
+                    .filter { !it.header.hasNoteContent }
             }
             PHOTOS_ONLY -> {
-                noteList.addAll(
+                noteList =
                     repository.allASCSortedNotes()
-                        .filter { it.note.hasNoteContent })
+                        .filter { it.header.hasNoteContent }
             }
         }
     }
 
     suspend fun getDESCNotes(filter: Int) {
-        noteList = mutableListOf()
         when (filter) {
             ALL -> {
-                noteList.addAll(repository.allDESCSortedNotes())
+                noteList = repository.allDESCSortedNotes()
             }
             TEXT_ONLY -> {
-                noteList.addAll(
-                    repository.allDESCSortedNotes().filter { !it.note.hasNoteContent })
+                noteList =
+                    repository.allDESCSortedNotes().filter { !it.header.hasNoteContent }
             }
             PHOTOS_ONLY -> {
-                noteList.addAll(
-                    repository.allDESCSortedNotes().filter { it.note.hasNoteContent })
+                noteList =
+                    repository.allDESCSortedNotes().filter { it.header.hasNoteContent }
             }
         }
     }
@@ -85,7 +81,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     fun onDeleteSelected() {
         viewModelScope.launch {
             val noteListToDelete =
-                noteList.filter { it.note.isChecked }
+                noteList.filter { it.header.isChecked }
             repository.deleteNoteWithImagesList(noteListToDelete)
             flags?.let { repository.updateFlags(it) }
         }
@@ -96,8 +92,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         withContext(Dispatchers.Default) {
             var updateNeeded = false
             for (item in noteList) {
-                if (item.note.title.isEmpty() &&
-                    item.note.text.isEmpty() &&
+                if (item.header.title.isEmpty() &&
+                    item.header.text.isEmpty() &&
                     (item.images.isEmpty() ||
                             item.images.none { !it.hidden || it.signature.isNotEmpty() })
                 ) {
@@ -141,16 +137,16 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     fun swap(from: Int, to: Int) {
         flags?.let {
             val fromItem = noteList[from]
-            noteList.remove(noteList[from])
-            noteList.add(to, fromItem)
+            (noteList as MutableList<NoteWithImages>).remove(noteList[from])
+            (noteList as MutableList<NoteWithImages>).add(to, fromItem)
             if (it.ascendingOrder) {
                 noteList.forEachIndexed { index, item ->
-                    item.note.pos = index
+                    item.header.pos = index
                 }
             } else {
                 var pos = noteList.size - 1
                 noteList.forEach { item ->
-                    item.note.pos = pos
+                    item.header.pos = pos
                     pos--
                 }
             }

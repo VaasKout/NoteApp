@@ -9,8 +9,8 @@
             type="com.example.noteexample.database.Image" />
 
         <variable
-            name="note"
-            type="com.example.noteexample.database.Note" />
+            name="header"
+            type="com.example.noteexample.database.Header" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -44,7 +44,7 @@
                 android:paddingBottom="@dimen/dp_8"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 android:textColor="@color/secondaryTextColor"
-                app:titleText="@{note}"
+                app:titleText="@{header}"
                 tools:text="@string/title" />
 
             <TextView
@@ -60,7 +60,7 @@
                 tools:visibility="visible"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 android:textColor="@color/secondaryTextColor"
-                app:firstNoteText="@{note}"
+                app:firstNoteText="@{header}"
                 tools:text="Заметка" />
 
 

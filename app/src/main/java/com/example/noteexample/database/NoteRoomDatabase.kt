@@ -5,11 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Note::class, Image::class, Flags::class],
+    entities = [Header::class, Image::class, Flags::class],
     version = 1,
     exportSchema = false
 )
@@ -31,7 +33,7 @@ abstract class NoteRoomDatabase : RoomDatabase() {
                     ).addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            GlobalScope.launch {
+                            CoroutineScope(Dispatchers.IO).launch {
                                 getDatabase(context).noteDao().insertFlags(Flags())
                             }
                         }

@@ -2,12 +2,14 @@ package com.example.noteexample.database
 
 import androidx.room.*
 
-/**
- * Caution: Querying data with nested relationships requires Room to manipulate a large volume
- * of data and can affect performance.
- * Use as few nested relationships as possible in your queries.
- * [https://developer.android.com/training/data-storage/room/relationships#nested-relationships]
- */
+///**
+// * Caution: Querying data with nested relationships requires Room to manipulate a large volume
+// * of data and can affect performance.
+// * Use as few nested relationships as possible in your queries.
+// * [https://developer.android.com/training/data-storage/room/relationships#nested-relationships]
+// */
+
+
 
 
 @Entity(tableName = "flags_table")
@@ -19,8 +21,8 @@ data class Flags(
     var columns: Int = 2,
 )
 
-@Entity(tableName = "note_table")
-data class Note(
+@Entity(tableName = "header_table")
+data class Header(
     @PrimaryKey(autoGenerate = true) var noteID: Long = 0,
     @ColumnInfo(name = "position") var pos: Int = 0,
     var title: String = "",
@@ -41,7 +43,7 @@ data class Image(
 
 
 data class NoteWithImages(
-    @Embedded val note: Note,
+    @Embedded val header: Header,
     @Relation(
         parentColumn = "noteID",
         entityColumn = "parentNoteID",
