@@ -11,16 +11,21 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel (application: Application): AndroidViewModel(application){
 
-    private val repository: NoteRepository
-    val flagsLiveData: LiveData<Flags>
+    //Variables
     var flags: Flags? = null
 
+    //LiveData
+    val flagsLiveData: LiveData<Flags>
+
+
+    private val repository: NoteRepository
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         flagsLiveData = repository.flags
     }
 
+    //DB functions
     fun updateFlags(){
         viewModelScope.launch {
             flags?.let { repository.updateFlags(it) }

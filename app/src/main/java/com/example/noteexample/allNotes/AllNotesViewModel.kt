@@ -33,8 +33,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     private val _actionModeFlag = MutableLiveData<Boolean>()
     var actionModeFlag: LiveData<Boolean> = _actionModeFlag
 
+    //define repository and flagsLiveData
     private val repository: NoteRepository
-
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
@@ -42,52 +42,34 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * Coroutine functions
+     * Swap algorithm is used in [AllNotesFragment.helper]
+     * Position in recyclerView is attached to
+     * [com.example.noteexample.database.Header.pos] in ACS or DESC order
      */
-
-    suspend fun getASCNotes(filter: Int) {
-        when (filter) {
-            ALL -> {
-                noteList = repository.allASCSortedNotes()
-            }
-            TEXT_ONLY -> {
-                noteList = repository.allASCSortedNotes()
-                    .filter { !it.header.hasNoteContent }
-            }
-            PHOTOS_ONLY -> {
-                noteList =
-                    repository.allASCSortedNotes()
-                        .filter { it.header.hasNoteContent }
-            }
-        }
-    }
-
-    suspend fun getDESCNotes(filter: Int) {
-        when (filter) {
-            ALL -> {
-                noteList = repository.allDESCSortedNotes()
-            }
-            TEXT_ONLY -> {
-                noteList =
-                    repository.allDESCSortedNotes().filter { !it.header.hasNoteContent }
-            }
-            PHOTOS_ONLY -> {
-                noteList =
-                    repository.allDESCSortedNotes().filter { it.header.hasNoteContent }
+    fun swap(from: Int, to: Int) {
+        flags?.let {
+            val fromItem = noteList[from]
+            (noteList as MutableList<NoteWithImages>).remove(noteList[from])
+            (noteList as MutableList<NoteWithImages>).add(to, fromItem)
+            if (it.ascendingOrder) {
+                noteList.forEachIndexed { index, item ->
+                    item.header.pos = index
+                }
+            } else {
+                var pos = noteList.size - 1
+                noteList.forEach { item ->
+                    item.header.pos = pos
+                    pos--
+                }
             }
         }
     }
 
-    fun onDeleteSelected() {
-        viewModelScope.launch {
-            val noteListToDelete =
-                noteList.filter { it.header.isChecked }
-            repository.deleteNoteWithImagesList(noteListToDelete)
-            flags?.let { repository.updateFlags(it) }
-        }
-
-    }
-
+    /**
+     * Delete empty [com.example.noteexample.database.Header]
+     * and empty [com.example.noteexample.database.Image] objects
+     * [Dispatchers.Default] is used in case of heavy list computations
+     */
     suspend fun deleteUnused() {
         withContext(Dispatchers.Default) {
             var updateNeeded = false
@@ -120,6 +102,61 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    /**
+     * Two next methods sort [noteList] in [flagsLiveData] in ASC or DESC order
+     * @see com.example.noteexample.database.Flags
+     */
+
+    suspend fun getASCNotes(filter: Int) {
+        when (filter) {
+            ALL -> {
+                noteList = repository.allASCSortedNotes()
+            }
+            TEXT_ONLY -> {
+                noteList = repository.allASCSortedNotes()
+                    .filter { it.images.isEmpty() }
+            }
+            PHOTOS_ONLY -> {
+                noteList =
+                    repository.allASCSortedNotes()
+                        .filter { it.images.isNotEmpty() }
+            }
+        }
+    }
+
+    suspend fun getDESCNotes(filter: Int) {
+        when (filter) {
+            ALL -> {
+                noteList = repository.allDESCSortedNotes()
+            }
+            TEXT_ONLY -> {
+                noteList =
+                    repository.allDESCSortedNotes().filter { it.images.isEmpty() }
+            }
+            PHOTOS_ONLY -> {
+                noteList =
+                    repository.allDESCSortedNotes().filter { it.images.isNotEmpty() }
+            }
+        }
+    }
+
+    /**
+     * Methods for database
+     *
+     * updateFlags method triggers [flagsLiveData]
+     * @see com.example.noteexample.repository.NoteRepository
+     */
+
+    fun onDeleteSelected() {
+        viewModelScope.launch {
+            val noteListToDelete =
+                noteList.filter { it.header.isChecked }
+            repository.deleteNoteWithImagesList(noteListToDelete)
+            flags?.let { repository.updateFlags(it) }
+        }
+
+    }
+
     fun updateNoteList() {
         viewModelScope.launch {
             repository.updateNoteWithImagesList(noteList)
@@ -134,24 +171,10 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun swap(from: Int, to: Int) {
-        flags?.let {
-            val fromItem = noteList[from]
-            (noteList as MutableList<NoteWithImages>).remove(noteList[from])
-            (noteList as MutableList<NoteWithImages>).add(to, fromItem)
-            if (it.ascendingOrder) {
-                noteList.forEachIndexed { index, item ->
-                    item.header.pos = index
-                }
-            } else {
-                var pos = noteList.size - 1
-                noteList.forEach { item ->
-                    item.header.pos = pos
-                    pos--
-                }
-            }
-        }
-    }
+
+    /**
+     * LiveData methods
+     */
 
     fun onStartActionMode(){
         _actionModeFlag.value = true

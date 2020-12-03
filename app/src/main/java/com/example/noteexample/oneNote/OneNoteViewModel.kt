@@ -13,12 +13,14 @@ class OneNoteViewModel(
     noteID: Long,
 ) : AndroidViewModel(application) {
 
-    private val repository: NoteRepository
-    var scrollPosition: Int = 0
-
+    //LiveData
     val currentNoteLiveData: LiveData<NoteWithImages>
+
+    //Variables
+    var scrollPosition: Int = 0
     val dataItemList = mutableListOf<NoteWithImagesRecyclerItems>()
 
+    private val repository: NoteRepository
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)

@@ -19,6 +19,13 @@ import kotlinx.coroutines.launch
 
 class OnePhotoFragment : Fragment() {
 
+    init {
+        lifecycleScope.launchWhenStarted {
+            //flags for changes of status bar
+            requireActivity().window
+                .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        }
+    }
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,19 +36,21 @@ class OnePhotoFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_one_photo, container, false)
         binding.lifecycleOwner = this
 
-        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
 
-        // finally change the color
+        // change color of status bar
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireActivity(), R.color.grey_material)
 
+        //viewModel
         val application = requireNotNull(this.activity).application
         val viewModelFactory = OneNoteViewModelFactory(application, args.noteID)
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
 
+        /**
+         * Visibility of text fields depends on [OneNoteViewModel.currentNoteLiveData] value
+         */
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
             binding.header = it.header
             if (it.header.title.isNotEmpty()) {
@@ -81,14 +90,26 @@ class OnePhotoFragment : Fragment() {
             }
         }
 
+        /**
+         * Set animation to hide text and binding.toolbarOnePhoto
+         * @see R.xml.fragment_one_photo_xml_one_photo_constraint_scene
+         */
         binding.imgOnePhoto.setOnClickListener {
             binding.motionOnePhoto.setTransition(R.id.start, R.id.endHide)
-
         }
 
 
+        /**
+         * Swipe listener to animate image closure
+         * @see OnSwipeTouchListener
+         *
+         * Application uses custom library to zoom image
+         * "com.github.MikeOrtiz:TouchImageView:3.0.3"
+         */
         binding.imgOnePhoto.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
             override fun onSwipeTop() {
+
+                //check if image zoomed
                 if (!binding.imgOnePhoto.isZoomed) {
                         binding.titleViewOnePhoto.visibility = View.INVISIBLE
                         binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
@@ -124,10 +145,6 @@ class OnePhotoFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        requireActivity().window
-            .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
     }

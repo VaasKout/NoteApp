@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentNoteMainBinding
+import com.example.noteexample.utils.GlideApp
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -24,15 +25,21 @@ import kotlinx.coroutines.withContext
 
 class AllNotesFragment : Fragment() {
 
-    /**
-     *  Define viewModel for NoteFragment
-     */
+
     private var actionMode: ActionMode? = null
     private val noteAdapter = NoteAdapter()
     private var cards = mutableListOf<MaterialCardView>()
+
+    /**
+     *  Define [AllNotesViewModel] object for [AllNotesFragment]
+     */
     private val viewModel by lazy {
         ViewModelProvider(this).get(AllNotesViewModel::class.java)
     }
+
+    /**
+     * [actionModeController] is attached to [actionMode] and is called by long click on note
+     */
 
     private val actionModeController = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -75,6 +82,12 @@ class AllNotesFragment : Fragment() {
         }
     }
 
+    /**
+     * [helper] helps to manually sort items on main screen,
+     * but sometimes it causes bugs when layout manager is
+     * [StaggeredGridLayoutManager] with 2 columns
+     */
+
     private val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
                 ItemTouchHelper.DOWN or ItemTouchHelper.UP,
@@ -105,18 +118,20 @@ class AllNotesFragment : Fragment() {
 //                        recyclerView.layoutManager?.scrollToPosition(0)
 //                    }
 //                }
-
                 viewModel.startedMove = true
             }
             return true
         }
 
+        /**
+         * Update [AllNotesViewModel.noteList] when item is released
+         * Flag [AllNotesViewModel.startedMove] is used to prevent destruction of action mode
+         */
         override fun clearView(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ) {
             super.clearView(recyclerView, viewHolder)
-            //Started move to not destroy action mode
             if (viewModel.startedMove) {
 //                if (recyclerView.layoutManager is StaggeredGridLayoutManager){
 //                    (recyclerView.layoutManager as StaggeredGridLayoutManager).gapStrategy =
@@ -138,8 +153,6 @@ class AllNotesFragment : Fragment() {
         lifecycleScope.launchWhenStarted {
             requireActivity().window
                 .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-
-
         }
     }
 
@@ -147,9 +160,14 @@ class AllNotesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        /**
+         * Databinding for [R.layout.fragment_note_main]
+         */
         viewModel.onDoneActionMode()
         val binding: FragmentNoteMainBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_note_main, container, false)
+
+        //RecyclerView options
         binding.recyclerView.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
@@ -161,6 +179,10 @@ class AllNotesFragment : Fragment() {
         }
         helper.attachToRecyclerView(binding.recyclerView)
 
+
+        /**
+         * Toolbar clickListener
+         */
         binding.toolbarNoteMain.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.delete_from_main -> {
@@ -195,6 +217,11 @@ class AllNotesFragment : Fragment() {
             }
         }
 
+        /**
+         * Search mode for text in notes
+         * Coroutine with [Dispatchers.Default] sort list asynchronously
+         * to prevent blocking the ui thread in case of heavy computations
+         */
         binding.searchEdit.addTextChangedListener {
             if (viewModel.searchStarted) {
                 lifecycleScope.launch(Dispatchers.Default) {
@@ -214,6 +241,10 @@ class AllNotesFragment : Fragment() {
             }
         }
 
+        /**
+         * [AllNotesViewModel.searchModeFlag] LiveData for searchMode
+         */
+
         viewModel.searchModeFlag.observe(viewLifecycleOwner, {
             if (it) {
                 binding.searchEdit.visibility = View.VISIBLE
@@ -225,6 +256,10 @@ class AllNotesFragment : Fragment() {
                 viewModel.searchStarted = false
             }
         })
+
+        /**
+         * [AllNotesViewModel.flagsLiveData] for [com.example.noteexample.database.Flags]
+         */
 
         viewModel.flagsLiveData.observe(viewLifecycleOwner, {
             if (it != null) {
@@ -239,7 +274,6 @@ class AllNotesFragment : Fragment() {
                     cards = mutableListOf()
                     noteAdapter.submitList(viewModel.noteList)
                     noteAdapter.notifyDataSetChanged()
-
                 }
 
                 if (it.columns == 2 &&
@@ -257,8 +291,9 @@ class AllNotesFragment : Fragment() {
 
 
         /**
-         * [AllNotesViewModel.actionModeFlag]
+         * [AllNotesViewModel.actionModeFlag] LiveData
          */
+
         viewModel.actionModeFlag.observe(viewLifecycleOwner, {
             if (it) {
                 binding.fabToInsert.visibility = View.GONE
@@ -268,23 +303,87 @@ class AllNotesFragment : Fragment() {
         })
 
 
+        /**
+         * [NoteAdapter.holder] LiveData
+         * All visibility set manually because of common bug in ListAdapter,
+         * Glide and BindingAdapter which set image or title in other items,
+         * where it shouldn't be
+         */
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
             if (holder.adapterPosition >= 0) {
                 lifecycleScope.launch {
                     cards.add(holder.binding.mainCard)
                     val card = holder.binding.mainCard
-                    val date = holder.binding.dateMain
+                    val title = holder.binding.titleMain
+                    val text = holder.binding.noteMain
+                    val img = holder.binding.photoMain
+                    val view1 = holder.binding.view1
+                    val view2 = holder.binding.view2
                     val view3 = holder.binding.view3
+                    val date = holder.binding.dateMain
 
-                    viewModel.flags?.let {
-                        if (it.showDate) {
-                            date.visibility = View.VISIBLE
-                            view3.visibility = View.VISIBLE
-                        } else{
-                            date.visibility = View.GONE
+                    card.isChecked = false
+                    title.visibility = View.GONE
+                    text.visibility = View.GONE
+                    img.visibility = View.GONE
+                    view1.visibility = View.GONE
+                    view2.visibility = View.GONE
+                    view3.visibility = View.GONE
+                    date.visibility = View.GONE
+
+                    noteAdapter.currentList[holder.adapterPosition]?.also {
+                        if (it.header.title.isNotEmpty()) {
+                            title.visibility = View.VISIBLE
+                            title.text = it.header.title
+                        }
+
+                        if (it.header.text.isNotEmpty()) {
+                            text.visibility = View.VISIBLE
+                            text.text = it.header.text
+                        }
+
+                        if (it.images.isNotEmpty()) {
+                            var photoInserted = false
+                            for (content in it.images) {
+                                if (content.photoPath.isNotEmpty()) {
+                                    img.visibility = View.VISIBLE
+                                    GlideApp.with(requireContext())
+                                        .load(content.photoPath)
+                                        .into(img)
+                                    photoInserted = true
+                                    break
+                                }
+                            }
+                            if (!photoInserted &&
+                                it.header.text.isEmpty() &&
+                                it.images[0].signature.isNotEmpty()
+                            ) {
+                                text.text = it.images[0].signature
+                                text.visibility = View.VISIBLE
+                            }
+                        }
+
+                        if (it.header.title.isNotEmpty() && it.header.text.isNotEmpty()) {
+                            view1.visibility = View.VISIBLE
+                        }
+                        if ((it.header.text.isNotEmpty() || it.header.title.isNotEmpty()) &&
+                            img.visibility == View.VISIBLE
+                        ) {
+                            view2.visibility = View.VISIBLE
+                        }
+
+                        viewModel.flags?.let { flags ->
+                            if (flags.showDate) {
+                                date.text = it.header.date
+                                date.visibility = View.VISIBLE
+                                view3.visibility = View.VISIBLE
+                            }
                         }
                     }
 
+
+                    //MainCard LongCLickListener
+                    //Long click starts actionMode
                     card.setOnLongClickListener {
                         if (viewModel.searchStarted) {
                             viewModel.onDoneSearch()
@@ -307,6 +406,7 @@ class AllNotesFragment : Fragment() {
                         true
                     }
 
+                    //MainCard ClickListener
                     card.setOnClickListener {
                         if (viewModel.searchStarted) {
                             viewModel.onDoneSearch()
@@ -345,7 +445,7 @@ class AllNotesFragment : Fragment() {
         })
 
         /**
-         * listen to fab click
+         * listen to fab click and goto [com.example.noteexample.editNote.EditNoteFragment]
          */
         binding.fabToInsert.setOnClickListener {
             this.findNavController()
@@ -356,14 +456,25 @@ class AllNotesFragment : Fragment() {
             viewModel.onDoneSearch()
         }
 
+        /**
+         * Convenient back press to end [actionMode] or [AllNotesViewModel.searchModeFlag]
+         * and if none of them aren't activated, then close app
+         */
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (viewModel.searchStarted) {
-                viewModel.onDoneSearch()
-            } else {
-                requireActivity().finishAffinity()
+            when {
+                viewModel.searchStarted -> {
+                    viewModel.onDoneSearch()
+                }
+                actionMode != null -> {
+                    actionMode?.finish()
+                }
+                else -> {
+                    requireActivity().finishAffinity()
+                }
             }
         }
 
+        //LifecycleOwner for LiveData
         binding.lifecycleOwner = this
         return binding.root
     }

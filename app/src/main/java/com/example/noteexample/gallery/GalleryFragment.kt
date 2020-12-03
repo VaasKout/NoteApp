@@ -34,10 +34,16 @@ class GalleryFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        /**
+         * binding for GalleryFragment
+         * @see R.layout.fragment_gallery
+         */
         val binding: FragmentGalleryBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_gallery, container, false)
 
+        /**
+         * [getDialog] listener triggers motion layout animation when state changes
+         */
         dialog?.setOnShowListener {
             val bottomSheetBehavior = (dialog as BottomSheetDialog).behavior
 
@@ -76,6 +82,9 @@ class GalleryFragment : BottomSheetDialogFragment() {
             setHasFixedSize(true)
         }
 
+        /**
+         * [GalleryViewModel.actionMode] checks photos to insert
+         */
         if (viewModel.galleryList.any { list -> list.isChecked }) {
             viewModel.onStartActionMode()
             binding.galleryMenuTitle.text =
@@ -97,6 +106,11 @@ class GalleryFragment : BottomSheetDialogFragment() {
             }
         })
 
+
+        /**
+         * [GalleryAdapter.holder] LiveData
+         * onClickListener starts or ends actionMode
+         */
         galleryAdapter.holder.observe(viewLifecycleOwner, { holder ->
             val card = holder.binding.galleryCard
 
@@ -117,6 +131,9 @@ class GalleryFragment : BottomSheetDialogFragment() {
             }
         })
 
+        /**
+         * NavIcon clickListener
+         */
         binding.galleryBackButton.setOnClickListener {
             if (viewModel.actionModeStarted) {
                 viewModel.clearSelected()
@@ -127,6 +144,9 @@ class GalleryFragment : BottomSheetDialogFragment() {
             }
         }
 
+        /**
+         * Accept item clickListener
+         */
         binding.acceptSelectedPhotos.setOnClickListener {
             lifecycleScope.launch(Dispatchers.Default) {
                 viewModel.insertImages()

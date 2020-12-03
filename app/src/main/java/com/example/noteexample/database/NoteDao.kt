@@ -3,12 +3,17 @@ package com.example.noteexample.database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 
+
+/**
+ * @Dao Interface for Note database
+ */
+
 @Dao
 interface NoteDao {
 
-    @Transaction
-    @Query("SELECT * from header_table")
-    fun getAllNotes(): LiveData<List<NoteWithImages>>
+    /**
+     * [Header] Queries
+     */
 
     @Transaction
     @Query("SELECT * from header_table ORDER BY position DESC")
@@ -54,6 +59,10 @@ interface NoteDao {
     suspend fun deleteNoteList(headerList: List<Header>)
 
 
+    /**
+     * [Image] Queries
+     */
+
     @Insert
     suspend fun insertImages(images: List<Image>)
 
@@ -77,6 +86,10 @@ interface NoteDao {
     suspend fun deleteImages(images: List<Image>)
 
 
+    /**
+     * [Flags] Queries
+     */
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertFlags(flags: Flags)
 
@@ -85,4 +98,10 @@ interface NoteDao {
 
     @Query("SELECT * from flags_table WHERE id = 0")
     fun getFlags(): LiveData<Flags>
+
+
+
+    //    @Transaction
+//    @Query("SELECT * from header_table")
+//    fun getAllNotes(): LiveData<List<NoteWithImages>>
 }

@@ -12,9 +12,16 @@ import com.example.noteexample.R
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
 import com.example.noteexample.databinding.HeaderEditBinding
-import com.example.noteexample.databinding.RecyclerNoteContentEditItemBinding
+import com.example.noteexample.databinding.RecyclerImageEditItemBinding
 import com.example.noteexample.utils.DataDiffCallBack
 import com.example.noteexample.utils.NoteWithImagesRecyclerItems
+
+/**
+ * ListAdapter for [EditNoteFragment] with header on 0 position
+ *
+ * [OneNoteEditAdapter.headerHolder] LiveData for header
+ * [OneNoteEditAdapter.imgHolder] LiveData for other items
+ */
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
@@ -22,11 +29,11 @@ private const val ITEM_VIEW_TYPE_ITEM = 1
 class OneNoteEditAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(DataDiffCallBack()) {
 
-    private val _noteHolder = MutableLiveData<NoteEditHolder>()
-    val noteHolder: LiveData<NoteEditHolder> = _noteHolder
+    private val _headerHolder = MutableLiveData<NoteEditHolder>()
+    val headerHolder: LiveData<NoteEditHolder> = _headerHolder
 
-    private val _noteContentHolder = MutableLiveData<NoteContentEditHolder>()
-    val noteContentHolder: LiveData<NoteContentEditHolder> = _noteContentHolder
+    private val _imgHolder = MutableLiveData<NoteContentEditHolder>()
+    val imgHolder: LiveData<NoteContentEditHolder> = _imgHolder
 
 //    private val adapterScope = CoroutineScope(Dispatchers.Default)
 //    fun addHeaderAndSubmitList(note: Note?, noteContent: List<NoteContent>) {
@@ -74,11 +81,11 @@ class OneNoteEditAdapter :
                 return NoteEditHolder(binding)
             }
             ITEM_VIEW_TYPE_ITEM -> {
-                val binding: RecyclerNoteContentEditItemBinding =
+                val binding: RecyclerImageEditItemBinding =
                     DataBindingUtil
                         .inflate(
                             LayoutInflater.from(parent.context),
-                            R.layout.recycler_note_content_edit_item,
+                            R.layout.recycler_image_edit_item,
                             parent,
                             false
                         )
@@ -88,23 +95,23 @@ class OneNoteEditAdapter :
         }
     }
 
-    inner class NoteContentEditHolder(val binding: RecyclerNoteContentEditItemBinding) :
+    inner class NoteContentEditHolder(val binding: RecyclerImageEditItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(images: Image) {
-            _noteContentHolder.value = this
+            _imgHolder.value = this
             binding.data = images
-                if (images.photoPath.isEmpty()) {
-                    binding.deleteCircle.visibility = View.GONE
-                    binding.deleteCircleIcon.visibility = View.GONE
-                }
+            if (images.photoPath.isEmpty()) {
+                binding.deleteCircle.visibility = View.GONE
+                binding.deleteCircleIcon.visibility = View.GONE
+            }
         }
     }
 
     inner class NoteEditHolder(val binding: HeaderEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(header: Header) {
-            _noteHolder.value = this
+            _headerHolder.value = this
             binding.header = header
         }
     }

@@ -12,6 +12,10 @@ import kotlin.math.abs
 
  open class OnSwipeTouchListener(ctx: Context?) : OnTouchListener{
 
+     /**
+      * Custom realisation of OnTouchListener for swipe events
+      */
+
     companion object{
         private const val SWIPE_THRESHOLD = 300
         private const val SWIPE_VELOCITY_THRESHOLD = 300

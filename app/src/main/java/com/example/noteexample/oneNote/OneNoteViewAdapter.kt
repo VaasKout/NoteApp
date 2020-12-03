@@ -12,7 +12,7 @@ import com.example.noteexample.R
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
 import com.example.noteexample.databinding.HeaderViewBinding
-import com.example.noteexample.databinding.RecyclerNoteContentViewItemBinding
+import com.example.noteexample.databinding.RecyclerImageViewItemBinding
 import com.example.noteexample.utils.DataDiffCallBack
 import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 
@@ -22,6 +22,10 @@ private const val ITEM_VIEW_TYPE_ITEM = 1
 class OneNoteViewAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(DataDiffCallBack()) {
 
+    /**
+     * ListAdapter for [OneNoteFragment]
+     * similar with [com.example.noteexample.editNote.OneNoteEditAdapter]
+     */
     private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
     val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder
 
@@ -57,11 +61,11 @@ class OneNoteViewAdapter :
                 return NoteViewHolder(binding)
             }
             ITEM_VIEW_TYPE_ITEM -> {
-                val binding: RecyclerNoteContentViewItemBinding =
+                val binding: RecyclerImageViewItemBinding =
                     DataBindingUtil
                         .inflate(
                             LayoutInflater.from(parent.context),
-                            R.layout.recycler_note_content_view_item,
+                            R.layout.recycler_image_view_item,
                             parent,
                             false
                         )
@@ -71,7 +75,7 @@ class OneNoteViewAdapter :
         }
     }
 
-    inner class NoteContentViewHolder(val binding: RecyclerNoteContentViewItemBinding) :
+    inner class NoteContentViewHolder(val binding: RecyclerImageViewItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(image: Image) {

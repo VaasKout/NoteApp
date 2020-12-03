@@ -7,10 +7,20 @@ import kotlinx.coroutines.withContext
 
 class NoteRepository(private val noteDao: NoteDao) {
 
-//    val allNotes = noteDao.getAllNotes()
+    /**
+     * Repository for Dao methods
+     * @see NoteDao
+     */
+
+    /**
+     * @see NoteWithImages
+     */
+
+    //    val allNotes = noteDao.getAllNotes()
     fun getNoteLiveData(id: Long): LiveData<NoteWithImages> = noteDao.getNoteLiveData(id)
     fun getLastLiveData(): LiveData<NoteWithImages> = noteDao.getLastNoteLiveData()
     suspend fun getLastNote() = withContext(Dispatchers.IO) { noteDao.getLastNote() }
+
 
     suspend fun allDESCSortedNotes(): List<NoteWithImages> =
         withContext(Dispatchers.IO) { noteDao.getAllDESCSortedNotes() }
@@ -21,11 +31,7 @@ class NoteRepository(private val noteDao: NoteDao) {
     suspend fun getNote(key: Long): NoteWithImages =
         withContext(Dispatchers.IO) { noteDao.getNote(key) }
 
-    suspend fun insertNote(header: Header) {
-        withContext(Dispatchers.IO) {
-            noteDao.insertNote(header)
-        }
-    }
+
 
     suspend fun insertNoteWithImages(note: NoteWithImages) {
         withContext(Dispatchers.IO) {
@@ -86,6 +92,22 @@ class NoteRepository(private val noteDao: NoteDao) {
     }
 
 
+    /**
+     * @see Header
+     */
+    suspend fun insertNote(header: Header) {
+        withContext(Dispatchers.IO) {
+            noteDao.insertNote(header)
+        }
+    }
+
+
+
+
+    /**
+     * @see Image
+     *
+     */
     suspend fun insertImages(images: List<Image>) {
         withContext(Dispatchers.IO) {
             noteDao.insertImages(images)
@@ -111,6 +133,9 @@ class NoteRepository(private val noteDao: NoteDao) {
     }
 
 
+    /**
+     * @see Flags
+     */
     val flags: LiveData<Flags> = noteDao.getFlags()
 
     suspend fun updateFlags(flags: Flags) {

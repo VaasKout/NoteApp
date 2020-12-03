@@ -10,19 +10,32 @@ import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentSettingsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
+//constants for filter notes
 const val ALL = 0
 const val TEXT_ONLY = 1
 const val PHOTOS_ONLY = 2
 
 
 class SettingsFragment : BottomSheetDialogFragment() {
+    /**
+     * This Fragment set parameters for [SettingsViewModel.flagsLiveData]
+     * which sort notes in specific way on Main fragment
+     *
+     * @see com.example.noteexample.database.Flags
+     * @see com.example.noteexample.allNotes.AllNotesFragment
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        /**
+         * Binding for SettingsFragment
+         * @see R.layout.fragment_settings
+         */
         val binding: FragmentSettingsBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
-        binding.lifecycleOwner = this
+
+        //viewModel
         val viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
 
         viewModel.flagsLiveData.observe(viewLifecycleOwner, {
@@ -55,6 +68,10 @@ class SettingsFragment : BottomSheetDialogFragment() {
             }
         })
 
+        /**
+         * Show or hide date
+         * @see R.layout.recycler_main_item
+         */
         binding.switchDate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 viewModel.flags?.showDate = true
@@ -64,6 +81,11 @@ class SettingsFragment : BottomSheetDialogFragment() {
                 viewModel.updateFlags()
             }
         }
+
+        /**
+         * Set columns count for recyclerView adapter
+         */
+
 
         binding.oneColumn.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -79,6 +101,12 @@ class SettingsFragment : BottomSheetDialogFragment() {
             }
         }
 
+        /**
+         *  Sort notes by position
+         *  @see com.example.noteexample.database.Header.pos
+         */
+
+
         binding.sortDESC.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 viewModel.flags?.ascendingOrder = false
@@ -92,6 +120,11 @@ class SettingsFragment : BottomSheetDialogFragment() {
                 viewModel.updateFlags()
             }
         }
+
+        /**
+         * Filter notes by empty or not empty list of
+         * [com.example.noteexample.database.NoteWithImages.images]
+         */
 
         binding.filterAll.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -114,6 +147,7 @@ class SettingsFragment : BottomSheetDialogFragment() {
             }
         }
 
+        binding.lifecycleOwner = this
         return binding.root
     }
 }

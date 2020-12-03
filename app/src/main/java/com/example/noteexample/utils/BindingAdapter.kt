@@ -13,6 +13,12 @@ import com.example.noteexample.database.Image
 @GlideModule
 class GlideAppModule : AppGlideModule()
 
+/**
+ * Binding adapter functions for [com.example.noteexample.database.Header]
+ *
+ * R.layout.header_edit
+ * R.layout.header_view
+ */
 
 @BindingAdapter("titleText")
 fun TextView.titleText(header: Header?) {
@@ -25,7 +31,7 @@ fun TextView.titleText(header: Header?) {
                 visibility = View.VISIBLE
                 text = it.title
             }
-            this !is EditText && it.text.isEmpty() ->{
+            this !is EditText && it.title.isEmpty() ->{
                 visibility = View.GONE
             }
         }
@@ -51,6 +57,13 @@ fun TextView.firstNoteText(header: Header?) {
     }
 }
 
+/**
+ * Binding adapter functions for [com.example.noteexample.database.Image]
+ *
+ * R.layout.recycler_image_edit_item
+ * R.layout.recycler_image_view_item
+ */
+
 @BindingAdapter("photoNoteText")
 fun TextView.photoNoteText(data: Image?) {
     data?.let {
@@ -66,13 +79,6 @@ fun TextView.photoNoteText(data: Image?) {
                 visibility = View.GONE
             }
         }
-    }
-}
-
-@BindingAdapter("date")
-fun TextView.setDate(header: Header?) {
-    header?.let {
-        text = it.date
     }
 }
 

@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.databinding.GalleryRecyclerItemBinding
 
+/**
+ * Data class for image items
+ * [GalleryData.isChecked] is used to select photos are going to be inserted
+ */
 data class GalleryData (
     val imgSrcUrl: String,
     var isChecked: Boolean = false,
@@ -20,7 +24,10 @@ class GalleryAdapter :
     ListAdapter<GalleryData, GalleryAdapter.GalleryViewHolder>(
         GalleryDiffCallBack()
     ) {
-
+    /**
+     * [holder] LiveData observes each item for [GalleryFragment]
+     * to setOnClickListener for each image
+     */
     private val _holder = MutableLiveData<GalleryViewHolder>()
     val holder: LiveData<GalleryViewHolder> = _holder
 

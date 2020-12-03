@@ -10,8 +10,10 @@ import androidx.room.*
 // */
 
 
-
-
+/**
+ * [Flags] Entity sorts notes in [com.example.noteexample.allNotes.AllNotesFragment]
+ * and updated in [com.example.noteexample.settings.SettingsFragment]
+ */
 @Entity(tableName = "flags_table")
 data class Flags(
     @PrimaryKey val id: Long = 0,
@@ -21,6 +23,17 @@ data class Flags(
     var columns: Int = 2,
 )
 
+
+/**
+ * [Header] is attached to title, text and date of each note
+ *
+ * [Header.isChecked] is used to select items to perform actions in
+ * [com.example.noteexample.allNotes.AllNotesFragment.actionMode]
+ *
+ * ColumnInfo [pos] sorts items by index in ACS or DESC order in
+ * [com.example.noteexample.allNotes.AllNotesFragment]
+ */
+
 @Entity(tableName = "header_table")
 data class Header(
     @PrimaryKey(autoGenerate = true) var noteID: Long = 0,
@@ -28,9 +41,14 @@ data class Header(
     var title: String = "",
     var text: String = "",
     var date: String = "",
-    var hasNoteContent: Boolean = false,
     var isChecked: Boolean = false,
 )
+
+/**
+ * [Image] is attached to each image and signature, inserted in note,
+ * [Image.hidden] flag define visibility of image in
+ * [com.example.noteexample.editNote.EditNoteFragment]
+ */
 
 @Entity(tableName = "image_table")
 data class Image(
@@ -41,7 +59,9 @@ data class Image(
     var hidden: Boolean = false,
 )
 
-
+/**
+ * This class binds two @Entity objects [Header], [Image] in relation to One-To-Many
+ */
 data class NoteWithImages(
     @Embedded val header: Header,
     @Relation(

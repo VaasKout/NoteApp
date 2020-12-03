@@ -5,7 +5,7 @@
     <Transition
         motion:constraintSetEnd="@+id/endUp"
         motion:constraintSetStart="@id/start"
-        motion:duration="200">
+        motion:duration="150">
         <OnSwipe
             motion:dragDirection="dragUp"
             motion:touchAnchorId="@id/img_one_photo" />
@@ -13,7 +13,7 @@
     <Transition
         motion:constraintSetEnd="@+id/endDown"
         motion:constraintSetStart="@id/start"
-        motion:duration="200">
+        motion:duration="150">
         <OnSwipe
             motion:dragDirection="dragDown"
             motion:touchAnchorId="@id/img_one_photo" />

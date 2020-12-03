@@ -4,6 +4,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    /**
+     * Application is written on MVVM architecture
+     * with single activity
+     *
+     * @see R.navigation.navigation
+     */
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

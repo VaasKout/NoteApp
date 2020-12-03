@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.utils.Camera
@@ -32,11 +34,16 @@ import kotlinx.coroutines.withContext
 
 class EditNoteFragment : Fragment() {
 
+    /**
+     * [requestPermissionLauncher] request permission for storage
+     * [startCamera] opens camera to make and save photo in photoPath
+     *
+     * @see Camera
+     */
+
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
-
-
 
     private val viewModel by lazy {
         val application: Application = requireNotNull(this.activity).application
@@ -44,14 +51,57 @@ class EditNoteFragment : Fragment() {
         ViewModelProvider(this, updateViewModelFactory).get(EditNoteViewModel::class.java)
     }
 
+    val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
+                ItemTouchHelper.DOWN or ItemTouchHelper.UP,
+        0
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val from = viewHolder.adapterPosition - 1
+            val to = target.adapterPosition - 1
+
+            if (from >= 0 && to >= 0) {
+                viewModel.swap(from, to)
+                recyclerView.adapter?.notifyItemMoved(from + 1, to + 1)
+            }
+            return true
+        }
+
+        override fun clearView(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ) {
+            super.clearView(recyclerView, viewHolder)
+            viewModel.updateCurrentNote()
+        }
+
+        override fun onSwiped(
+            viewHolder: RecyclerView.ViewHolder,
+            direction: Int
+        ) {
+        }
+
+    })
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
+        //Camera object
         val camera = Camera(requireActivity())
-        //binding for EditNoteFragment
+
+        /**
+         * binding for EditNoteFragment
+         * @see R.layout.fragment_edit_note
+         */
+
         val binding: FragmentEditNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note, container, false)
         binding.lifecycleOwner = this
@@ -61,7 +111,8 @@ class EditNoteFragment : Fragment() {
             adapter = noteAdapter
             setHasFixedSize(true)
         }
-        viewModel.helper.attachToRecyclerView(binding.editRecycler)
+        helper.attachToRecyclerView(binding.editRecycler)
+
 
         requestPermissionLauncher =
             registerForActivityResult(
@@ -97,15 +148,20 @@ class EditNoteFragment : Fragment() {
                 }
             }
 
+        //navIcon clickListener
         binding.toolbarNoteEdit.setNavigationOnClickListener {
             viewModel.backPressed = true
             viewModel.onStartNavigating()
         }
 
+
+        //menuClickListener
         binding.toolbarNoteEdit.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
-                    val items = camera.dialogList
+                    val items =
+                        requireNotNull(this.activity).application
+                            .resources.getStringArray(R.array.dialog_array)
                     MaterialAlertDialogBuilder(requireContext())
                         .setItems(items) { _, index ->
                             when (index) {
@@ -148,18 +204,35 @@ class EditNoteFragment : Fragment() {
             }
         }
 
-
-        noteAdapter.noteHolder.observe(viewLifecycleOwner) { holder ->
+        /**
+         * LiveData for header
+         * @see OneNoteEditAdapter.headerHolder
+         *
+         * TextChangeListener write title and text values and updates them when exit
+         * or accidentally close app if this is note is new
+         * @see onPause
+         */
+        noteAdapter.headerHolder.observe(viewLifecycleOwner) { holder ->
             holder.binding.titleEdit.addTextChangedListener {
-                viewModel.title = it.toString()
+                viewModel.currentNote?.header?.title = it.toString()
             }
             holder.binding.firstNoteEdit.addTextChangedListener {
-                viewModel.text = it.toString()
+                viewModel.currentNote?.header?.text = it.toString()
             }
         }
 
-        noteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
+        /**
+         * LiveData for images
+         * @see OneNoteEditAdapter.imgHolder
+         *
+         * set visibility and clickListeners when the
+         * image is in normal state or in hidden state
+         * @see com.example.noteexample.database.Image.hidden
+         */
 
+        noteAdapter.imgHolder.observe(viewLifecycleOwner, { holder ->
+
+            //set state between normal and hidden state
             if (noteAdapter.currentList[holder.adapterPosition].image?.hidden == true) {
                 holder.binding.photo.visibility = View.GONE
                 holder.binding.restoreButton.visibility = View.VISIBLE
@@ -172,7 +245,7 @@ class EditNoteFragment : Fragment() {
                 holder.binding.deleteCircle.visibility = View.VISIBLE
             }
 
-
+            //save current signature
             holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
                 noteAdapter.currentList[holder.adapterPosition].image?.let {
                     it.signature = editable.toString()
@@ -182,12 +255,19 @@ class EditNoteFragment : Fragment() {
                 }
             }
 
+            /**
+             * When delete circle is pressed, image disappears
+             * and restore button becomes [View.VISIBLE]
+             */
             holder.binding.deleteCircle.setOnClickListener {
                 noteAdapter.currentList[holder.adapterPosition].image?.hidden = true
                 viewModel.updateCurrentNote()
                 noteAdapter.notifyItemChanged(holder.adapterPosition)
             }
 
+            /**
+             * Restore button retuns image in normal state
+             */
             holder.binding.restoreButton.setOnClickListener {
                 noteAdapter.currentList[holder.adapterPosition].image?.hidden = false
                 viewModel.updateCurrentNote()
@@ -195,72 +275,102 @@ class EditNoteFragment : Fragment() {
             }
         })
 
+
+        /**
+         * Back button triggers [EditNoteViewModel.navigateBack] LiveData
+         */
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             viewModel.backPressed = true
             viewModel.onStartNavigating()
         }
 
-            viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
-                viewModel.currentNote = it
-                lifecycleScope.launch(Dispatchers.Default) {
-                    viewModel.currentNote?.let { note ->
-                        if (!viewModel.itemListSame) {
-                            viewModel.dataItemList = mutableListOf()
-                            viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(note.header))
-                            note.images.forEach { image ->
-                                viewModel.dataItemList.add(NoteWithImagesRecyclerItems(image = image))
-                            }
-                        } else {
-                            viewModel.dataItemList.forEachIndexed { index, dataItem ->
-                                if (index > 0) {
-                                    dataItem.image = note.images[index - 1]
-                                }
-                            }
-                            viewModel.itemListSame = false
-                        }
 
-                        withContext(Dispatchers.Main) {
-                            noteAdapter.submitList(viewModel.dataItemList)
+        /**
+         * [EditNoteViewModel.currentNoteLiveData] submits list for [OneNoteEditAdapter]
+         *
+         * It doesn't define new list each time to prevent blinks each time
+         * [EditNoteViewModel.currentNoteLiveData] is observed
+         */
+        viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
+            viewModel.currentNote = it
+            lifecycleScope.launch(Dispatchers.Default) {
+                it?.let { note ->
+                    if (!viewModel.itemListSame) {
+                        viewModel.noteList = mutableListOf()
+                        viewModel.noteList.add(0, NoteWithImagesRecyclerItems(note.header))
+                        note.images.forEach { image ->
+                            viewModel.noteList.add(NoteWithImagesRecyclerItems(image = image))
                         }
+                    } else {
+                        viewModel.noteList.forEachIndexed { index, item ->
+                            if (index > 0) {
+                                item.image = note.images[index - 1]
+                            }
+                        }
+                        viewModel.itemListSame = false
+                    }
+                    withContext(Dispatchers.Main) {
+                        noteAdapter.submitList(viewModel.noteList)
                     }
                 }
-            })
-
-        fun checkEmpty() {
-            viewModel.updateCurrentNote()
-            viewModel.currentNote?.let {
-                if (it.images.isEmpty() &&
-                    viewModel.title.isEmpty() &&
-                    viewModel.text.isEmpty()
-                ) {
-                    viewModel.deleteUnused()
-                }
             }
+        })
 
-            this.findNavController()
-                .navigate(
-                    EditNoteFragmentDirections.actionEditNoteFragmentToAllNotesFragment()
-                )
-            viewModel.onDoneNavigating()
+
+        //Inner function to reduce repetitive code
+        fun checkAndNavigate() {
+            lifecycleScope.launch {
+                viewModel.currentNote?.let {
+                    if (it.images.isEmpty() &&
+                        it.header.title.isEmpty() &&
+                        it.header.text.isEmpty() &&
+                        viewModel.allHidden
+                    ) {
+                        viewModel.deleteUnused()
+                    }
+                }
+                this@EditNoteFragment.findNavController()
+                    .navigate(
+                        EditNoteFragmentDirections.actionEditNoteFragmentToAllNotesFragment()
+                    )
+                viewModel.onDoneNavigating()
+            }
         }
 
+
+        /**
+         * [EditNoteViewModel.startNote] and [EditNoteViewModel.currentNote]
+         * checks if note is changed comparable to start state
+         */
         viewModel.navigateBack.observe(viewLifecycleOwner, {
             if (it == true) {
                 viewModel.updateCurrentNote()
-                if (args.noteID > -1) {
+                viewModel.currentNote?.let { noteWithImages ->
+                    if (noteWithImages.images.any { item -> !item.hidden } ||
+                        noteWithImages.images.any { item -> item.signature.isNotEmpty() }) {
+                        viewModel.allHidden = false
+                    }
                     when {
                         viewModel.backPressed -> {
-                            if (viewModel.startNote != viewModel.currentNote) {
+                            if (viewModel.startNote?.header?.title != noteWithImages.header.title ||
+                                viewModel.startNote?.header?.text != noteWithImages.header.text ||
+                                viewModel.startNote?.images != noteWithImages.images
+                            ) {
                                 MaterialAlertDialogBuilder(requireContext())
                                     .setMessage("Сохранить изменения?")
                                     .setNegativeButton("Нет") { _, _ ->
-                                        viewModel.deleteNote(viewModel.currentNote)
-                                        viewModel.insertNoteWithImages(viewModel.startNote)
-                                        this.findNavController().popBackStack()
-                                        viewModel.onDoneNavigating()
+                                        lifecycleScope.launch {
+                                            if (args.noteID > -1) {
+                                                viewModel.deleteNoteWithImages(noteWithImages)
+                                                viewModel.insertNoteWithImages(viewModel.startNote)
+                                            } else {
+                                                viewModel.deleteUnused()
+                                            }
+                                            this@EditNoteFragment.findNavController().popBackStack()
+                                        }
                                     }
                                     .setPositiveButton("Да") { _, _ ->
-                                        checkEmpty()
+                                        checkAndNavigate()
                                     }.show()
                                 viewModel.onDoneNavigating()
                             } else {
@@ -269,44 +379,7 @@ class EditNoteFragment : Fragment() {
                             }
                         }
                         !viewModel.backPressed -> {
-                            checkEmpty()
-                        }
-                    }
-                } else {
-                    viewModel.currentNote?.let { noteWithImages ->
-                        if (noteWithImages.images.any { item -> !item.hidden } ||
-                            noteWithImages.images.any { item -> item.signature.isNotEmpty() }) {
-                            viewModel.allHidden = false
-                        }
-
-                        when {
-                            (noteWithImages.images.isEmpty() ||
-                                    viewModel.allHidden) &&
-                                    viewModel.text.isEmpty() &&
-                                    viewModel.title.isEmpty()
-                            -> {
-                                this.findNavController().popBackStack()
-                                viewModel.deleteUnused()
-                                viewModel.onDoneNavigating()
-                            }
-                            viewModel.backPressed -> {
-                                MaterialAlertDialogBuilder(requireContext())
-                                    .setMessage("Сохранить изменения?")
-                                    .setNegativeButton("Нет") { _, _ ->
-                                        viewModel.deleteUnused()
-                                        this.findNavController().popBackStack()
-                                        viewModel.onDoneNavigating()
-                                    }
-                                    .setPositiveButton("Да") { _, _ ->
-                                        this.findNavController().popBackStack()
-                                        viewModel.onDoneNavigating()
-                                    }.show()
-                                viewModel.onDoneNavigating()
-                            }
-                            !viewModel.backPressed -> {
-                                this.findNavController().popBackStack()
-                                viewModel.onDoneNavigating()
-                            }
+                            checkAndNavigate()
                         }
                     }
                 }
@@ -315,6 +388,9 @@ class EditNoteFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * [EditNoteViewModel.updateCurrentNote] updates new note in case app is closed accidentally
+     */
     override fun onPause() {
         super.onPause()
         if (args.noteID == -1L) {

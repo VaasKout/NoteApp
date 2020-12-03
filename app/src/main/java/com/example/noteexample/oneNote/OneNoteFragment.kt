@@ -22,22 +22,27 @@ class OneNoteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        /**
+         * Binding for OneNoteFragment
+         * @see R.layout.fragment_one_note
+         */
         val args by navArgs<OneNoteFragmentArgs>()
         val binding: FragmentOneNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_one_note, container, false)
-        binding.lifecycleOwner = this
 
         val application = requireNotNull(this.activity).application
         val viewModelFactory = OneNoteViewModelFactory(application, args.noteID)
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
 
+        //Adapter options
         val oneNoteAdapter = OneNoteViewAdapter()
         binding.recyclerOneNote.apply {
             adapter = oneNoteAdapter
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
         }
+
 
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, { current ->
             if (viewModel.dataItemList.isEmpty()) {
@@ -48,15 +53,21 @@ class OneNoteFragment : Fragment() {
             }
             oneNoteAdapter.submitList(viewModel.dataItemList)
 
+            /**
+             * Scroll to specific position when user returns from [OnePhotoFragment]
+             * by default it gets to 0, so user can have bad experience
+             */
             lifecycleScope.launch {
+                //it doesn't work without delay
                 delay(8)
                 binding.recyclerOneNote
                     .layoutManager?.scrollToPosition(viewModel.scrollPosition)
             }
-
-            //bug when scroll position
         })
 
+        /**
+         * goto [OnePhotoFragment] with specific photo
+         */
         oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             holder.binding.photoOneNote.setOnClickListener {
                 viewModel.scrollPosition = holder.adapterPosition
@@ -74,13 +85,15 @@ class OneNoteFragment : Fragment() {
         })
 
         /**
-         * Menu onClickListener
+         * Nav Icon clickListener
          */
-
         binding.toolbarOneNote.setNavigationOnClickListener {
             this.findNavController().popBackStack()
         }
 
+        /**
+         * Menu clickListener
+         */
         binding.toolbarOneNote.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.edit_item -> {
@@ -95,6 +108,7 @@ class OneNoteFragment : Fragment() {
             }
         }
 
+        binding.lifecycleOwner = this
         return binding.root
     }
 }

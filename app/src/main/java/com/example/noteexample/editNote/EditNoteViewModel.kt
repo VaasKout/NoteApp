@@ -2,12 +2,13 @@ package com.example.noteexample.editNote
 
 import android.app.Application
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
-import com.example.noteexample.database.*
+import com.example.noteexample.database.Header
+import com.example.noteexample.database.Image
+import com.example.noteexample.database.NoteRoomDatabase
+import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.NoteWithImagesRecyclerItems
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,17 +18,21 @@ class EditNoteViewModel(
 ) : AndroidViewModel(application) {
 
     //Flags
+    /**
+     * [allHidden] checks if every img is hidden and doesn't have signature
+     * [backPressed] checks if user pressed backButton
+     * [itemListSame] prevents full [noteList] update to prevent submit another list,
+     * which cause unacceptable animation
+     */
     var allHidden = true
     var backPressed = false
     var itemListSame = false
 
     //Variables
     var position = 0
-    var title = ""
-    var text = ""
     var startNote: NoteWithImages? = null
     var currentNote: NoteWithImages? = null
-    var dataItemList = mutableListOf<NoteWithImagesRecyclerItems>()
+    var noteList = mutableListOf<NoteWithImagesRecyclerItems>()
 
     //Repository
     private val repository: NoteRepository
@@ -41,57 +46,22 @@ class EditNoteViewModel(
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
+        /**
+         * this LiveData get it's value asynchronously,
+         * for new note it inserts new Header object in DB,
+         * for existing note it gets value from DB
+         */
         currentNoteLiveData = liveData {
             emitSource(getNote())
         }
     }
 
-    val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
-                ItemTouchHelper.DOWN or ItemTouchHelper.UP,
-        0
-    ) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            val from = viewHolder.adapterPosition - 1
-            val to = target.adapterPosition - 1
-
-            if (from >= 0 && to >= 0) {
-                swap(from, to)
-                recyclerView.adapter?.notifyItemMoved(from + 1, to + 1)
-            }
-            return true
-        }
-
-        override fun clearView(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder
-        ) {
-            super.clearView(recyclerView, viewHolder)
-            viewModelScope.launch {
-                currentNote?.let { repository.updateNoteWithImages(it) }
-            }
-        }
-
-        override fun onSwiped(
-            viewHolder: RecyclerView.ViewHolder,
-            direction: Int
-        ) {
-        }
-
-    })
-
     /**
-     * Coroutine methods
+     * [swap] is attached to [EditNoteFragment.helper] to sort images manually,
+     * this function swaps imgIDs
      */
-
     fun swap(from: Int, to: Int) {
-        if (!itemListSame) {
-            itemListSame = true
-        }
+        itemListSame = true
         currentNote?.let {
             val tmpID = it.images[from].imgID
             it.images[from].imgID = it.images[to].imgID
@@ -99,56 +69,9 @@ class EditNoteViewModel(
         }
     }
 
-    //Dao functions
-    private suspend fun getNote(): LiveData<NoteWithImages> {
-        return if (noteID > -1) {
-            startNote = repository.getNote(noteID)
-            repository.getNoteLiveData(noteID)
-        } else {
-            position = repository.allASCSortedNotes().size
-            val note = Header(pos = position)
-            repository.insertNote(note)
-            startNote = repository.getLastNote()
-            repository.getLastLiveData()
-        }
-    }
-
-
-    fun updateCurrentNote() {
-        viewModelScope.launch {
-            if (noteID > -1) {
-                currentNote?.let {
-                    it.header.title = title
-                    it.header.text = text
-                    it.header.hasNoteContent =
-                        it.images.isNotEmpty() && it.images.any { item -> !item.hidden }
-                    repository.updateNoteWithImages(it)
-                }
-            } else {
-                val cal = Calendar.getInstance().time
-                val time =
-                    SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
-                currentNote?.let {
-                    it.header.title = title
-                    it.header.text = text
-                    it.header.date = time
-                    it.header.hasNoteContent =
-                        it.images.isNotEmpty() && it.images.any { item -> !item.hidden }
-                    repository.updateNoteWithImages(it)
-                }
-            }
-        }
-    }
-
-    fun onStartNavigating() {
-        _navigateBack.value = true
-    }
-
-    fun onDoneNavigating() {
-        _navigateBack.value = false
-    }
-
-
+    /**
+     * Insert note in [EditNoteFragment.startCamera]
+     */
     fun insertCameraPhoto(path: String) {
         viewModelScope.launch {
             currentNote?.let {
@@ -170,19 +93,57 @@ class EditNoteViewModel(
         }
     }
 
-    fun insertNoteWithImages(noteWithImages: NoteWithImages?) {
-        noteWithImages?.let {
-            viewModelScope.launch {
-                repository.insertNoteWithImages(noteWithImages)
+    /**
+     * Emit source for [currentNoteLiveData]
+     */
+    private suspend fun getNote(): LiveData<NoteWithImages> {
+        return if (noteID > -1) {
+            startNote = repository.getNote(noteID)
+            repository.getNoteLiveData(noteID)
+        } else {
+            position = repository.allASCSortedNotes().size
+            val header = Header(pos = position)
+            repository.insertNote(header)
+            startNote = repository.getLastNote()
+            repository.getLastLiveData()
+        }
+    }
+
+    /**
+     * Database methods
+     */
+
+    fun updateCurrentNote() {
+        viewModelScope.launch {
+            if (noteID > -1) {
+                currentNote?.let {
+                    repository.updateNoteWithImages(it)
+                }
+            } else {
+                /**
+                 * Each note has it's date
+                 * @see com.example.noteexample.database.Header.date
+                 */
+                val cal = Calendar.getInstance().time
+                val time =
+                    SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
+                currentNote?.let {
+                    it.header.date = time
+                    repository.updateNoteWithImages(it)
+                }
             }
         }
     }
 
-    fun deleteNote(noteWithImages: NoteWithImages?) {
+    suspend fun insertNoteWithImages(noteWithImages: NoteWithImages?) {
         noteWithImages?.let {
-            viewModelScope.launch {
-                repository.deleteNoteWithImages(it)
-            }
+            repository.insertNoteWithImages(noteWithImages)
+        }
+    }
+
+    suspend fun deleteNoteWithImages(noteWithImages: NoteWithImages?) {
+        noteWithImages?.let {
+            repository.deleteNoteWithImages(it)
         }
     }
 
@@ -192,9 +153,22 @@ class EditNoteViewModel(
         }
     }
 
-    fun deleteUnused() {
-        viewModelScope.launch {
-            currentNote?.let { repository.deleteNoteWithImages(it) }
-        }
+    suspend fun deleteUnused() {
+        currentNote?.let { repository.deleteNoteWithImages(it) }
     }
+
+    /**
+     * Methods for [navigateBack] LiveData
+     * it triggers closure of [EditNoteFragment]
+     */
+
+    fun onStartNavigating() {
+        _navigateBack.value = true
+    }
+
+    fun onDoneNavigating() {
+        _navigateBack.value = false
+    }
+
+
 }

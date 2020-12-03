@@ -27,6 +27,7 @@ class GalleryViewModel(val noteID: Long, application: Application) : AndroidView
     private val _actionMode = MutableLiveData<Boolean>()
     val actionMode: LiveData<Boolean> = _actionMode
 
+
     private val repository: NoteRepository
 
     init {
@@ -37,18 +38,10 @@ class GalleryViewModel(val noteID: Long, application: Application) : AndroidView
         }
     }
 
-    fun getData(camera: Camera) {
-        runBlocking {  }
-        galleryList = camera.loadImagesFromStorage()
-    }
-
-
-    fun clearSelected() {
-        galleryList.forEach {
-            it.isChecked = false
-        }
-    }
-
+    /**
+     * Insert photos in current note and replace all hidden by new
+     * @see com.example.noteexample.editNote.EditNoteFragment
+     */
     suspend fun insertImages() {
         val photoList = mutableListOf<GalleryData>()
         val newNoteContentList = mutableListOf<Image>()
@@ -71,13 +64,34 @@ class GalleryViewModel(val noteID: Long, application: Application) : AndroidView
                     )
                     newNoteContentList.add(image)
                 }
-
-                repository.insertImages(newNoteContentList)
                 repository.updateNoteWithImages(current)
+                repository.insertImages(newNoteContentList)
             }
         }
     }
 
+    /**
+     * Function loads list of photos from gallery
+     * @see Camera.loadImagesFromStorage
+     */
+    fun getData(camera: Camera) {
+        galleryList = camera.loadImagesFromStorage()
+    }
+
+    /**
+     * Clear [galleryList] if action mode is done
+     */
+    fun clearSelected() {
+        galleryList.forEach {
+            it.isChecked = false
+        }
+    }
+
+
+
+    /**
+     * [actionMode] functions
+     */
     fun onStartActionMode() {
         _actionMode.value = true
     }
