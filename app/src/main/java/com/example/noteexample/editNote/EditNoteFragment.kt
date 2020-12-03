@@ -159,6 +159,7 @@ class EditNoteFragment : Fragment() {
         binding.toolbarNoteEdit.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.insert_photo -> {
+                    viewModel.updateCurrentNote()
                     val items =
                         requireNotNull(this.activity).application
                             .resources.getStringArray(R.array.dialog_array)

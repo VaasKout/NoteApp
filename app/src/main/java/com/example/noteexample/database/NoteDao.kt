@@ -44,7 +44,7 @@ interface NoteDao {
     suspend fun deleteAllNotes()
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertNote(header: Header)
+    suspend fun insertHeader(header: Header)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun updateNote(header: Header)

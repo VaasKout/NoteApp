@@ -35,7 +35,7 @@ class NoteRepository(private val noteDao: NoteDao) {
 
     suspend fun insertNoteWithImages(note: NoteWithImages) {
         withContext(Dispatchers.IO) {
-            noteDao.insertNote(note.header)
+            noteDao.insertHeader(note.header)
             noteDao.insertImages(note.images)
         }
     }
@@ -97,7 +97,7 @@ class NoteRepository(private val noteDao: NoteDao) {
      */
     suspend fun insertNote(header: Header) {
         withContext(Dispatchers.IO) {
-            noteDao.insertNote(header)
+            noteDao.insertHeader(header)
         }
     }
 
