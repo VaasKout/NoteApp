@@ -18,8 +18,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Camera(private val activity: Activity) {
+
+    //TODO comment here
     lateinit var currentPhotoPath: String
-    //TODO move it to String.xml *application.resources.getStringArray(R.array...)*
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
