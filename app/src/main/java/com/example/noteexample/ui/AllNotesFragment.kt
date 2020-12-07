@@ -150,7 +150,7 @@ class AllNotesFragment : Fragment() {
     })
 
     init {
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launchWhenCreated {
             requireActivity().window
                 .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }

@@ -64,7 +64,7 @@
     </fragment>
     <dialog
         android:id="@+id/settingsFragment"
-        android:name="com.example.noteexample.settings.SettingsFragment"
+        android:name="com.example.noteexample.ui.SettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/fragment_settings"/>
     <fragment
