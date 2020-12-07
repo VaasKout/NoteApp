@@ -1,4 +1,4 @@
-package com.example.noteexample.settings
+package com.example.noteexample.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentSettingsBinding
+import com.example.noteexample.viewmodels.SettingsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 //constants for filter notes
@@ -22,7 +23,7 @@ class SettingsFragment : BottomSheetDialogFragment() {
      * which sort notes in specific way on Main fragment
      *
      * @see com.example.noteexample.database.Flags
-     * @see com.example.noteexample.allNotes.AllNotesFragment
+     * @see AllNotesFragment
      */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

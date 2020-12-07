@@ -1,4 +1,4 @@
-package com.example.noteexample.utils
+package com.example.noteexample.adapters
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.noteexample.database.Header
@@ -7,8 +7,8 @@ import com.example.noteexample.database.Image
 /**
  * DiffUtil and data class for adapters with header
  *
- * @see com.example.noteexample.editNote.OneNoteEditAdapter
- * @see com.example.noteexample.oneNote.OneNoteViewAdapter
+ * @see com.example.noteexample.adapters.OneNoteEditAdapter
+ * @see com.example.noteexample.adapters.OneNoteViewAdapter
  */
 data class NoteWithImagesRecyclerItems(
     val header: Header? = null,

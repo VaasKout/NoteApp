@@ -1,4 +1,4 @@
-package com.example.noteexample.editNote
+package com.example.noteexample.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.*
@@ -7,11 +7,14 @@ import com.example.noteexample.database.Image
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
-import com.example.noteexample.utils.NoteWithImagesRecyclerItems
+import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * ViewModel for [com.example.noteexample.ui.EditNoteFragment]
+ */
 class EditNoteViewModel(
     private val noteID: Long = -1,
     application: Application
@@ -57,8 +60,8 @@ class EditNoteViewModel(
     }
 
     /**
-     * [swap] is attached to [EditNoteFragment.helper] to sort images manually,
-     * this function swaps imgIDs
+     * [swap] is attached to [com.example.noteexample.ui.EditNoteFragment.helper]
+     * to sort images manually, this function swaps imgIDs
      */
     fun swap(from: Int, to: Int) {
         itemListSame = true
@@ -70,7 +73,7 @@ class EditNoteViewModel(
     }
 
     /**
-     * Insert note in [EditNoteFragment.startCamera]
+     * Insert note in [com.example.noteexample.ui.EditNoteFragment.startCamera]
      */
     fun insertCameraPhoto(path: String) {
         viewModelScope.launch {
@@ -159,7 +162,7 @@ class EditNoteViewModel(
 
     /**
      * Methods for [navigateBack] LiveData
-     * it triggers closure of [EditNoteFragment]
+     * it triggers closure of [com.example.noteexample.ui.EditNoteFragment]
      */
 
     fun onStartNavigating() {

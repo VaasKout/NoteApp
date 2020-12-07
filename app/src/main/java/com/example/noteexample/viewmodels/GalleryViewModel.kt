@@ -1,4 +1,4 @@
-package com.example.noteexample.gallery
+package com.example.noteexample.viewmodels
 
 
 import android.app.Application
@@ -9,10 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.noteexample.database.Image
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
+import com.example.noteexample.adapters.GalleryData
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
 import kotlinx.coroutines.*
 
+/**
+ * ViewModel for [com.example.noteexample.ui.GalleryFragment]
+ */
 class GalleryViewModel(val noteID: Long, application: Application) : AndroidViewModel(application) {
 
     //Variables
@@ -40,7 +44,7 @@ class GalleryViewModel(val noteID: Long, application: Application) : AndroidView
 
     /**
      * Insert photos in current note and replace all hidden by new
-     * @see com.example.noteexample.editNote.EditNoteFragment
+     * @see com.example.noteexample.ui.EditNoteFragment
      */
     suspend fun insertImages() {
         val photoList = mutableListOf<GalleryData>()
@@ -86,7 +90,6 @@ class GalleryViewModel(val noteID: Long, application: Application) : AndroidView
             it.isChecked = false
         }
     }
-
 
 
     /**

@@ -1,4 +1,4 @@
-package com.example.noteexample.allNotes
+package com.example.noteexample.ui
 
 import android.os.Bundle
 import android.view.*
@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
+import com.example.noteexample.viewmodels.AllNotesViewModel
+import com.example.noteexample.adapters.NoteAdapter
 import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.utils.GlideApp
 import com.google.android.material.card.MaterialCardView
@@ -111,13 +113,11 @@ class AllNotesFragment : Fragment() {
 //                    (recyclerView.layoutManager as StaggeredGridLayoutManager).gapStrategy =
 //                        StaggeredGridLayoutManager.GAP_HANDLING_NONE
 //                }
-//                lifecycleScope.launch {
-//                    delay(8)
 //                    if (from == 0 || to == 0){
 //                        recyclerView.scrollToPosition(0)
 //                        recyclerView.layoutManager?.scrollToPosition(0)
 //                    }
-//                }
+//
                 viewModel.startedMove = true
             }
             return true
@@ -183,6 +183,7 @@ class AllNotesFragment : Fragment() {
         /**
          * Toolbar clickListener
          */
+
         binding.toolbarNoteMain.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.delete_from_main -> {
@@ -208,8 +209,7 @@ class AllNotesFragment : Fragment() {
                 R.id.settings -> {
                     this.findNavController()
                         .navigate(
-                            AllNotesFragmentDirections
-                                .actionAllNotesFragmentToSettingsFragment()
+                            AllNotesFragmentDirections.actionAllNotesFragmentToSettingsFragment()
                         )
                     true
                 }
@@ -426,15 +426,16 @@ class AllNotesFragment : Fragment() {
                                     this@AllNotesFragment.findNavController()
                                         .navigate(
                                             AllNotesFragmentDirections
-                                                .actionAllNotesFragmentToOnePhotoFragment
-                                                    (header.noteID, images[0].imgID)
+                                                .actionAllNotesFragmentToOnePhotoFragment(
+                                                    header.noteID,
+                                                    images[0].imgID
+                                                )
                                         )
                                 } else {
                                     this@AllNotesFragment.findNavController()
                                         .navigate(
                                             AllNotesFragmentDirections
-                                                .actionAllNotesFragmentToOneNoteFragment
-                                                    (header.noteID)
+                                                .actionAllNotesFragmentToOneNoteFragment(header.noteID)
                                         )
                                 }
                             }
@@ -445,13 +446,12 @@ class AllNotesFragment : Fragment() {
         })
 
         /**
-         * listen to fab click and goto [com.example.noteexample.editNote.EditNoteFragment]
+         * listen to fab click and goto [EditNoteFragment]
          */
         binding.fabToInsert.setOnClickListener {
             this.findNavController()
                 .navigate(
-                    AllNotesFragmentDirections
-                        .actionAllNotesFragmentToEditNoteFragment()
+                    AllNotesFragmentDirections.actionAllNotesFragmentToEditNoteFragment()
                 )
             viewModel.onDoneSearch()
         }

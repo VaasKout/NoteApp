@@ -1,17 +1,14 @@
-package com.example.noteexample.allNotes
+package com.example.noteexample.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.noteexample.database.Flags
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
-import com.example.noteexample.settings.ALL
-import com.example.noteexample.settings.PHOTOS_ONLY
-import com.example.noteexample.settings.TEXT_ONLY
+import com.example.noteexample.ui.ALL
+import com.example.noteexample.ui.PHOTOS_ONLY
+import com.example.noteexample.ui.TEXT_ONLY
 import kotlinx.coroutines.*
 
 class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
@@ -35,6 +32,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
 
     //define repository and flagsLiveData
     private val repository: NoteRepository
+
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
@@ -42,7 +40,7 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * Swap algorithm is used in [AllNotesFragment.helper]
+     * Swap algorithm is used in [com.example.noteexample.ui.AllNotesFragment.helper]
      * Position in recyclerView is attached to
      * [com.example.noteexample.database.Header.pos] in ACS or DESC order
      */
@@ -176,11 +174,11 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
      * LiveData methods
      */
 
-    fun onStartActionMode(){
+    fun onStartActionMode() {
         _actionModeFlag.value = true
     }
 
-    fun onDoneActionMode(){
+    fun onDoneActionMode() {
         _actionModeFlag.value = false
     }
 

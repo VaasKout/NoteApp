@@ -1,4 +1,4 @@
-package com.example.noteexample.oneNote
+package com.example.noteexample.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +13,6 @@ import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
 import com.example.noteexample.databinding.HeaderViewBinding
 import com.example.noteexample.databinding.RecyclerImageViewItemBinding
-import com.example.noteexample.utils.DataDiffCallBack
-import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
@@ -23,8 +21,8 @@ class OneNoteViewAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(DataDiffCallBack()) {
 
     /**
-     * ListAdapter for [OneNoteFragment]
-     * similar with [com.example.noteexample.editNote.OneNoteEditAdapter]
+     * ListAdapter for [com.example.noteexample.ui.OneNoteFragment]
+     * similar with [com.example.noteexample.adapters.OneNoteEditAdapter]
      */
     private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
     val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder

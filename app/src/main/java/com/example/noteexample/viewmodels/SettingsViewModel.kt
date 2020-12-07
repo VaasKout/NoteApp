@@ -1,4 +1,4 @@
-package com.example.noteexample.settings
+package com.example.noteexample.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -9,6 +9,9 @@ import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for [com.example.noteexample.ui.SettingsFragment]
+ */
 class SettingsViewModel (application: Application): AndroidViewModel(application){
 
     //Variables

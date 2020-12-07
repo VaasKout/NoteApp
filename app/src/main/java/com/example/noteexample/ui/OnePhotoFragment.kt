@@ -1,4 +1,4 @@
-package com.example.noteexample.oneNote
+package com.example.noteexample.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOnePhotoBinding
+import com.example.noteexample.viewmodels.OneNoteViewModel
+import com.example.noteexample.viewmodels.OneNoteViewModelFactory
 import com.example.noteexample.utils.OnSwipeTouchListener
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -81,8 +83,7 @@ class OnePhotoFragment : Fragment() {
                 R.id.edit_item -> {
                     this.findNavController()
                         .navigate(
-                            OnePhotoFragmentDirections
-                                .actionOnePhotoFragmentToEditNoteFragment(args.noteID)
+                            OnePhotoFragmentDirections.actionOnePhotoFragmentToEditNoteFragment(args.noteID)
                         )
                     true
                 }

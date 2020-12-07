@@ -1,4 +1,4 @@
-package com.example.noteexample.gallery
+package com.example.noteexample.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -25,7 +25,7 @@ class GalleryAdapter :
         GalleryDiffCallBack()
     ) {
     /**
-     * [holder] LiveData observes each item for [GalleryFragment]
+     * [holder] LiveData observes each item for [com.example.noteexample.ui.GalleryFragment]
      * to setOnClickListener for each image
      */
     private val _holder = MutableLiveData<GalleryViewHolder>()

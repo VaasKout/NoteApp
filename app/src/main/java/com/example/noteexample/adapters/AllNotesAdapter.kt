@@ -1,4 +1,4 @@
-package com.example.noteexample.allNotes
+package com.example.noteexample.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -16,8 +16,8 @@ class NoteAdapter :
     ListAdapter<NoteWithImages, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
 
     /**
-     * [holder] gets instance of InsertUpdateViewHolder and observed in [AllNotesFragment]
-     * to set clickListeners for recycler items
+     * [holder] gets instance of InsertUpdateViewHolder and observed in
+     * [com.example.noteexample.ui.AllNotesFragment] to set clickListeners for recycler items
      */
 
     private val _holder = MutableLiveData<NoteViewHolder>()

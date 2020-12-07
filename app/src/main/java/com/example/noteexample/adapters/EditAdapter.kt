@@ -1,4 +1,4 @@
-package com.example.noteexample.editNote
+package com.example.noteexample.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,11 +13,9 @@ import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
 import com.example.noteexample.databinding.HeaderEditBinding
 import com.example.noteexample.databinding.RecyclerImageEditItemBinding
-import com.example.noteexample.utils.DataDiffCallBack
-import com.example.noteexample.utils.NoteWithImagesRecyclerItems
 
 /**
- * ListAdapter for [EditNoteFragment] with header on 0 position
+ * ListAdapter for [com.example.noteexample.ui.EditNoteFragment] with header on 0 position
  *
  * [OneNoteEditAdapter.headerHolder] LiveData for header
  * [OneNoteEditAdapter.imgHolder] LiveData for other items

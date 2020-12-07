@@ -1,4 +1,4 @@
-package com.example.noteexample.gallery
+package com.example.noteexample.ui
 
 import android.app.Application
 import android.os.Bundle
@@ -12,6 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentGalleryBinding
+import com.example.noteexample.adapters.GalleryAdapter
+import com.example.noteexample.viewmodels.GalleryViewModel
+import com.example.noteexample.viewmodels.GalleryViewModelFactory
 import com.example.noteexample.utils.Camera
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -100,7 +103,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 viewModel.actionModeStarted = false
                 binding.acceptSelectedPhotos.visibility = View.GONE
                 binding.galleryMenuTitle.text = resources.getText(R.string.gallery)
-                if (!viewModel.expandedState){
+                if (!viewModel.expandedState) {
                     binding.galleryMotion.transitionToStart()
                 }
             }
@@ -150,7 +153,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
         binding.acceptSelectedPhotos.setOnClickListener {
             lifecycleScope.launch(Dispatchers.Default) {
                 viewModel.insertImages()
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     this@GalleryFragment.findNavController().popBackStack()
                     viewModel.onDoneActionMode()
                 }

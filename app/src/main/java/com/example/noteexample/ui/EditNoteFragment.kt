@@ -1,4 +1,4 @@
-package com.example.noteexample.editNote
+package com.example.noteexample.ui
 
 import android.Manifest
 import android.app.Activity
@@ -23,9 +23,12 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
+import com.example.noteexample.adapters.OneNoteEditAdapter
 import com.example.noteexample.databinding.FragmentEditNoteBinding
+import com.example.noteexample.viewmodels.EditNoteViewModel
+import com.example.noteexample.viewmodels.EditNoteViewModelFactory
 import com.example.noteexample.utils.Camera
-import com.example.noteexample.utils.NoteWithImagesRecyclerItems
+import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -122,10 +125,9 @@ class EditNoteFragment : Fragment() {
                     viewModel.startNote?.header?.let { item ->
                         this.findNavController()
                             .navigate(
-                                EditNoteFragmentDirections
-                                    .actionEditNoteFragmentToGalleryFragment(
-                                        item.noteID
-                                    )
+                                EditNoteFragmentDirections.actionEditNoteFragmentToGalleryFragment(
+                                    item.noteID
+                                )
                             )
                     }
                 } else {
@@ -180,10 +182,9 @@ class EditNoteFragment : Fragment() {
                                         viewModel.startNote?.header?.let { item ->
                                             this.findNavController()
                                                 .navigate(
-                                                    EditNoteFragmentDirections
-                                                        .actionEditNoteFragmentToGalleryFragment(
-                                                            item.noteID
-                                                        )
+                                                    EditNoteFragmentDirections.actionEditNoteFragmentToGalleryFragment(
+                                                        item.noteID
+                                                    )
                                                 )
                                         }
 

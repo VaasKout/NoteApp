@@ -1,4 +1,4 @@
-package com.example.noteexample.oneNote
+package com.example.noteexample.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +12,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteexample.R
+import com.example.noteexample.adapters.OneNoteViewAdapter
 import com.example.noteexample.databinding.FragmentOneNoteBinding
-import com.example.noteexample.utils.NoteWithImagesRecyclerItems
+import com.example.noteexample.viewmodels.OneNoteViewModel
+import com.example.noteexample.viewmodels.OneNoteViewModelFactory
+import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -74,11 +77,10 @@ class OneNoteFragment : Fragment() {
                 oneNoteAdapter.currentList[holder.adapterPosition].image?.let {
                     this.findNavController()
                         .navigate(
-                            OneNoteFragmentDirections
-                                .actionOneNoteFragmentToOnePhotoFragment(
-                                    args.noteID,
-                                    it.imgID
-                                )
+                            OneNoteFragmentDirections.actionOneNoteFragmentToOnePhotoFragment(
+                                args.noteID,
+                                it.imgID
+                            )
                         )
                 }
             }
@@ -99,8 +101,7 @@ class OneNoteFragment : Fragment() {
                 R.id.edit_item -> {
                     this.findNavController()
                         .navigate(
-                            OneNoteFragmentDirections
-                                .actionOneNoteFragmentToEditNoteFragment(args.noteID)
+                            OneNoteFragmentDirections.actionOneNoteFragmentToEditNoteFragment(args.noteID)
                         )
                     true
                 }

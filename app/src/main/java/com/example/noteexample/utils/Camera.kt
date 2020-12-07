@@ -10,7 +10,7 @@ import android.provider.MediaStore
 import android.view.View
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
-import com.example.noteexample.gallery.GalleryData
+import com.example.noteexample.adapters.GalleryData
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.IOException
@@ -19,7 +19,11 @@ import java.util.*
 
 class Camera(private val activity: Activity) {
 
-    //TODO comment here
+    /**
+     * This class opens camera and load images from storage
+     * @see com.example.noteexample.ui.GalleryFragment
+     * @see com.example.noteexample.ui.EditNoteFragment
+     */
     lateinit var currentPhotoPath: String
 
     @Throws(IOException::class)
@@ -38,6 +42,7 @@ class Camera(private val activity: Activity) {
         }
     }
 
+    //Intent for open camera and take picture
     fun dispatchTakePictureIntent(barView: View): Intent {
         return Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
@@ -71,6 +76,7 @@ class Camera(private val activity: Activity) {
         }
     }
 
+    //Load all images from gallery
     fun loadImagesFromStorage(): List<GalleryData> {
 
         val uriExternal: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI

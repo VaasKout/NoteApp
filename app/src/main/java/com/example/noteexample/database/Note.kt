@@ -11,8 +11,8 @@ import androidx.room.*
 
 
 /**
- * [Flags] Entity sorts notes in [com.example.noteexample.allNotes.AllNotesFragment]
- * and updated in [com.example.noteexample.settings.SettingsFragment]
+ * [Flags] Entity sorts notes in [com.example.noteexample.ui.AllNotesFragment]
+ * and updated in [com.example.noteexample.ui.SettingsFragment]
  */
 @Entity(tableName = "flags_table")
 data class Flags(
@@ -28,10 +28,10 @@ data class Flags(
  * [Header] is attached to title, text and date of each note
  *
  * [Header.isChecked] is used to select items to perform actions in
- * [com.example.noteexample.allNotes.AllNotesFragment.actionMode]
+ * [com.example.noteexample.ui.AllNotesFragment.actionMode]
  *
  * ColumnInfo [pos] sorts items by index in ACS or DESC order in
- * [com.example.noteexample.allNotes.AllNotesFragment]
+ * [com.example.noteexample.ui.AllNotesFragment]
  */
 
 @Entity(tableName = "header_table")
@@ -47,7 +47,7 @@ data class Header(
 /**
  * [Image] is attached to each image and signature, inserted in note,
  * [Image.hidden] flag define visibility of image in
- * [com.example.noteexample.editNote.EditNoteFragment]
+ * [com.example.noteexample.ui.EditNoteFragment]
  */
 
 @Entity(tableName = "image_table")

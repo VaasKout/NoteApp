@@ -1,4 +1,4 @@
-package com.example.noteexample.oneNote
+package com.example.noteexample.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -6,8 +6,12 @@ import androidx.lifecycle.LiveData
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
-import com.example.noteexample.utils.NoteWithImagesRecyclerItems
+import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 
+/**
+ * ViewModel for [com.example.noteexample.ui.OneNoteFragment]
+ * and [com.example.noteexample.ui.OnePhotoFragment]
+ */
 class OneNoteViewModel(
     application: Application,
     noteID: Long,
