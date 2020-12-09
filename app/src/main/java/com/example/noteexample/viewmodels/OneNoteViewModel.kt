@@ -13,8 +13,8 @@ import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
  * and [com.example.noteexample.ui.OnePhotoFragment]
  */
 class OneNoteViewModel(
-    application: Application,
     noteID: Long,
+    application: Application,
 ) : AndroidViewModel(application) {
 
     //LiveData

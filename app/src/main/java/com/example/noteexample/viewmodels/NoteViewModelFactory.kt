@@ -8,11 +8,20 @@ import java.lang.IllegalArgumentException
 @Suppress("UNCHECKED_CAST")
 class NoteViewModelFactory(
     private val noteID: Long = -1,
-    private val application: Application) : ViewModelProvider.Factory{
+    private val application: Application
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(EditNoteViewModel::class.java)){
-            return EditNoteViewModel(noteID, application) as T
+        return when {
+            modelClass.isAssignableFrom(EditNoteViewModel::class.java) -> {
+                EditNoteViewModel(noteID, application) as T
+            }
+            modelClass.isAssignableFrom(GalleryViewModel::class.java) -> {
+                GalleryViewModel(noteID, application) as T
+            }
+            modelClass.isAssignableFrom(OneNoteViewModel::class.java) -> {
+                OneNoteViewModel(noteID, application) as T
+            }
+            else -> throw IllegalArgumentException("Unknown class in UpdateNoteViewModelFactory")
         }
-        throw IllegalArgumentException("Unknown class in UpdateNoteViewModelFactory")
     }
 }
