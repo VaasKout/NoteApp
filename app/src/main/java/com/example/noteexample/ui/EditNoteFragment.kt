@@ -26,7 +26,7 @@ import com.example.noteexample.R
 import com.example.noteexample.adapters.OneNoteEditAdapter
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.viewmodels.EditNoteViewModel
-import com.example.noteexample.viewmodels.EditNoteViewModelFactory
+import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.example.noteexample.utils.Camera
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -50,7 +50,7 @@ class EditNoteFragment : Fragment() {
 
     private val viewModel by lazy {
         val application: Application = requireNotNull(this.activity).application
-        val updateViewModelFactory = EditNoteViewModelFactory(args.noteID, application)
+        val updateViewModelFactory = NoteViewModelFactory(args.noteID, application)
         ViewModelProvider(this, updateViewModelFactory).get(EditNoteViewModel::class.java)
     }
 

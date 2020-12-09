@@ -13,8 +13,8 @@ import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOnePhotoBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
-import com.example.noteexample.viewmodels.OneNoteViewModelFactory
 import com.example.noteexample.utils.OnSwipeTouchListener
+import com.example.noteexample.viewmodels.NoteViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -46,7 +46,7 @@ class OnePhotoFragment : Fragment() {
 
         //viewModel
         val application = requireNotNull(this.activity).application
-        val viewModelFactory = OneNoteViewModelFactory(application, args.noteID)
+        val viewModelFactory = NoteViewModelFactory(args.noteID, application)
         val viewModel = ViewModelProvider(this, viewModelFactory)
             .get(OneNoteViewModel::class.java)
 

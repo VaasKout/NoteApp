@@ -14,8 +14,8 @@ import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentGalleryBinding
 import com.example.noteexample.adapters.GalleryAdapter
 import com.example.noteexample.viewmodels.GalleryViewModel
-import com.example.noteexample.viewmodels.GalleryViewModelFactory
 import com.example.noteexample.utils.Camera
+import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -29,7 +29,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
     private val args by navArgs<GalleryFragmentArgs>()
     private val viewModel by lazy {
         val application: Application = requireNotNull(this.activity).application
-        val galleryViewModelFactory = GalleryViewModelFactory(args.noteID, application)
+        val galleryViewModelFactory = NoteViewModelFactory(args.noteID, application)
         ViewModelProvider(this, galleryViewModelFactory).get(GalleryViewModel::class.java)
     }
 
