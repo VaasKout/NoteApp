@@ -1,9 +1,8 @@
 package com.example.noteexample.viewmodels
 
-import android.app.Application
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.noteexample.database.Flags
-import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.ui.ALL
@@ -11,7 +10,9 @@ import com.example.noteexample.ui.PHOTOS_ONLY
 import com.example.noteexample.ui.TEXT_ONLY
 import kotlinx.coroutines.*
 
-class AllNotesViewModel(application: Application) : AndroidViewModel(application) {
+class AllNotesViewModel @ViewModelInject constructor(
+    private val repository: NoteRepository
+): ViewModel(){
 
     //Flags
     var startedMove = false
@@ -22,22 +23,14 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     var noteList = listOf<NoteWithImages>()
 
     //LiveData
-    var flagsLiveData: LiveData<Flags>
-
     private val _searchModeFlag = MutableLiveData<Boolean>()
     var searchModeFlag: LiveData<Boolean> = _searchModeFlag
 
     private val _actionModeFlag = MutableLiveData<Boolean>()
     var actionModeFlag: LiveData<Boolean> = _actionModeFlag
 
-    //define repository and flagsLiveData
-    private val repository: NoteRepository
-
-    init {
-        val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
-        repository = NoteRepository(noteDao)
-        flagsLiveData = repository.flags
-    }
+    //inject repository and flagsLiveData
+    var flagsLiveData: LiveData<Flags> = repository.flags
 
     /**
      * Swap algorithm is used in [com.example.noteexample.ui.AllNotesFragment.helper]

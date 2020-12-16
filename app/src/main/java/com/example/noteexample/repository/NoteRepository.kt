@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import com.example.noteexample.database.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class NoteRepository(private val noteDao: NoteDao) {
+@Singleton
+class NoteRepository @Inject constructor(private val noteDao: NoteDao) {
 
     /**
      * Repository for Dao methods
@@ -58,6 +61,7 @@ class NoteRepository(private val noteDao: NoteDao) {
         }
         withContext(Dispatchers.IO) {
             noteDao.deleteNoteList(notes)
+            noteDao.deleteImages(images)
         }
 
     }
@@ -106,7 +110,6 @@ class NoteRepository(private val noteDao: NoteDao) {
 
     /**
      * @see Image
-     *
      */
     suspend fun insertImages(images: List<Image>) {
         withContext(Dispatchers.IO) {
@@ -131,7 +134,6 @@ class NoteRepository(private val noteDao: NoteDao) {
             noteDao.deleteImage(image)
         }
     }
-
 
     /**
      * @see Flags

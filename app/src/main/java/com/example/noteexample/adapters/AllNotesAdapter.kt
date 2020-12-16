@@ -41,7 +41,6 @@ class NoteAdapter :
     inner class NoteViewHolder(val binding: RecyclerMainItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind() {
-//          binding.mainCard.isChecked = noteWithImages.note.isChecked
             _holder.value = this
             binding.executePendingBindings()
         }
@@ -57,8 +56,3 @@ class NoteDiffCallBack : DiffUtil.ItemCallback<NoteWithImages>() {
         return oldItem == newItem
     }
 }
-
-
-
-
-

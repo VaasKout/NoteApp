@@ -2,7 +2,6 @@ package com.example.noteexample.ui
 
 import android.Manifest
 import android.app.Activity
-import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -16,7 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -26,9 +25,10 @@ import com.example.noteexample.R
 import com.example.noteexample.adapters.OneNoteEditAdapter
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.viewmodels.EditNoteViewModel
-import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.example.noteexample.utils.Camera
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
+import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,16 +47,14 @@ class EditNoteFragment : Fragment() {
      * @see Camera
      */
 
-
     @Inject lateinit var camera: Camera
+    @Inject lateinit var repository: NoteRepository
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
 
-    private val viewModel by lazy {
-        val application: Application = requireNotNull(this.activity).application
-        val updateViewModelFactory = NoteViewModelFactory(args.noteID, application)
-        ViewModelProvider(this, updateViewModelFactory).get(EditNoteViewModel::class.java)
+    private val viewModel by viewModels<EditNoteViewModel>{
+        NoteViewModelFactory(args.noteID, repository)
     }
 
     val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
@@ -185,7 +183,8 @@ class EditNoteFragment : Fragment() {
                                         viewModel.startNote?.header?.let { item ->
                                             this.findNavController()
                                                 .navigate(
-                                                    EditNoteFragmentDirections.actionEditNoteFragmentToGalleryFragment(
+                                                    EditNoteFragmentDirections
+                                                        .actionEditNoteFragmentToGalleryFragment(
                                                         item.noteID
                                                     )
                                                 )

@@ -1,10 +1,8 @@
 package com.example.noteexample.viewmodels
 
-import android.app.Application
 import androidx.lifecycle.*
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
@@ -17,16 +15,16 @@ import java.util.*
  */
 class EditNoteViewModel(
     private val noteID: Long = -1,
-    application: Application
-) : AndroidViewModel(application) {
+    private val repository: NoteRepository
+) : ViewModel() {
 
-    //Flags
     /**
      * [allHidden] checks if every img is hidden and doesn't have signature
      * [backPressed] checks if user pressed backButton
      * [itemListSame] prevents full [noteList] update to prevent submit another list,
      * which cause unacceptable animation
      */
+    //Flags
     var allHidden = true
     var backPressed = false
     var itemListSame = false
@@ -37,9 +35,6 @@ class EditNoteViewModel(
     var currentNote: NoteWithImages? = null
     var noteList = mutableListOf<NoteWithImagesRecyclerItems>()
 
-    //Repository
-    private val repository: NoteRepository
-
     //LiveData
     val currentNoteLiveData: LiveData<NoteWithImages>
 
@@ -47,8 +42,6 @@ class EditNoteViewModel(
     val navigateBack: LiveData<Boolean> = _navigateBack
 
     init {
-        val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
-        repository = NoteRepository(noteDao)
         /**
          * this LiveData get it's value asynchronously,
          * for new note it inserts new Header object in DB,
@@ -172,6 +165,4 @@ class EditNoteViewModel(
     fun onDoneNavigating() {
         _navigateBack.value = false
     }
-
-
 }

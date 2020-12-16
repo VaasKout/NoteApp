@@ -6,21 +6,35 @@ import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOnePhotoBinding
+import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.OneNoteViewModel
 import com.example.noteexample.utils.OnSwipeTouchListener
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class OnePhotoFragment : Fragment() {
+
+
+    private val args by navArgs<OnePhotoFragmentArgs>()
+    @Inject
+    lateinit var repository: NoteRepository
+
+    //viewModel
+    private val viewModel: OneNoteViewModel by viewModels {
+        NoteViewModelFactory(args.noteID, repository)
+    }
+
 
     init {
         lifecycleScope.launchWhenStarted {
@@ -29,27 +43,22 @@ class OnePhotoFragment : Fragment() {
                 .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
     }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val args by navArgs<OnePhotoFragmentArgs>()
+
         val binding: FragmentOnePhotoBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_one_photo, container, false)
         binding.lifecycleOwner = this
-
 
 
         // change color of status bar
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireActivity(), R.color.grey_material)
 
-        //viewModel
-        val application = requireNotNull(this.activity).application
-        val viewModelFactory = NoteViewModelFactory(args.noteID, application)
-        val viewModel = ViewModelProvider(this, viewModelFactory)
-            .get(OneNoteViewModel::class.java)
 
         /**
          * Visibility of text fields depends on [OneNoteViewModel.currentNoteLiveData] value
@@ -113,12 +122,12 @@ class OnePhotoFragment : Fragment() {
 
                 //check if image zoomed
                 if (!binding.imgOnePhoto.isZoomed) {
-                        binding.titleViewOnePhoto.visibility = View.INVISIBLE
-                        binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
-                        binding.noteViewOnePhoto.visibility = View.INVISIBLE
-                        binding.toolbarOnePhoto.visibility = View.INVISIBLE
-                        binding.motionOnePhoto.setTransition(R.id.start, R.id.endUp)
-                        binding.motionOnePhoto.transitionToEnd()
+                    binding.titleViewOnePhoto.visibility = View.INVISIBLE
+                    binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                    binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                    binding.toolbarOnePhoto.visibility = View.INVISIBLE
+                    binding.motionOnePhoto.setTransition(R.id.start, R.id.endUp)
+                    binding.motionOnePhoto.transitionToEnd()
                     lifecycleScope.launch {
                         delay(150)
                         this@OnePhotoFragment.findNavController().popBackStack()
@@ -128,12 +137,12 @@ class OnePhotoFragment : Fragment() {
 
             override fun onSwipeBottom() {
                 if (!binding.imgOnePhoto.isZoomed) {
-                        binding.titleViewOnePhoto.visibility = View.INVISIBLE
-                        binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
-                        binding.noteViewOnePhoto.visibility = View.INVISIBLE
-                        binding.toolbarOnePhoto.visibility = View.INVISIBLE
-                        binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
-                        binding.motionOnePhoto.transitionToEnd()
+                    binding.titleViewOnePhoto.visibility = View.INVISIBLE
+                    binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                    binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                    binding.toolbarOnePhoto.visibility = View.INVISIBLE
+                    binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
+                    binding.motionOnePhoto.transitionToEnd()
                     lifecycleScope.launch {
                         delay(150)
                         this@OnePhotoFragment.findNavController().popBackStack()
@@ -151,11 +160,6 @@ class OnePhotoFragment : Fragment() {
             ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
     }
 }
-
-
-
-
-
 
 
 //            viewModel.currentNoteContent?.let {

@@ -3,10 +3,12 @@ package com.example.noteexample.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
+import javax.inject.Inject
 
 /**
  * ViewModel for [com.example.noteexample.ui.OneNoteFragment]
@@ -14,20 +16,14 @@ import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
  */
 class OneNoteViewModel(
     noteID: Long,
-    application: Application,
-) : AndroidViewModel(application) {
+    repository: NoteRepository
+) : ViewModel() {
 
     //LiveData
-    val currentNoteLiveData: LiveData<NoteWithImages>
+    val currentNoteLiveData: LiveData<NoteWithImages> = repository.getNoteLiveData(noteID)
 
     //Variables
     var scrollPosition: Int = 0
     val dataItemList = mutableListOf<NoteWithImagesRecyclerItems>()
 
-    private val repository: NoteRepository
-    init {
-        val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
-        repository = NoteRepository(noteDao)
-        currentNoteLiveData = repository.getNoteLiveData(noteID)
-    }
 }

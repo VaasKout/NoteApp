@@ -1,23 +1,21 @@
 package com.example.noteexample.viewmodels
 
-
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.noteexample.database.Image
-import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.adapters.GalleryData
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 /**
  * ViewModel for [com.example.noteexample.ui.GalleryFragment]
  */
-class GalleryViewModel(val noteID: Long, application: Application) : AndroidViewModel(application) {
+class GalleryViewModel(
+    val noteID: Long,
+    val repository: NoteRepository
+) : ViewModel() {
 
     //Variables
     var galleryList = listOf<GalleryData>()
@@ -31,12 +29,7 @@ class GalleryViewModel(val noteID: Long, application: Application) : AndroidView
     private val _actionMode = MutableLiveData<Boolean>()
     val actionMode: LiveData<Boolean> = _actionMode
 
-
-    private val repository: NoteRepository
-
     init {
-        val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
-        repository = NoteRepository(noteDao)
         viewModelScope.launch {
             currentNote = repository.getNote(noteID)
         }

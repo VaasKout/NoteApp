@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentSettingsBinding
@@ -19,6 +20,10 @@ const val PHOTOS_ONLY = 2
 
 @AndroidEntryPoint
 class SettingsFragment : BottomSheetDialogFragment() {
+
+    //viewModel
+    private val viewModel: SettingsViewModel by viewModels()
+
     /**
      * This Fragment set parameters for [SettingsViewModel.flagsLiveData]
      * which sort notes in specific way on Main fragment
@@ -37,16 +42,13 @@ class SettingsFragment : BottomSheetDialogFragment() {
         val binding: FragmentSettingsBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
 
-        //viewModel
-        val viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
-
         viewModel.flagsLiveData.observe(viewLifecycleOwner, {
             viewModel.flags = it
             if (it.showDate) {
                 binding.switchDate.isChecked = true
             }
 
-            if (it.columns == 2){
+            if (it.columns == 2) {
                 binding.twoColumns.isChecked = true
             } else {
                 binding.oneColumn.isChecked = true
@@ -57,7 +59,7 @@ class SettingsFragment : BottomSheetDialogFragment() {
             } else {
                 binding.sortDESC.isChecked = true
             }
-            when(it.filter) {
+            when (it.filter) {
                 ALL -> {
                     binding.filterAll.isChecked = true
                 }
@@ -97,7 +99,7 @@ class SettingsFragment : BottomSheetDialogFragment() {
         }
 
         binding.twoColumns.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked){
+            if (isChecked) {
                 viewModel.flags?.columns = 2
                 viewModel.updateFlags()
             }

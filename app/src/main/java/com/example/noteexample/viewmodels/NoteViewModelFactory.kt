@@ -1,25 +1,25 @@
 package com.example.noteexample.viewmodels
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.noteexample.repository.NoteRepository
 import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class NoteViewModelFactory(
     private val noteID: Long = -1,
-    private val application: Application
+    private val repository: NoteRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(EditNoteViewModel::class.java) -> {
-                EditNoteViewModel(noteID, application) as T
+                EditNoteViewModel(noteID, repository) as T
             }
             modelClass.isAssignableFrom(GalleryViewModel::class.java) -> {
-                GalleryViewModel(noteID, application) as T
+                GalleryViewModel(noteID, repository) as T
             }
             modelClass.isAssignableFrom(OneNoteViewModel::class.java) -> {
-                OneNoteViewModel(noteID, application) as T
+                OneNoteViewModel(noteID, repository) as T
             }
             else -> throw IllegalArgumentException("Unknown class in UpdateNoteViewModelFactory")
         }

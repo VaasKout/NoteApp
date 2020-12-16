@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -29,7 +30,6 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class AllNotesFragment : Fragment() {
 
-
     private var actionMode: ActionMode? = null
     private val noteAdapter = NoteAdapter()
     private var cards = mutableListOf<MaterialCardView>()
@@ -37,9 +37,7 @@ class AllNotesFragment : Fragment() {
     /**
      *  Define [AllNotesViewModel] object for [AllNotesFragment]
      */
-    private val viewModel by lazy {
-        ViewModelProvider(this).get(AllNotesViewModel::class.java)
-    }
+    private val viewModel: AllNotesViewModel by viewModels()
 
     /**
      * [actionModeController] is attached to [actionMode] and is called by long click on note
@@ -463,16 +461,10 @@ class AllNotesFragment : Fragment() {
          * and if none of them aren't activated, then close app
          */
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            when {
-                viewModel.searchStarted -> {
-                    viewModel.onDoneSearch()
-                }
-                actionMode != null -> {
-                    actionMode?.finish()
-                }
-                else -> {
-                    requireActivity().finishAffinity()
-                }
+            if (viewModel.searchStarted) {
+                viewModel.onDoneSearch()
+            } else {
+                requireActivity().finishAffinity()
             }
         }
 

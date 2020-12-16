@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -16,13 +17,24 @@ import com.example.noteexample.adapters.OneNoteViewAdapter
 import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
+import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class OneNoteFragment : Fragment() {
+
+    @Inject
+    lateinit var repository: NoteRepository
+    private val args by navArgs<OneNoteFragmentArgs>()
+    private val oneNoteAdapter = OneNoteViewAdapter()
+    private val viewModel: OneNoteViewModel by viewModels {
+        NoteViewModelFactory(args.noteID, repository)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,17 +43,12 @@ class OneNoteFragment : Fragment() {
          * Binding for OneNoteFragment
          * @see R.layout.fragment_one_note
          */
-        val args by navArgs<OneNoteFragmentArgs>()
+
         val binding: FragmentOneNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_one_note, container, false)
 
-        val application = requireNotNull(this.activity).application
-        val viewModelFactory = NoteViewModelFactory(args.noteID, application)
-        val viewModel = ViewModelProvider(this, viewModelFactory)
-            .get(OneNoteViewModel::class.java)
-
         //Adapter options
-        val oneNoteAdapter = OneNoteViewAdapter()
+
         binding.recyclerOneNote.apply {
             adapter = oneNoteAdapter
             setHasFixedSize(true)

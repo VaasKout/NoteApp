@@ -1,11 +1,11 @@
 package com.example.noteexample.ui
 
-import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentGalleryBinding
 import com.example.noteexample.adapters.GalleryAdapter
+import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.GalleryViewModel
 import com.example.noteexample.utils.Camera
 import com.example.noteexample.viewmodels.NoteViewModelFactory
@@ -29,12 +30,13 @@ import javax.inject.Inject
 class GalleryFragment : BottomSheetDialogFragment() {
 
 
-    @Inject lateinit var camera: Camera
+    @Inject
+    lateinit var camera: Camera
+    @Inject
+    lateinit var repository: NoteRepository
     private val args by navArgs<GalleryFragmentArgs>()
-    private val viewModel by lazy {
-        val application: Application = requireNotNull(this.activity).application
-        val galleryViewModelFactory = NoteViewModelFactory(args.noteID, application)
-        ViewModelProvider(this, galleryViewModelFactory).get(GalleryViewModel::class.java)
+    private val viewModel: GalleryViewModel by viewModels {
+        NoteViewModelFactory(args.noteID, repository)
     }
 
     override fun onCreateView(
