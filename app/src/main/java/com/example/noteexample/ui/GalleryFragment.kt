@@ -19,13 +19,17 @@ import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class GalleryFragment : BottomSheetDialogFragment() {
 
+
+    @Inject lateinit var camera: Camera
     private val args by navArgs<GalleryFragmentArgs>()
     private val viewModel by lazy {
         val application: Application = requireNotNull(this.activity).application
@@ -77,7 +81,7 @@ class GalleryFragment : BottomSheetDialogFragment() {
          */
 
         val galleryAdapter = GalleryAdapter()
-        val camera = Camera(requireActivity())
+
         viewModel.getData(camera)
         binding.galleryRecyclerView.apply {
             galleryAdapter.submitList(viewModel.galleryList)

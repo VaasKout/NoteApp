@@ -15,10 +15,11 @@ import com.example.noteexample.databinding.FragmentOnePhotoBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
 import com.example.noteexample.utils.OnSwipeTouchListener
 import com.example.noteexample.viewmodels.NoteViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class OnePhotoFragment : Fragment() {
 
     init {

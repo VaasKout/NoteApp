@@ -17,9 +17,11 @@ import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.example.noteexample.viewmodels.NoteViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class OneNoteFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -31,10 +31,13 @@ import com.example.noteexample.utils.Camera
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class EditNoteFragment : Fragment() {
 
     /**
@@ -44,6 +47,8 @@ class EditNoteFragment : Fragment() {
      * @see Camera
      */
 
+
+    @Inject lateinit var camera: Camera
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
@@ -97,8 +102,6 @@ class EditNoteFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //Camera object
-        val camera = Camera(requireActivity())
 
         /**
          * binding for EditNoteFragment

@@ -10,13 +10,14 @@ import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentSettingsBinding
 import com.example.noteexample.viewmodels.SettingsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 //constants for filter notes
 const val ALL = 0
 const val TEXT_ONLY = 1
 const val PHOTOS_ONLY = 2
 
-
+@AndroidEntryPoint
 class SettingsFragment : BottomSheetDialogFragment() {
     /**
      * This Fragment set parameters for [SettingsViewModel.flagsLiveData]

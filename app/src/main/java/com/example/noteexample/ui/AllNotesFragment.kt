@@ -21,10 +21,12 @@ import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.utils.GlideApp
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@AndroidEntryPoint
 class AllNotesFragment : Fragment() {
 
 

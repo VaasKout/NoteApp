@@ -1,23 +1,27 @@
 package com.example.noteexample.utils
 
-import android.app.Activity
+
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
 import com.example.noteexample.adapters.GalleryData
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class Camera(private val activity: Activity) {
+class Camera @Inject constructor(@ApplicationContext private val context: Context) {
 
     /**
      * This class opens camera and load images from storage
@@ -32,12 +36,13 @@ class Camera(private val activity: Activity) {
         val timeStamp: String =
             SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir: File? =
-            activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "JPEG_${timeStamp}_", /* prefix */
             ".jpg", /* suffix */
             storageDir /* directory */
         ).apply {
+            Log.e("ab", absolutePath)
             currentPhotoPath = absolutePath
         }
     }
@@ -45,15 +50,15 @@ class Camera(private val activity: Activity) {
     //Intent for open camera and take picture
     fun dispatchTakePictureIntent(barView: View): Intent {
         return Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            // Ensure that there's a camera activity to handle the intent
-            takePictureIntent.resolveActivity(activity.packageManager)?.also {
+            // Ensure that there's a camera context to handle the intent
+            takePictureIntent.resolveActivity(context.packageManager)?.also {
                 // Create the File where the photo should go
                 val photoFile: File? = try {
                     createImageFile()
                 } catch (ex: IOException) {
                     Snackbar.make(
                         barView,
-                        activity.getString(R.string.camera_error),
+                        context.getString(R.string.camera_error),
                         Snackbar.LENGTH_LONG
                     ).show()
                     null
@@ -61,7 +66,7 @@ class Camera(private val activity: Activity) {
                 // Continue only if the File was successfully created
                 photoFile?.also {
                     val photoURI: Uri = FileProvider.getUriForFile(
-                        activity,
+                        context,
                         "com.example.android.fileprovider",
                         it
                     )
@@ -70,7 +75,7 @@ class Camera(private val activity: Activity) {
             }
             val file = File(currentPhotoPath)
             MediaScannerConnection.scanFile(
-                activity, arrayOf(file.toString()),
+                context, arrayOf(file.toString()),
                 arrayOf(file.name), null
             )
         }
@@ -85,7 +90,7 @@ class Camera(private val activity: Activity) {
         val listOfAllImages: MutableList<GalleryData> = mutableListOf()
         val projection = arrayOf(MediaStore.Images.Media._ID)
         var imageId: Long
-        cursor = activity.contentResolver.query(uriExternal, projection, null, null, null)
+        cursor = context.contentResolver.query(uriExternal, projection, null, null, null)
         if (cursor != null) {
             columnIndexID = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             while (cursor.moveToNext()) {
@@ -100,20 +105,20 @@ class Camera(private val activity: Activity) {
     }
 }
 
-//if (ContextCompat.checkSelfPermission(thisActivity,
+//if (ContextCompat.checkSelfPermission(thiscontext,
 //            Manifest.permission.WRITE_EXTERNAL_STORAGE)
 //            != PackageManager.PERMISSION_GRANTED) {
 //
 //        // Permission is not granted
 //        // Should we show an explanation?
-//        if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
+//        if (contextCompat.shouldShowRequestPermissionRationale(thiscontext,
 //                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 //            // Show an explanation to the user *asynchronously* -- don't block
 //            // this thread waiting for the user's response! After the user
 //            // sees the explanation, try again to request the permission.
 //        } else {
 //            // No explanation needed; request the permission
-//            ActivityCompat.requestPermissions(thisActivity,
+//            contextCompat.requestPermissions(thiscontext,
 //                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 //                    MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
 //
