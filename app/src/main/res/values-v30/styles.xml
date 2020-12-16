@@ -9,6 +9,7 @@
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
         <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="android:windowBackground">#d1c4e9</item>
         <item name="colorControlNormal">@android:color/black</item>
     </style>
 

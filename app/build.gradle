@@ -12,9 +12,9 @@ android {
 
     defaultConfig {
         applicationId "com.vaas.note"
-        minSdkVersion 29
+        minSdkVersion 24
         targetSdkVersion 30
-        versionCode 1
+        versionCode 3
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
