@@ -2,5 +2,5 @@
 <paths>
     <external-path
         name="my_images"
-        path="Android/data/com.vaas.note/files/Pictures" />
+        path="Android/data/com.vaas.notes/files/Pictures" />
 </paths>

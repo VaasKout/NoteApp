@@ -28,7 +28,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class GalleryFragment : BottomSheetDialogFragment() {
 
-
     @Inject
     lateinit var camera: Camera
     @Inject

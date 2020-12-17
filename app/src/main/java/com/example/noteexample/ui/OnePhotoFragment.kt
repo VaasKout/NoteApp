@@ -44,10 +44,8 @@ class OnePhotoFragment : Fragment() {
             //flags for changes of status bar
             requireActivity().window
                 .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            requireActivity().window.statusBarColor =
-                ContextCompat.getColor(requireActivity(), R.color.grey_material)
-            delay(16)
-            binding.photoPager.setCurrentItem(args.pos, false)
+
+
         }
     }
 
@@ -57,6 +55,9 @@ class OnePhotoFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        requireActivity().window.statusBarColor =
+            ContextCompat.getColor(requireActivity(), R.color.grey_material)
 
         binding = DataBindingUtil
             .inflate(inflater, R.layout.fragment_one_photo, container, false)
@@ -73,9 +74,13 @@ class OnePhotoFragment : Fragment() {
             if (it.header.text.isNotEmpty()) {
                 binding.firstNoteViewOnePhoto.visibility = View.VISIBLE
             }
-
             binding.photoPager.adapter = pagerAdapter
-            pagerAdapter.submitList(it.images)
+            lifecycleScope.launch {
+                launch {
+                    pagerAdapter.submitList(it.images)
+                }.join()
+                binding.photoPager.setCurrentItem(args.pos, false)
+            }
         })
 
         /**
