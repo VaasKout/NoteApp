@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentSettingsBinding
 import com.example.noteexample.viewmodels.SettingsViewModel

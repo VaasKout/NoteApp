@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/motion_pager_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey_material"
+        app:layoutDescription="@xml/fragment_pager_item_xml_motion_pager_item_scene">
+
+        <com.ortiz.touchview.TouchImageView
+            android:id="@+id/img_one_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/one_photo"
+            android:scaleType="fitCenter"
+            tools:src="@tools:sample/backgrounds/scenic" />
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+</layout>

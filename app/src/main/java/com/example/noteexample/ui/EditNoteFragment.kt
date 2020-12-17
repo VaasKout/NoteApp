@@ -22,7 +22,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
-import com.example.noteexample.adapters.OneNoteEditAdapter
+import com.example.noteexample.adapters.EditSimpleNoteAdapter
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.viewmodels.EditNoteViewModel
 import com.example.noteexample.utils.Camera
@@ -110,7 +110,7 @@ class EditNoteFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note, container, false)
         binding.lifecycleOwner = this
 
-        val noteAdapter = OneNoteEditAdapter()
+        val noteAdapter = EditSimpleNoteAdapter()
         binding.editRecycler.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
@@ -210,7 +210,7 @@ class EditNoteFragment : Fragment() {
 
         /**
          * LiveData for header
-         * @see OneNoteEditAdapter.headerHolder
+         * @see EditSimpleNoteAdapter.headerHolder
          *
          * TextChangeListener write title and text values and updates them when exit
          * or accidentally close app if this is note is new
@@ -227,7 +227,7 @@ class EditNoteFragment : Fragment() {
 
         /**
          * LiveData for images
-         * @see OneNoteEditAdapter.imgHolder
+         * @see EditSimpleNoteAdapter.imgHolder
          *
          * set visibility and clickListeners when the
          * image is in normal state or in hidden state
@@ -290,7 +290,7 @@ class EditNoteFragment : Fragment() {
 
 
         /**
-         * [EditNoteViewModel.currentNoteLiveData] submits list for [OneNoteEditAdapter]
+         * [EditNoteViewModel.currentNoteLiveData] submits list for [EditSimpleNoteAdapter]
          *
          * It doesn't define new list each time to prevent blinks each time
          * [EditNoteViewModel.currentNoteLiveData] is observed

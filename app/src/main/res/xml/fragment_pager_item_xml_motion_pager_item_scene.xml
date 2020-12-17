@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/endUpPager"
+        motion:constraintSetStart="@id/startPager"
+        motion:duration="150"/>
+
+    <Transition
+        motion:constraintSetEnd="@+id/endDownPager"
+        motion:constraintSetStart="@id/startPager"
+        motion:duration="150"/>
+
+    <ConstraintSet android:id="@+id/startPager">
+        <Constraint
+            android:id="@+id/img_one_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/endUpPager">
+        <Constraint
+            android:id="@+id/img_one_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            motion:layout_constraintBottom_toTopOf="parent"
+            motion:visibilityMode="normal" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/endDownPager">
+        <Constraint
+            android:id="@+id/img_one_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            motion:layout_constraintTop_toBottomOf="parent"
+            motion:visibilityMode="normal" />
+    </ConstraintSet>
+</MotionScene>

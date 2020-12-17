@@ -59,8 +59,9 @@
             android:name="noteID"
             app:argType="long" />
         <argument
-            android:name="imgID"
-            app:argType="long" />
+            android:name="pos"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
     <dialog
         android:id="@+id/settingsFragment"

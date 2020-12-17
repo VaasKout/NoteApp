@@ -8,7 +8,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -422,21 +421,28 @@ class AllNotesFragment : Fragment() {
                             }
                         } else {
                             noteAdapter.currentList[holder.adapterPosition].apply {
-                                if (images.size == 1 && images[0].photoPath.isNotEmpty()) {
-                                    this@AllNotesFragment.findNavController()
-                                        .navigate(
-                                            AllNotesFragmentDirections
-                                                .actionAllNotesFragmentToOnePhotoFragment(
-                                                    header.noteID,
-                                                    images[0].imgID
-                                                )
-                                        )
-                                } else {
-                                    this@AllNotesFragment.findNavController()
-                                        .navigate(
-                                            AllNotesFragmentDirections
-                                                .actionAllNotesFragmentToOneNoteFragment(header.noteID)
-                                        )
+                                if (this@AllNotesFragment
+                                        .findNavController()
+                                        .currentDestination?.id ==
+                                    R.id.allNotesFragment
+                                ) {
+                                    if (images.size == 1 &&
+                                        images[0].photoPath.isNotEmpty()
+                                    ) {
+                                        this@AllNotesFragment.findNavController()
+                                            .navigate(
+                                                AllNotesFragmentDirections
+                                                    .actionAllNotesFragmentToOnePhotoFragment(
+                                                        header.noteID,
+                                                    )
+                                            )
+                                    } else {
+                                        this@AllNotesFragment.findNavController()
+                                            .navigate(
+                                                AllNotesFragmentDirections
+                                                    .actionAllNotesFragmentToOneNoteFragment(header.noteID)
+                                            )
+                                    }
                                 }
                             }
                         }

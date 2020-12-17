@@ -7,16 +7,15 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteexample.R
-import com.example.noteexample.adapters.OneNoteViewAdapter
 import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
+import com.example.noteexample.adapters.ViewSimpleNoteAdapter
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,8 +28,9 @@ class OneNoteFragment : Fragment() {
 
     @Inject
     lateinit var repository: NoteRepository
+    lateinit var binding: FragmentOneNoteBinding
     private val args by navArgs<OneNoteFragmentArgs>()
-    private val oneNoteAdapter = OneNoteViewAdapter()
+    private val oneNoteAdapter = ViewSimpleNoteAdapter()
     private val viewModel: OneNoteViewModel by viewModels {
         NoteViewModelFactory(args.noteID, repository)
     }
@@ -44,8 +44,8 @@ class OneNoteFragment : Fragment() {
          * @see R.layout.fragment_one_note
          */
 
-        val binding: FragmentOneNoteBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_one_note, container, false)
+        binding = DataBindingUtil
+            .inflate(inflater, R.layout.fragment_one_note, container, false)
 
         //Adapter options
 
@@ -53,6 +53,16 @@ class OneNoteFragment : Fragment() {
             adapter = oneNoteAdapter
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
+
+            /**
+             * Scroll to specific position when user returns from [OnePhotoFragment]
+             * by default it gets to 0, so user can have bad experience
+             */
+
+            lifecycleScope.launch {
+                delay(16)
+                scrollToPosition(viewModel.scrollPosition)
+            }
         }
 
 
@@ -65,16 +75,6 @@ class OneNoteFragment : Fragment() {
             }
             oneNoteAdapter.submitList(viewModel.dataItemList)
 
-            /**
-             * Scroll to specific position when user returns from [OnePhotoFragment]
-             * by default it gets to 0, so user can have bad experience
-             */
-            lifecycleScope.launch {
-                //it doesn't work without delay
-                delay(8)
-                binding.recyclerOneNote
-                    .layoutManager?.scrollToPosition(viewModel.scrollPosition)
-            }
         })
 
         /**
@@ -88,7 +88,7 @@ class OneNoteFragment : Fragment() {
                         .navigate(
                             OneNoteFragmentDirections.actionOneNoteFragmentToOnePhotoFragment(
                                 args.noteID,
-                                it.imgID
+                                viewModel.scrollPosition - 1
                             )
                         )
                 }

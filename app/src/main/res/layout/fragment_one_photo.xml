@@ -5,10 +5,6 @@
 
     <data>
         <variable
-            name="data"
-            type="com.example.noteexample.database.Image" />
-
-        <variable
             name="header"
             type="com.example.noteexample.database.Header" />
     </data>
@@ -20,16 +16,10 @@
         android:layout_height="match_parent"
         app:layoutDescription="@xml/fragment_one_photo_xml_one_photo_constraint_scene">
 
-
-            <com.ortiz.touchview.TouchImageView
-                android:id="@+id/img_one_photo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/one_photo"
-                android:scaleType="fitCenter"
-                app:imageUrl="@{data.photoPath}"
-                tools:src="@tools:sample/backgrounds/scenic" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/photo_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
             <TextView
                 android:id="@+id/title_view_one_photo"
@@ -64,21 +54,24 @@
                 tools:text="Заметка" />
 
 
-            <TextView
-                android:id="@+id/note_view_one_photo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/greyTransparent"
-                android:paddingStart="@dimen/dp_16"
-                android:paddingTop="@dimen/dp_12"
-                android:paddingEnd="@dimen/dp_16"
-                android:paddingBottom="@dimen/dp_12"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                android:textColor="@color/secondaryTextColor"
-                app:photoNoteText="@{data}"
-                tools:text="Note" />
+        <TextView
+            android:id="@+id/note_view_one_photo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/greyTransparent"
+            android:paddingStart="@dimen/dp_16"
+            android:paddingTop="@dimen/dp_12"
+            android:paddingEnd="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_12"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:textColor="@color/secondaryTextColor"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="Note"
+            tools:visibility="visible" />
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_one_photo"
             android:layout_width="match_parent"
@@ -87,5 +80,6 @@
             android:theme="@style/OnePhoto"
             app:menu="@menu/note_view_menu"
             app:navigationIcon="@drawable/ic_back_arrow" />
+
     </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

@@ -6,8 +6,6 @@
         motion:constraintSetEnd="@+id/endInGallery"
         motion:constraintSetStart="@id/startInGallery"
         motion:duration="200">
-        <KeyFrameSet>
-        </KeyFrameSet>
     </Transition>
 
     <ConstraintSet android:id="@+id/startInGallery">

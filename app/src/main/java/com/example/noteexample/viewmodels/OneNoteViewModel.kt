@@ -1,14 +1,10 @@
 package com.example.noteexample.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.noteexample.database.NoteRoomDatabase
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
-import javax.inject.Inject
 
 /**
  * ViewModel for [com.example.noteexample.ui.OneNoteFragment]
@@ -23,7 +19,7 @@ class OneNoteViewModel(
     val currentNoteLiveData: LiveData<NoteWithImages> = repository.getNoteLiveData(noteID)
 
     //Variables
+    var animationOnEnd = false
     var scrollPosition: Int = 0
     val dataItemList = mutableListOf<NoteWithImagesRecyclerItems>()
-
 }

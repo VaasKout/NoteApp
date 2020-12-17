@@ -7,15 +7,16 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.viewpager2.widget.ViewPager2
 import com.example.noteexample.R
+import com.example.noteexample.adapters.ViewPagerAdapter
 import com.example.noteexample.databinding.FragmentOnePhotoBinding
 import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.utils.CustomTouchListener
 import com.example.noteexample.viewmodels.OneNoteViewModel
-import com.example.noteexample.utils.OnSwipeTouchListener
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -25,10 +26,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class OnePhotoFragment : Fragment() {
 
-
-    private val args by navArgs<OnePhotoFragmentArgs>()
     @Inject
     lateinit var repository: NoteRepository
+    lateinit var binding: FragmentOnePhotoBinding
+    private val args by navArgs<OnePhotoFragmentArgs>()
+    private val pagerAdapter = ViewPagerAdapter()
+
 
     //viewModel
     private val viewModel: OneNoteViewModel by viewModels {
@@ -41,8 +44,13 @@ class OnePhotoFragment : Fragment() {
             //flags for changes of status bar
             requireActivity().window
                 .addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            requireActivity().window.statusBarColor =
+                ContextCompat.getColor(requireActivity(), R.color.grey_material)
+            delay(16)
+            binding.photoPager.setCurrentItem(args.pos, false)
         }
     }
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -50,15 +58,9 @@ class OnePhotoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val binding: FragmentOnePhotoBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_one_photo, container, false)
+        binding = DataBindingUtil
+            .inflate(inflater, R.layout.fragment_one_photo, container, false)
         binding.lifecycleOwner = this
-
-
-        // change color of status bar
-        requireActivity().window.statusBarColor =
-            ContextCompat.getColor(requireActivity(), R.color.grey_material)
-
 
         /**
          * Visibility of text fields depends on [OneNoteViewModel.currentNoteLiveData] value
@@ -71,13 +73,9 @@ class OnePhotoFragment : Fragment() {
             if (it.header.text.isNotEmpty()) {
                 binding.firstNoteViewOnePhoto.visibility = View.VISIBLE
             }
-            if (it.images.isNotEmpty()) {
-                val img = it.images.filter { item -> item.imgID == args.imgID }[0]
-                binding.data = img
-                if (img.signature.isNotEmpty()) {
-                    binding.noteViewOnePhoto.visibility = View.VISIBLE
-                }
-            }
+
+            binding.photoPager.adapter = pagerAdapter
+            pagerAdapter.submitList(it.images)
         })
 
         /**
@@ -93,7 +91,8 @@ class OnePhotoFragment : Fragment() {
                 R.id.edit_item -> {
                     this.findNavController()
                         .navigate(
-                            OnePhotoFragmentDirections.actionOnePhotoFragmentToEditNoteFragment(args.noteID)
+                            OnePhotoFragmentDirections
+                                .actionOnePhotoFragmentToEditNoteFragment(args.noteID)
                         )
                     true
                 }
@@ -101,55 +100,108 @@ class OnePhotoFragment : Fragment() {
             }
         }
 
+        binding.photoPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                if (pagerAdapter.currentList[position].signature.isNotEmpty()) {
+                    binding.noteViewOnePhoto.visibility = View.VISIBLE
+                    binding.noteViewOnePhoto.text =
+                        pagerAdapter.currentList[position].signature
+                } else {
+                    binding.noteViewOnePhoto.visibility = View.GONE
+                }
+                binding.toolbarOnePhoto.title = "${position + 1}/${pagerAdapter.currentList.size}"
+            }
+        })
+
+
         /**
          * Set animation to hide text and binding.toolbarOnePhoto
          * @see R.xml.fragment_one_photo_xml_one_photo_constraint_scene
          */
-        binding.imgOnePhoto.setOnClickListener {
-            binding.motionOnePhoto.setTransition(R.id.start, R.id.endHide)
-        }
+
+//        binding.photoPager.isUserInputEnabled = false
+        pagerAdapter.holder.observe(viewLifecycleOwner, { holder ->
+
+
+            holder.binding.imgOnePhoto.setOnClickListener {
+                if (!viewModel.animationOnEnd) {
+                    binding.motionOnePhoto.transitionToEnd()
+                    viewModel.animationOnEnd = true
+                } else {
+                    binding.motionOnePhoto.transitionToStart()
+                    viewModel.animationOnEnd = false
+                }
+            }
+
+
+            holder.binding.imgOnePhoto
+                .setOnTouchListener(object : CustomTouchListener(requireContext()) {
+
+                    override fun onSwipeTop() {
+                        //check if image zoomed
+                        if (!holder.binding.imgOnePhoto.isZoomed) {
+                            binding.titleViewOnePhoto.visibility = View.INVISIBLE
+                            binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                            binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                            binding.toolbarOnePhoto.visibility = View.INVISIBLE
+                            holder.binding.motionPagerItem
+                                .setTransition(R.id.startPager, R.id.endUpPager)
+                            holder.binding.motionPagerItem.transitionToEnd()
+
+                            lifecycleScope.launch {
+                                delay(200)
+                                if (this@OnePhotoFragment
+                                        .findNavController()
+                                        .currentDestination?.id ==
+                                    R.id.onePhotoFragment
+                                ) {
+                                    this@OnePhotoFragment.findNavController().popBackStack()
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onSwipeBottom() {
+
+                        if (!holder.binding.imgOnePhoto.isZoomed) {
+                            binding.titleViewOnePhoto.visibility = View.INVISIBLE
+                            binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                            binding.noteViewOnePhoto.visibility = View.INVISIBLE
+                            binding.toolbarOnePhoto.visibility = View.INVISIBLE
+                            holder.binding.motionPagerItem
+                                .setTransition(R.id.startPager, R.id.endDownPager)
+                            holder.binding.motionPagerItem.transitionToEnd()
+
+                            lifecycleScope.launch {
+                                delay(200)
+                                if (this@OnePhotoFragment
+                                        .findNavController()
+                                        .currentDestination?.id ==
+                                    R.id.onePhotoFragment
+                                ) {
+                                    this@OnePhotoFragment.findNavController().popBackStack()
+                                }
+                            }
+                        }
+                    }
+
+                    //TODO get callback
+                    override fun onDoubleTap() {
+                        binding.photoPager.isUserInputEnabled =
+                            holder.binding.imgOnePhoto.isZoomed
+                    }
+                })
+        })
 
 
         /**
          * Swipe listener to animate image closure
-         * @see OnSwipeTouchListener
+         * @see CustomTouchListener
          *
          * Application uses custom library to zoom image
          * "com.github.MikeOrtiz:TouchImageView:3.0.3"
          */
-        binding.imgOnePhoto.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
-            override fun onSwipeTop() {
-
-                //check if image zoomed
-                if (!binding.imgOnePhoto.isZoomed) {
-                    binding.titleViewOnePhoto.visibility = View.INVISIBLE
-                    binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
-                    binding.noteViewOnePhoto.visibility = View.INVISIBLE
-                    binding.toolbarOnePhoto.visibility = View.INVISIBLE
-                    binding.motionOnePhoto.setTransition(R.id.start, R.id.endUp)
-                    binding.motionOnePhoto.transitionToEnd()
-                    lifecycleScope.launch {
-                        delay(150)
-                        this@OnePhotoFragment.findNavController().popBackStack()
-                    }
-                }
-            }
-
-            override fun onSwipeBottom() {
-                if (!binding.imgOnePhoto.isZoomed) {
-                    binding.titleViewOnePhoto.visibility = View.INVISIBLE
-                    binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
-                    binding.noteViewOnePhoto.visibility = View.INVISIBLE
-                    binding.toolbarOnePhoto.visibility = View.INVISIBLE
-                    binding.motionOnePhoto.setTransition(R.id.start, R.id.endDown)
-                    binding.motionOnePhoto.transitionToEnd()
-                    lifecycleScope.launch {
-                        delay(150)
-                        this@OnePhotoFragment.findNavController().popBackStack()
-                    }
-                }
-            }
-        })
 
         return binding.root
     }
@@ -160,20 +212,3 @@ class OnePhotoFragment : Fragment() {
             ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
     }
 }
-
-
-//            viewModel.currentNoteContent?.let {
-//                if (it.photoPath.isEmpty() && it.note.isNotEmpty()) {
-//                    val constraintSet = ConstraintSet()
-//                    constraintSet.clone(binding.onePhotoConstraint)
-//                    constraintSet.clear(R.id.note_view_one_photo, ConstraintSet.BOTTOM)
-//                    constraintSet.connect(
-//                        R.id.note_view_one_photo,
-//                        ConstraintSet.TOP,
-//                        R.id.first_note_view_one_photo,
-//                        ConstraintSet.BOTTOM,
-//                        0
-//                    )
-//                    constraintSet.applyTo(binding.onePhotoConstraint)
-//                }
-//            }
