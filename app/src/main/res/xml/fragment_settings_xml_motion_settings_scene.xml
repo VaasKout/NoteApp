@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/endSettings"
+        motion:constraintSetStart="@id/startSettings"
+        motion:duration="200" />
+
+    <ConstraintSet android:id="@+id/startSettings">
+        <Constraint
+            android:id="@+id/line_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_12"
+            android:visibility="visible"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+        <Constraint
+            android:id="@+id/settings_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_16"
+            android:visibility="invisible"
+            motion:layout_constraintBottom_toTopOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent" />
+        <Constraint
+            android:id="@+id/settings_constraint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            motion:layout_constraintTop_toBottomOf="@id/line_settings" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/endSettings">
+        <Constraint
+            android:id="@+id/line_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_12"
+            android:visibility="invisible"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintBottom_toTopOf="parent" />
+        <Constraint
+            android:id="@+id/settings_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_16"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:visibility="visible"
+            motion:layout_constraintStart_toStartOf="parent" />
+        <Constraint
+            android:id="@+id/settings_constraint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            motion:layout_constraintTop_toBottomOf="@id/settings_view_top" />
+    </ConstraintSet>
+</MotionScene>

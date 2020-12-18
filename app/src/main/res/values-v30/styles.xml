@@ -34,10 +34,14 @@
     </style>
 
     <style name="GalleryTheme" parent="AppTheme">
+        <item name="android:background">@drawable/dialog_shapes_light</item>
         <item name="colorControlNormal">@android:color/black</item>
     </style>
     <style name="OnePhoto" parent="AppTheme">
         <item name="colorControlNormal">@android:color/white</item>
+    </style>
+    <style name="TopBackground">
+        <item name="android:background">@color/backgroundColor</item>
     </style>
 
 </resources>

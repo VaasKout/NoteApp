@@ -10,6 +10,12 @@
         android:layout_height="match_parent"
         android:theme="@style/GalleryTheme"
         app:layoutDescription="@xml/fragment_gallery_xml_gallery_layout_scene">
+        <View
+            android:id="@+id/gallery_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_16"
+            android:visibility="gone"
+            android:theme="@style/TopBackground"/>
 
         <ImageView
             android:id="@+id/accept_selected_photos"

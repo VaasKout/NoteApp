@@ -14,7 +14,7 @@
             app:destination="@id/oneNoteFragment" />
         <action
             android:id="@+id/action_allNotesFragment_to_onePhotoFragment"
-            app:destination="@id/onePhotoFragment" />
+            app:destination="@id/oneNotePagerFragment" />
         <action
             android:id="@+id/action_allNotesFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
@@ -30,7 +30,7 @@
         tools:layout="@layout/fragment_one_note">
         <action
             android:id="@+id/action_oneNoteFragment_to_onePhotoFragment"
-            app:destination="@id/onePhotoFragment" />
+            app:destination="@id/oneNotePagerFragment" />
         <action
             android:id="@+id/action_oneNoteFragment_to_editNoteFragment"
             app:destination="@id/editNoteFragment" />
@@ -48,10 +48,10 @@
             app:argType="long" />
     </dialog>
     <fragment
-        android:id="@+id/onePhotoFragment"
-        android:name="com.example.noteexample.ui.OnePhotoFragment"
+        android:id="@+id/oneNotePagerFragment"
+        android:name="com.example.noteexample.ui.OneNotePagerFragment"
         android:label="OnePhotoFragment"
-        tools:layout="@layout/fragment_one_photo">
+        tools:layout="@layout/fragment_one_note_pager">
         <action
             android:id="@+id/action_onePhotoFragment_to_editNoteFragment"
             app:destination="@id/editNoteFragment" />

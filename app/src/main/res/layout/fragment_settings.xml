@@ -7,193 +7,203 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
+        <androidx.constraintlayout.motion.widget.MotionLayout
+            android:id="@+id/motion_settings"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:theme="@style/AppTheme"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-            tools:context=".settings.SettingsFragment">
+            app:layoutDescription="@xml/fragment_settings_xml_motion_settings_scene">
+
+            <View
+                android:id="@+id/settings_view_top"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_16"
+                android:theme="@style/TopBackground"
+                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/line_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_12"
                 android:contentDescription="@string/dialog_line"
-                android:src="@drawable/dialog_line"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/dialog_line"/>
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switch_date"
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/settings_constraint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_16"
-                android:layout_marginTop="@dimen/dp_8"
-                android:layout_marginEnd="@dimen/dp_16"
-                android:text="@string/show_date"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/line_settings" />
+                android:theme="@style/GalleryTheme"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+                tools:context=".settings.SettingsFragment">
 
-            <View
-                android:id="@+id/settings_view1"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_1"
-                android:layout_marginTop="@dimen/dp_8"
-                android:background="@color/primaryDarkColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/switch_date" />
-
-            <TextView
-                android:id="@+id/setting_column_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_16"
-                android:layout_marginTop="@dimen/dp_16"
-                android:layout_marginEnd="@dimen/dp_16"
-                android:text="@string/columns"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settings_view1" />
-
-            <RadioGroup
-                android:id="@+id/settings_column_radio_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:padding="@dimen/dp_8"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setting_column_text">
-
-                <RadioButton
-                    android:id="@+id/one_column"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_date"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/one_column"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                    android:layout_marginStart="@dimen/dp_16"
+                    android:layout_marginEnd="@dimen/dp_16"
+                    android:text="@string/show_date"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <RadioButton
-                    android:id="@+id/two_columns"
-                    android:layout_width="wrap_content"
+                <View
+                    android:id="@+id/settings_view1"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_1"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:background="@color/primaryDarkColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/switch_date" />
+
+                <TextView
+                    android:id="@+id/setting_column_text"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/two_columns"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                    android:layout_marginStart="@dimen/dp_16"
+                    android:layout_marginTop="@dimen/dp_16"
+                    android:layout_marginEnd="@dimen/dp_16"
+                    android:text="@string/columns"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_view1" />
 
-            </RadioGroup>
-
-
-            <TextView
-                android:id="@+id/settings_sort_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_16"
-                android:layout_marginTop="@dimen/dp_16"
-                android:layout_marginEnd="@dimen/dp_16"
-                android:text="@string/sort"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settings_view2" />
-
-            <RadioGroup
-                android:id="@+id/settings_sort_radio_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:padding="@dimen/dp_8"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settings_sort_text">
-
-                <RadioButton
-                    android:id="@+id/sort_DESC"
-                    android:layout_width="wrap_content"
+                <RadioGroup
+                    android:id="@+id/settings_column_radio_group"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/new_first"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:padding="@dimen/dp_8"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/setting_column_text">
 
-                <RadioButton
-                    android:id="@+id/sort_ASC"
-                    android:layout_width="wrap_content"
+                    <RadioButton
+                        android:id="@+id/one_column"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/one_column"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                    <RadioButton
+                        android:id="@+id/two_columns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/two_columns"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                </RadioGroup>
+
+
+                <TextView
+                    android:id="@+id/settings_sort_text"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/old_first"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                    android:layout_marginStart="@dimen/dp_16"
+                    android:layout_marginTop="@dimen/dp_16"
+                    android:layout_marginEnd="@dimen/dp_16"
+                    android:text="@string/sort"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_view2" />
 
-            </RadioGroup>
-
-            <View
-                android:id="@+id/settings_view2"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_1"
-                android:layout_marginTop="@dimen/dp_8"
-                android:background="@color/primaryDarkColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settings_column_radio_group" />
-
-            <TextView
-                android:id="@+id/setting_filter_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_16"
-                android:layout_marginTop="@dimen/dp_16"
-                android:layout_marginEnd="@dimen/dp_16"
-                android:text="@string/filter"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settings_view3" />
-
-            <RadioGroup
-                android:id="@+id/settings_filter_radio_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:padding="@dimen/dp_8"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setting_filter_text">
-
-                <RadioButton
-                    android:id="@+id/filter_all"
-                    android:layout_width="wrap_content"
+                <RadioGroup
+                    android:id="@+id/settings_sort_radio_group"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/all"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:padding="@dimen/dp_8"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_sort_text">
 
-                <RadioButton
-                    android:id="@+id/filter_text_only"
-                    android:layout_width="wrap_content"
+                    <RadioButton
+                        android:id="@+id/sort_DESC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/new_first"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                    <RadioButton
+                        android:id="@+id/sort_ASC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/old_first"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                </RadioGroup>
+
+                <View
+                    android:id="@+id/settings_view2"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_1"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:background="@color/primaryDarkColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_column_radio_group" />
+
+                <TextView
+                    android:id="@+id/setting_filter_text"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/only_notes"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                    android:layout_marginStart="@dimen/dp_16"
+                    android:layout_marginTop="@dimen/dp_16"
+                    android:layout_marginEnd="@dimen/dp_16"
+                    android:text="@string/filter"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_view3" />
 
-                <RadioButton
-                    android:id="@+id/filter_photos_only"
-                    android:layout_width="wrap_content"
+                <RadioGroup
+                    android:id="@+id/settings_filter_radio_group"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/only_photos"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
-            </RadioGroup>
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:padding="@dimen/dp_8"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/setting_filter_text">
 
-            <View
-                android:id="@+id/settings_view3"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_1"
-                android:layout_marginTop="@dimen/dp_8"
-                android:background="@color/primaryDarkColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settings_sort_radio_group" />
+                    <RadioButton
+                        android:id="@+id/filter_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/all"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                    <RadioButton
+                        android:id="@+id/filter_text_only"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/only_notes"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+                    <RadioButton
+                        android:id="@+id/filter_photos_only"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/only_photos"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+                </RadioGroup>
+
+                <View
+                    android:id="@+id/settings_view3"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_1"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:background="@color/primaryDarkColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_sort_radio_group" />
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.motion.widget.MotionLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

@@ -8,7 +8,7 @@ import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 
 /**
  * ViewModel for [com.example.noteexample.ui.OneNoteFragment]
- * and [com.example.noteexample.ui.OnePhotoFragment]
+ * and [com.example.noteexample.ui.OneNotePagerFragment]
  */
 class OneNoteViewModel(
     noteID: Long,

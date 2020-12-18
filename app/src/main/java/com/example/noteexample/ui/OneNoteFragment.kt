@@ -71,7 +71,7 @@ class OneNoteFragment : Fragment() {
                     }
                 }
                 /**
-                 * Scroll to specific position when user returns from [OnePhotoFragment]
+                 * Scroll to specific position when user returns from [OneNotePagerFragment]
                  * by default it gets to 0, so user can have bad experience
                  */
 
@@ -83,13 +83,13 @@ class OneNoteFragment : Fragment() {
         })
 
         /**
-         * goto [OnePhotoFragment] with specific photo
+         * goto [OneNotePagerFragment] with specific photo
          */
 
         oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
             holder.binding.photoOneNote.setOnClickListener {
-                viewModel.scrollPosition = holder.adapterPosition
-                oneNoteAdapter.currentList[holder.adapterPosition].image?.let {
+                viewModel.scrollPosition = holder.absoluteAdapterPosition
+                oneNoteAdapter.currentList[holder.absoluteAdapterPosition].image?.let {
                     this.findNavController()
                         .navigate(
                             OneNoteFragmentDirections.actionOneNoteFragmentToOnePhotoFragment(

@@ -70,8 +70,8 @@ class EditNoteFragment : Fragment() {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            val from = viewHolder.adapterPosition - 1
-            val to = target.adapterPosition - 1
+            val from = viewHolder.absoluteAdapterPosition - 1
+            val to = target.absoluteAdapterPosition - 1
 
             if (from >= 0 && to >= 0) {
                 viewModel.swap(from, to)
@@ -254,7 +254,7 @@ class EditNoteFragment : Fragment() {
         noteAdapter.imgHolder.observe(viewLifecycleOwner, { holder ->
 
             //set state between normal and hidden state
-            if (noteAdapter.currentList[holder.adapterPosition].image?.hidden == true) {
+            if (noteAdapter.currentList[holder.absoluteAdapterPosition].image?.hidden == true) {
                 holder.binding.photo.visibility = View.GONE
                 holder.binding.restoreButton.visibility = View.VISIBLE
                 holder.binding.deleteCircleIcon.visibility = View.GONE
@@ -268,7 +268,7 @@ class EditNoteFragment : Fragment() {
 
             //save current signature
             holder.binding.noteEditTextFirst.addTextChangedListener { editable ->
-                noteAdapter.currentList[holder.adapterPosition].image?.let {
+                noteAdapter.currentList[holder.absoluteAdapterPosition].image?.let {
                     it.signature = editable.toString()
                     if (it.photoPath.isEmpty() && it.signature.isEmpty()) {
                         viewModel.deleteImage(it)
@@ -281,18 +281,18 @@ class EditNoteFragment : Fragment() {
              * and restore button becomes [View.VISIBLE]
              */
             holder.binding.deleteCircle.setOnClickListener {
-                noteAdapter.currentList[holder.adapterPosition].image?.hidden = true
+                noteAdapter.currentList[holder.absoluteAdapterPosition].image?.hidden = true
                 viewModel.updateCurrentNote()
-                noteAdapter.notifyItemChanged(holder.adapterPosition)
+                noteAdapter.notifyItemChanged(holder.absoluteAdapterPosition)
             }
 
             /**
              * Restore button retuns image in normal state
              */
             holder.binding.restoreButton.setOnClickListener {
-                noteAdapter.currentList[holder.adapterPosition].image?.hidden = false
+                noteAdapter.currentList[holder.absoluteAdapterPosition].image?.hidden = false
                 viewModel.updateCurrentNote()
-                noteAdapter.notifyItemChanged(holder.adapterPosition)
+                noteAdapter.notifyItemChanged(holder.absoluteAdapterPosition)
             }
         })
 

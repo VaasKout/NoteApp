@@ -102,8 +102,8 @@ class AllNotesFragment : Fragment() {
             if (actionMode != null) {
                 actionMode?.finish()
             }
-            val from = viewHolder.adapterPosition
-            val to = target.adapterPosition
+            val from = viewHolder.absoluteAdapterPosition
+            val to = target.absoluteAdapterPosition
 
             if (from >= 0 && to >= 0) {
                 viewModel.swap(from, to)
@@ -309,7 +309,7 @@ class AllNotesFragment : Fragment() {
          * where it shouldn't be
          */
         noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
-            if (holder.adapterPosition >= 0) {
+            if (holder.absoluteAdapterPosition >= 0) {
                 lifecycleScope.launch {
                     cards.add(holder.binding.mainCard)
                     val card = holder.binding.mainCard
@@ -330,7 +330,7 @@ class AllNotesFragment : Fragment() {
                     view3.visibility = View.GONE
                     date.visibility = View.GONE
 
-                    noteAdapter.currentList[holder.adapterPosition]?.also {
+                    noteAdapter.currentList[holder.absoluteAdapterPosition]?.also {
                         if (it.header.title.isNotEmpty()) {
                             title.visibility = View.VISIBLE
                             title.text = it.header.title
@@ -388,7 +388,7 @@ class AllNotesFragment : Fragment() {
                             viewModel.onDoneSearch()
                         }
                         card.isChecked = !card.isChecked
-                        noteAdapter.currentList[holder.adapterPosition].header.isChecked =
+                        noteAdapter.currentList[holder.absoluteAdapterPosition].header.isChecked =
                             card.isChecked
                         if (actionMode == null) {
                             actionMode =
@@ -412,7 +412,7 @@ class AllNotesFragment : Fragment() {
                         }
                         if (actionMode != null) {
                             card.isChecked = !card.isChecked
-                            noteAdapter.currentList[holder.adapterPosition].header.isChecked =
+                            noteAdapter.currentList[holder.absoluteAdapterPosition].header.isChecked =
                                 card.isChecked
                             actionMode?.title =
                                 "${viewModel.noteList.filter { it.header.isChecked }.size}"
@@ -420,7 +420,7 @@ class AllNotesFragment : Fragment() {
                                 actionMode?.finish()
                             }
                         } else {
-                            noteAdapter.currentList[holder.adapterPosition].apply {
+                            noteAdapter.currentList[holder.absoluteAdapterPosition].apply {
                                 if (this@AllNotesFragment
                                         .findNavController()
                                         .currentDestination?.id ==

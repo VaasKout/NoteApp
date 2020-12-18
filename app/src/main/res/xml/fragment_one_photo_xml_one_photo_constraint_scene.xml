@@ -11,7 +11,7 @@
 
     <ConstraintSet android:id="@+id/start">
         <Constraint
-            android:id="@+id/toolbar_one_photo"
+            android:id="@+id/toolbar_one_note_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             motion:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintTop_toBottomOf="@id/toolbar_one_photo"
+            motion:layout_constraintTop_toBottomOf="@id/toolbar_one_note_pager"
             motion:visibilityMode="ignore" />
         <Constraint
             android:id="@+id/first_note_view_one_photo"
@@ -49,7 +49,7 @@
 
     <ConstraintSet android:id="@+id/endHide">
         <Constraint
-            android:id="@+id/toolbar_one_photo"
+            android:id="@+id/toolbar_one_note_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             motion:layout_constraintEnd_toEndOf="parent"

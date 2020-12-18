@@ -85,11 +85,10 @@ class Camera @Inject constructor(@ApplicationContext private val context: Contex
 
     //Load all images from gallery
     fun loadImagesFromStorage(): List<GalleryData> {
-
         val uriExternal: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val cursor: Cursor?
         val columnIndexID: Int
-        val listOfAllImages: MutableList<GalleryData> = mutableListOf()
+        val listOfAllImages = mutableListOf<GalleryData>()
         val projection = arrayOf(MediaStore.Images.Media._ID)
         var imageId: Long
         cursor = context.contentResolver.query(uriExternal, projection, null, null, null)
@@ -107,7 +106,7 @@ class Camera @Inject constructor(@ApplicationContext private val context: Contex
     }
 }
 
-//if (ContextCompat.checkSelfPermission(thiscontext,
+//if (ContextCompat.checkSelfPermission(context,
 //            Manifest.permission.WRITE_EXTERNAL_STORAGE)
 //            != PackageManager.PERMISSION_GRANTED) {
 //

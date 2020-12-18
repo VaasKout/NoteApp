@@ -5,10 +5,17 @@
     <Transition
         motion:constraintSetEnd="@+id/endInGallery"
         motion:constraintSetStart="@id/startInGallery"
-        motion:duration="200">
-    </Transition>
+        motion:duration="200"/>
 
     <ConstraintSet android:id="@+id/startInGallery">
+        <Constraint
+            android:id="@+id/gallery_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_16"
+            android:visibility="invisible"
+            motion:layout_constraintBottom_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent" />
         <Constraint
             android:id="@+id/accept_selected_photos"
             android:layout_width="wrap_content"
@@ -55,11 +62,17 @@
 
     <ConstraintSet android:id="@+id/endInGallery">
         <Constraint
+            android:id="@+id/gallery_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_16"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent" />
+        <Constraint
             android:id="@+id/accept_selected_photos"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_8"
-            android:layout_marginEnd="@dimen/dp_16"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginEnd="@dimen/dp_8"
             motion:visibilityMode="ignore"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintTop_toTopOf="parent" />
@@ -75,12 +88,11 @@
         <Constraint
             android:id="@+id/gallery_back_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="?attr/actionBarSize"
             android:layout_marginStart="@dimen/dp_8"
-            android:layout_marginTop="@dimen/dp_8"
             android:visibility="visible"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintTop_toTopOf="parent" />
+            motion:layout_constraintTop_toTopOf="parent"/>
         <Constraint
             android:id="@+id/line_gallery"
             android:layout_width="wrap_content"
@@ -92,10 +104,11 @@
         <Constraint
             android:id="@+id/gallery_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_12"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintTop_toBottomOf="@id/gallery_menu_title" />
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"/>
     </ConstraintSet>
 </MotionScene>

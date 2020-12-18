@@ -20,7 +20,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -140,8 +139,8 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 binding.galleryMotion.transitionToEnd()
             } else {
                 viewModel.actionModeStarted = false
-                binding.acceptSelectedPhotos.visibility = View.GONE
                 binding.galleryMenuTitle.text = resources.getText(R.string.gallery)
+                binding.acceptSelectedPhotos.visibility = View.GONE
                 if (!viewModel.expandedState) {
                     binding.galleryMotion.transitionToStart()
                 }
@@ -158,16 +157,18 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
             card.setOnClickListener {
                 card.isChecked = !card.isChecked
-                viewModel.galleryList[holder.adapterPosition].isChecked =
+                viewModel.galleryList[holder.absoluteAdapterPosition].isChecked =
                     card.isChecked
                 binding.galleryMenuTitle.text =
                     viewModel.galleryList.filter { list -> list.isChecked }.size.toString()
+                binding.acceptSelectedPhotos.visibility = View.VISIBLE
 
                 if (!viewModel.actionModeStarted) {
                     viewModel.onStartActionMode()
                 } else if (viewModel.actionModeStarted &&
                     galleryAdapter.currentList.none { list -> list.isChecked }
                 ) {
+
                     viewModel.onDoneActionMode()
                 }
             }

@@ -13,7 +13,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.example.noteexample.R
 import com.example.noteexample.adapters.ViewPagerAdapter
-import com.example.noteexample.databinding.FragmentOnePhotoBinding
+import com.example.noteexample.databinding.FragmentOneNotePagerBinding
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.CustomTouchListener
 import com.example.noteexample.viewmodels.OneNoteViewModel
@@ -24,12 +24,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class OnePhotoFragment : Fragment() {
+class OneNotePagerFragment : Fragment() {
 
     @Inject
     lateinit var repository: NoteRepository
-    lateinit var binding: FragmentOnePhotoBinding
-    private val args by navArgs<OnePhotoFragmentArgs>()
+    lateinit var binding: FragmentOneNotePagerBinding
+    private val args by navArgs<OneNotePagerFragmentArgs>()
     private val pagerAdapter = ViewPagerAdapter()
 
 
@@ -60,7 +60,7 @@ class OnePhotoFragment : Fragment() {
             ContextCompat.getColor(requireActivity(), R.color.grey_material)
 
         binding = DataBindingUtil
-            .inflate(inflater, R.layout.fragment_one_photo, container, false)
+            .inflate(inflater, R.layout.fragment_one_note_pager, container, false)
         binding.lifecycleOwner = this
 
         /**
@@ -87,16 +87,16 @@ class OnePhotoFragment : Fragment() {
          * Menu onClickListener
          */
 
-        binding.toolbarOnePhoto.setNavigationOnClickListener {
+        binding.toolbarOneNotePager.setNavigationOnClickListener {
             this.findNavController().popBackStack()
         }
 
-        binding.toolbarOnePhoto.setOnMenuItemClickListener {
+        binding.toolbarOneNotePager.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.edit_item -> {
                     this.findNavController()
                         .navigate(
-                            OnePhotoFragmentDirections
+                            OneNotePagerFragmentDirections
                                 .actionOnePhotoFragmentToEditNoteFragment(args.noteID)
                         )
                     true
@@ -115,7 +115,7 @@ class OnePhotoFragment : Fragment() {
                 } else {
                     binding.noteViewOnePhoto.visibility = View.GONE
                 }
-                binding.toolbarOnePhoto.title = "${position + 1}/${pagerAdapter.currentList.size}"
+                binding.toolbarOneNotePager.title = "${position + 1}/${pagerAdapter.currentList.size}"
             }
         })
 
@@ -149,19 +149,19 @@ class OnePhotoFragment : Fragment() {
                             binding.titleViewOnePhoto.visibility = View.INVISIBLE
                             binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
                             binding.noteViewOnePhoto.visibility = View.INVISIBLE
-                            binding.toolbarOnePhoto.visibility = View.INVISIBLE
+                            binding.toolbarOneNotePager.visibility = View.INVISIBLE
                             holder.binding.motionPagerItem
                                 .setTransition(R.id.startPager, R.id.endUpPager)
                             holder.binding.motionPagerItem.transitionToEnd()
 
                             lifecycleScope.launch {
                                 delay(200)
-                                if (this@OnePhotoFragment
+                                if (this@OneNotePagerFragment
                                         .findNavController()
                                         .currentDestination?.id ==
-                                    R.id.onePhotoFragment
+                                    R.id.oneNotePagerFragment
                                 ) {
-                                    this@OnePhotoFragment.findNavController().popBackStack()
+                                    this@OneNotePagerFragment.findNavController().popBackStack()
                                 }
                             }
                         }
@@ -173,19 +173,19 @@ class OnePhotoFragment : Fragment() {
                             binding.titleViewOnePhoto.visibility = View.INVISIBLE
                             binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
                             binding.noteViewOnePhoto.visibility = View.INVISIBLE
-                            binding.toolbarOnePhoto.visibility = View.INVISIBLE
+                            binding.toolbarOneNotePager.visibility = View.INVISIBLE
                             holder.binding.motionPagerItem
                                 .setTransition(R.id.startPager, R.id.endDownPager)
                             holder.binding.motionPagerItem.transitionToEnd()
 
                             lifecycleScope.launch {
                                 delay(200)
-                                if (this@OnePhotoFragment
+                                if (this@OneNotePagerFragment
                                         .findNavController()
                                         .currentDestination?.id ==
-                                    R.id.onePhotoFragment
+                                    R.id.oneNotePagerFragment
                                 ) {
-                                    this@OnePhotoFragment.findNavController().popBackStack()
+                                    this@OneNotePagerFragment.findNavController().popBackStack()
                                 }
                             }
                         }
