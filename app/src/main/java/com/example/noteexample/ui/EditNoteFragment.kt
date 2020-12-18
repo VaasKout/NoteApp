@@ -47,15 +47,18 @@ class EditNoteFragment : Fragment() {
      * @see Camera
      */
 
-    @Inject lateinit var camera: Camera
-    @Inject lateinit var repository: NoteRepository
+    @Inject
+    lateinit var camera: Camera
+    @Inject
+    lateinit var repository: NoteRepository
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
 
-    private val viewModel by viewModels<EditNoteViewModel>{
+    private val viewModel by viewModels<EditNoteViewModel> {
         NoteViewModelFactory(args.noteID, repository)
     }
+
 
     val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
@@ -93,6 +96,18 @@ class EditNoteFragment : Fragment() {
 
     })
 
+    init {
+        lifecycleScope.launchWhenStarted {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                viewModel.updateGalleryData()
+            }
+        }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -123,13 +138,15 @@ class EditNoteFragment : Fragment() {
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
-                    viewModel.startNote?.header?.let { item ->
-                        this.findNavController()
-                            .navigate(
-                                EditNoteFragmentDirections.actionEditNoteFragmentToGalleryFragment(
-                                    item.noteID
+                    lifecycleScope.launch {
+                        viewModel.updateGalleryData()
+                        viewModel.startNote?.header?.let { item ->
+                            this@EditNoteFragment.findNavController()
+                                .navigate(
+                                    EditNoteFragmentDirections
+                                        .actionEditNoteFragmentToGalleryFragment(item.noteID)
                                 )
-                            )
+                        }
                     }
                 } else {
                     Snackbar.make(
@@ -171,7 +188,7 @@ class EditNoteFragment : Fragment() {
                             when (index) {
                                 0 -> {
                                     startCamera.launch(
-                                        camera.dispatchTakePictureIntent(binding.editRecycler)
+                                        camera.dispatchTakePictureIntent()
                                     )
                                 }
                                 1 -> {
@@ -181,12 +198,12 @@ class EditNoteFragment : Fragment() {
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
                                         viewModel.startNote?.header?.let { item ->
-                                            this.findNavController()
+                                            this@EditNoteFragment.findNavController()
                                                 .navigate(
                                                     EditNoteFragmentDirections
                                                         .actionEditNoteFragmentToGalleryFragment(
-                                                        item.noteID
-                                                    )
+                                                            item.noteID
+                                                        )
                                                 )
                                         }
 

@@ -14,13 +14,13 @@ import com.example.noteexample.databinding.FragmentGalleryBinding
 import com.example.noteexample.adapters.GalleryAdapter
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.GalleryViewModel
-import com.example.noteexample.utils.Camera
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -29,9 +29,9 @@ import javax.inject.Inject
 class GalleryFragment : BottomSheetDialogFragment() {
 
     @Inject
-    lateinit var camera: Camera
-    @Inject
     lateinit var repository: NoteRepository
+    lateinit var binding: FragmentGalleryBinding
+    private val galleryAdapter = GalleryAdapter()
     private val args by navArgs<GalleryFragmentArgs>()
     private val viewModel: GalleryViewModel by viewModels {
         NoteViewModelFactory(args.noteID, repository)
@@ -45,8 +45,9 @@ class GalleryFragment : BottomSheetDialogFragment() {
          * binding for GalleryFragment
          * @see R.layout.fragment_gallery
          */
-        val binding: FragmentGalleryBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_gallery, container, false)
+        binding = DataBindingUtil
+            .inflate(inflater, R.layout.fragment_gallery, container, false)
+
 
         /**
          * [getDialog] listener triggers motion layout animation when state changes
@@ -77,21 +78,55 @@ class GalleryFragment : BottomSheetDialogFragment() {
         }
 
         /**
+         * NavIcon clickListener
+         */
+        binding.galleryBackButton.setOnClickListener {
+            if (viewModel.actionModeStarted) {
+                viewModel.clearSelected()
+                galleryAdapter.notifyDataSetChanged()
+                viewModel.onDoneActionMode()
+            } else {
+                this.findNavController().popBackStack()
+            }
+        }
+
+        /**
+         * Accept item clickListener
+         */
+        binding.acceptSelectedPhotos.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.insertImages()
+                withContext(Dispatchers.Main) {
+                    this@GalleryFragment.findNavController().popBackStack()
+                    viewModel.onDoneActionMode()
+                }
+            }
+        }
+
+        binding.lifecycleOwner = this
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        /**
          * RecyclerView options
          */
 
-        val galleryAdapter = GalleryAdapter()
-
-        viewModel.getData(camera)
-        binding.galleryRecyclerView.apply {
+        lifecycleScope.launch {
+            viewModel.getData()
             galleryAdapter.submitList(viewModel.galleryList)
-            adapter = galleryAdapter
-            setHasFixedSize(true)
+            binding.galleryRecyclerView.apply {
+                adapter = galleryAdapter
+                setHasFixedSize(true)
+            }
         }
 
         /**
          * [GalleryViewModel.actionMode] checks photos to insert
          */
+
         if (viewModel.galleryList.any { list -> list.isChecked }) {
             viewModel.onStartActionMode()
             binding.galleryMenuTitle.text =
@@ -113,11 +148,11 @@ class GalleryFragment : BottomSheetDialogFragment() {
             }
         })
 
-
         /**
          * [GalleryAdapter.holder] LiveData
          * onClickListener starts or ends actionMode
          */
+
         galleryAdapter.holder.observe(viewLifecycleOwner, { holder ->
             val card = holder.binding.galleryCard
 
@@ -137,34 +172,5 @@ class GalleryFragment : BottomSheetDialogFragment() {
                 }
             }
         })
-
-        /**
-         * NavIcon clickListener
-         */
-        binding.galleryBackButton.setOnClickListener {
-            if (viewModel.actionModeStarted) {
-                viewModel.clearSelected()
-                galleryAdapter.notifyDataSetChanged()
-                viewModel.onDoneActionMode()
-            } else {
-                this.findNavController().popBackStack()
-            }
-        }
-
-        /**
-         * Accept item clickListener
-         */
-        binding.acceptSelectedPhotos.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.Default) {
-                viewModel.insertImages()
-                withContext(Dispatchers.Main) {
-                    this@GalleryFragment.findNavController().popBackStack()
-                    viewModel.onDoneActionMode()
-                }
-            }
-        }
-
-        binding.lifecycleOwner = this
-        return binding.root
     }
 }

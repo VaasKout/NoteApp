@@ -6,6 +6,24 @@
   <color name="secondaryColor">#8e24aa</color>
   <color name="secondaryLightColor">#c158dc</color>
   <color name="secondaryDarkColor">#5c007a</color>
+    <color name="backgroundColor">#d1c4e9</color>
+
+<!--  <color name="primaryColor">#2196f3</color>-->
+<!--  <color name="primaryLightColor">#6ec6ff</color>-->
+<!--  <color name="primaryDarkColor">#0069c0</color>-->
+<!--  <color name="secondaryColor">#64b5f6</color>-->
+<!--  <color name="secondaryLightColor">#9be7ff</color>-->
+<!--  <color name="secondaryDarkColor">#2286c3</color>-->
+<!--  <color name="backgroundColor">#e8eaf6</color>-->
+
+<!--  <color name="primaryColor">#1a237e</color>-->
+<!--  <color name="primaryLightColor">#534bae</color>-->
+<!--  <color name="primaryDarkColor">#000051</color>-->
+<!--  <color name="secondaryColor">#9fa8da</color>-->
+<!--  <color name="secondaryLightColor">#d1d9ff</color>-->
+<!--  <color name="secondaryDarkColor">#6f79a8</color>-->
+<!--  <color name="backgroundColor">#e8eaf6</color>-->
+
   <color name="primaryTextColor">#000000</color>
   <color name="secondaryTextColor">#ffffff</color>
   <color name="grey_material">@color/material_grey_900</color>

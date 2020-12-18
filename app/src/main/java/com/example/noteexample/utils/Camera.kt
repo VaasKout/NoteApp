@@ -10,9 +10,10 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.example.noteexample.R
-import com.example.noteexample.adapters.GalleryData
+import com.example.noteexample.database.GalleryData
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -48,7 +49,7 @@ class Camera @Inject constructor(@ApplicationContext private val context: Contex
     }
 
     //Intent for open camera and take picture
-    fun dispatchTakePictureIntent(barView: View): Intent {
+    fun dispatchTakePictureIntent(): Intent {
         return Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera context to handle the intent
             takePictureIntent.resolveActivity(context.packageManager)?.also {
@@ -56,11 +57,12 @@ class Camera @Inject constructor(@ApplicationContext private val context: Contex
                 val photoFile: File? = try {
                     createImageFile()
                 } catch (ex: IOException) {
-                    Snackbar.make(
-                        barView,
-                        context.getString(R.string.camera_error),
-                        Snackbar.LENGTH_LONG
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.camera_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     null
                 }
                 // Continue only if the File was successfully created

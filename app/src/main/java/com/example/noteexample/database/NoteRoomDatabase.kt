@@ -5,16 +5,18 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.noteexample.utils.Camera
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Room Database itself
  */
 
 @Database(
-    entities = [Header::class, Image::class, Flags::class],
+    entities = [Header::class, Image::class, Flags::class, GalleryData::class],
     version = 1,
     exportSchema = false
 )

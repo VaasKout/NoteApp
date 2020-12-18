@@ -2,13 +2,15 @@ package com.example.noteexample.repository
 
 import androidx.lifecycle.LiveData
 import com.example.noteexample.database.*
+import com.example.noteexample.utils.Camera
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NoteRepository @Inject constructor(private val noteDao: NoteDao) {
+class NoteRepository @Inject
+constructor(private val noteDao: NoteDao, private val camera: Camera) {
 
     /**
      * Repository for Dao methods
@@ -33,7 +35,6 @@ class NoteRepository @Inject constructor(private val noteDao: NoteDao) {
 
     suspend fun getNote(key: Long): NoteWithImages =
         withContext(Dispatchers.IO) { noteDao.getNote(key) }
-
 
 
     suspend fun insertNoteWithImages(note: NoteWithImages) {
@@ -106,8 +107,6 @@ class NoteRepository @Inject constructor(private val noteDao: NoteDao) {
     }
 
 
-
-
     /**
      * @see Image
      */
@@ -136,8 +135,26 @@ class NoteRepository @Inject constructor(private val noteDao: NoteDao) {
     }
 
     /**
+     * @see GalleryData
+     */
+
+    suspend fun updateGalleryData() {
+        return withContext(Dispatchers.IO) {
+            noteDao.deleteAllGalleryData()
+            val cameraList = camera.loadImagesFromStorage()
+            noteDao.insertGalleryData(cameraList)
+        }
+    }
+
+    suspend fun getGalleryData(): List<GalleryData> =
+        withContext(Dispatchers.IO){ noteDao.getAllGalleryData() }
+
+
+
+    /**
      * @see Flags
      */
+
     val flags: LiveData<Flags> = noteDao.getFlags()
 
     suspend fun updateFlags(flags: Flags) {

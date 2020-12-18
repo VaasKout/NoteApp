@@ -3,11 +3,10 @@ package com.example.noteexample.viewmodels
 import androidx.lifecycle.*
 import com.example.noteexample.database.Image
 import com.example.noteexample.database.NoteWithImages
-import com.example.noteexample.adapters.GalleryData
+import com.example.noteexample.database.GalleryData
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
 import kotlinx.coroutines.*
-import javax.inject.Inject
 
 /**
  * ViewModel for [com.example.noteexample.ui.GalleryFragment]
@@ -71,9 +70,14 @@ class GalleryViewModel(
      * Function loads list of photos from gallery
      * @see Camera.loadImagesFromStorage
      */
-    fun getData(camera: Camera) {
-        galleryList = camera.loadImagesFromStorage()
+
+    suspend fun getData(){
+        if (galleryList.isEmpty()){
+            galleryList = repository.getGalleryData()
+        }
     }
+
+
 
     /**
      * Clear [galleryList] if action mode is done

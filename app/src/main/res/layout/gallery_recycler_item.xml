@@ -6,7 +6,7 @@
     <data>
         <variable
            name="data"
-            type="com.example.noteexample.adapters.GalleryData"/>
+            type="com.example.noteexample.database.GalleryData"/>
     </data>
 
     <com.google.android.material.card.MaterialCardView

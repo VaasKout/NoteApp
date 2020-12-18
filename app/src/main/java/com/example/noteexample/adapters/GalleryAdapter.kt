@@ -9,16 +9,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
+import com.example.noteexample.database.GalleryData
 import com.example.noteexample.databinding.GalleryRecyclerItemBinding
 
 /**
  * Data class for image items
  * [GalleryData.isChecked] is used to select photos are going to be inserted
  */
-data class GalleryData (
-    val imgSrcUrl: String,
-    var isChecked: Boolean = false,
-)
+
 
 class GalleryAdapter :
     ListAdapter<GalleryData, GalleryAdapter.GalleryViewHolder>(

@@ -78,6 +78,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/greyTransparent"
             android:theme="@style/OnePhoto"
+            app:titleTextColor="@color/secondaryTextColor"
             app:menu="@menu/note_view_menu"
             app:navigationIcon="@drawable/ic_back_arrow" />
 
