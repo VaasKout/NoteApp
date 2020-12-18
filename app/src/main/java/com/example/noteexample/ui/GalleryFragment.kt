@@ -1,6 +1,8 @@
 package com.example.noteexample.ui
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentGalleryBinding
 import com.example.noteexample.adapters.GalleryAdapter
@@ -19,9 +22,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,6 +47,16 @@ class GalleryFragment : BottomSheetDialogFragment() {
          */
         binding = DataBindingUtil
             .inflate(inflater, R.layout.fragment_gallery, container, false)
+        /**
+         * RecyclerView options
+         */
+        viewModel.getData()
+        galleryAdapter.submitList(viewModel.galleryList)
+        binding.galleryRecyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = GridLayoutManager(requireContext(), 3)
+            binding.galleryRecyclerView.adapter = galleryAdapter
+        }
 
 
         /**
@@ -108,19 +119,6 @@ class GalleryFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        /**
-         * RecyclerView options
-         */
-
-        lifecycleScope.launch {
-            viewModel.getData()
-            galleryAdapter.submitList(viewModel.galleryList)
-            binding.galleryRecyclerView.apply {
-                adapter = galleryAdapter
-                setHasFixedSize(true)
-            }
-        }
 
         /**
          * [GalleryViewModel.actionMode] checks photos to insert

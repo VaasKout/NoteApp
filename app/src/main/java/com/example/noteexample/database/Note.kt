@@ -23,9 +23,8 @@ data class Flags(
     var columns: Int = 2,
 )
 
-@Entity(tableName = "gallery_images")
+
 data class GalleryData (
-    @PrimaryKey
     val imgSrcUrl: String,
     var isChecked: Boolean = false,
 )

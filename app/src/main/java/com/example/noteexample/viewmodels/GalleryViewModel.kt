@@ -71,13 +71,11 @@ class GalleryViewModel(
      * @see Camera.loadImagesFromStorage
      */
 
-    suspend fun getData(){
+    fun getData(){
         if (galleryList.isEmpty()){
             galleryList = repository.getGalleryData()
         }
     }
-
-
 
     /**
      * Clear [galleryList] if action mode is done

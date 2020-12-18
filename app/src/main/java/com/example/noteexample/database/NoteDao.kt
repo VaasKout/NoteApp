@@ -58,17 +58,17 @@ interface NoteDao {
     @Delete
     suspend fun deleteNoteList(headerList: List<Header>)
 
-    /**
-     * [GalleryData] Queries
-     */
-    @Insert
-    suspend fun insertGalleryData(galleryData: List<GalleryData>)
-
-    @Query("DELETE FROM gallery_images")
-    suspend fun deleteAllGalleryData()
-
-    @Query("select * from gallery_images")
-    suspend fun getAllGalleryData(): List<GalleryData>
+//    /**
+//     * [GalleryData] Queries
+//     */
+//    @Insert
+//    suspend fun insertGalleryData(galleryData: List<GalleryData>)
+//
+//    @Query("DELETE FROM gallery_images")
+//    suspend fun deleteAllGalleryData()
+//
+//    @Query("select * from gallery_images")
+//    suspend fun getAllGalleryData(): List<GalleryData>
 
 
     /**

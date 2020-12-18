@@ -97,7 +97,7 @@ class Camera @Inject constructor(@ApplicationContext private val context: Contex
             while (cursor.moveToNext()) {
                 imageId = cursor.getLong(columnIndexID)
                 val uriImage = Uri.withAppendedPath(uriExternal, imageId.toString()).toString()
-                val imgUrl = GalleryData(uriImage)
+                val imgUrl = GalleryData(imgSrcUrl = uriImage)
                 listOfAllImages.add(imgUrl)
             }
             cursor.close()

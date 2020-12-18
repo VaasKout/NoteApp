@@ -138,18 +138,15 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
      * @see GalleryData
      */
 
-    suspend fun updateGalleryData() {
-        return withContext(Dispatchers.IO) {
-            noteDao.deleteAllGalleryData()
-            val cameraList = camera.loadImagesFromStorage()
-            noteDao.insertGalleryData(cameraList)
-        }
-    }
+//    suspend fun updateGalleryData() {
+//        return withContext(Dispatchers.IO) {
+////            noteDao.deleteAllGalleryData()
+//            val cameraList = camera.loadImagesFromStorage()
+////            noteDao.insertGalleryData(cameraList)
+//        }
+//    }
 
-    suspend fun getGalleryData(): List<GalleryData> =
-        withContext(Dispatchers.IO){ noteDao.getAllGalleryData() }
-
-
+   fun getGalleryData(): List<GalleryData> = camera.loadImagesFromStorage()
 
     /**
      * @see Flags

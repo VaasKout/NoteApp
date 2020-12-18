@@ -108,9 +108,9 @@ class EditNoteViewModel(
     /**
      * Database methods
      */
-    suspend fun updateGalleryData(){
-            repository.updateGalleryData()
-    }
+//    suspend fun updateGalleryData(){
+//            repository.updateGalleryData()
+//    }
 
     fun updateCurrentNote() {
         viewModelScope.launch {

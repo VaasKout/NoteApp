@@ -16,7 +16,7 @@ import javax.inject.Inject
  */
 
 @Database(
-    entities = [Header::class, Image::class, Flags::class, GalleryData::class],
+    entities = [Header::class, Image::class, Flags::class],
     version = 1,
     exportSchema = false
 )

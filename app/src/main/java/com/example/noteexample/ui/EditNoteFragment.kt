@@ -96,18 +96,6 @@ class EditNoteFragment : Fragment() {
 
     })
 
-    init {
-        lifecycleScope.launchWhenStarted {
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                viewModel.updateGalleryData()
-            }
-        }
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -139,7 +127,6 @@ class EditNoteFragment : Fragment() {
             ) { isGranted: Boolean ->
                 if (isGranted) {
                     lifecycleScope.launch {
-                        viewModel.updateGalleryData()
                         viewModel.startNote?.header?.let { item ->
                             this@EditNoteFragment.findNavController()
                                 .navigate(
