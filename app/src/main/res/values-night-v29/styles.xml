@@ -26,13 +26,13 @@
         <item name="android:background">@drawable/dialog_shapes_dark</item>
     </style>
 
-    <style name="TopBackground">
-        <item name="android:background">@color/grey_material</item>
+    <style name="BottomSheetStyle" parent="AppTheme">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="colorControlNormal">@android:color/white</item>
     </style>
 
-    <style name="GalleryTheme" parent="AppTheme">
-        <item name="android:background">@drawable/dialog_shapes_dark</item>
-        <item name="colorControlNormal">@android:color/white</item>
+    <style name="TopBackground">
+        <item name="android:background">@color/grey_material</item>
     </style>
 
 </resources>

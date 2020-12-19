@@ -25,17 +25,16 @@
 
     <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/dialog_shapes_light</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="AppTheme">
         <item name="android:textColor">@android:color/black</item>
+        <item name="colorControlNormal">@android:color/black</item>
     </style>
 
     <style name="ToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
         <item name="android:background">@color/primaryColor</item>
         <item name="titleTextColor">@android:color/black</item>
-    </style>
-
-    <style name="GalleryTheme" parent="AppTheme">
-        <item name="android:background">@drawable/dialog_shapes_light</item>
-        <item name="colorControlNormal">@android:color/black</item>
     </style>
     <style name="OnePhoto" parent="AppTheme">
         <item name="colorControlNormal">@android:color/white</item>

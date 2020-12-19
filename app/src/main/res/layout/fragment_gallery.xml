@@ -8,7 +8,7 @@
         android:id="@+id/gallery_motion"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:theme="@style/GalleryTheme"
+        android:theme="@style/BottomSheetStyle"
         app:layoutDescription="@xml/fragment_gallery_xml_gallery_layout_scene">
         <View
             android:id="@+id/gallery_view_top"

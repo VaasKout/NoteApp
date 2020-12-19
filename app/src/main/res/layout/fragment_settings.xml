@@ -9,6 +9,7 @@
 
         <androidx.constraintlayout.motion.widget.MotionLayout
             android:id="@+id/motion_settings"
+            android:theme="@style/BottomSheetStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutDescription="@xml/fragment_settings_xml_motion_settings_scene">
@@ -32,7 +33,7 @@
                 android:id="@+id/settings_constraint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/GalleryTheme"
+
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
                 tools:context=".settings.SettingsFragment">
 

@@ -9,10 +9,12 @@ import androidx.fragment.app.viewModels
 import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentSettingsBinding
 import com.example.noteexample.viewmodels.SettingsViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
-//constants for filter notes
+//constants for filtering notes
 const val ALL = 0
 const val TEXT_ONLY = 1
 const val PHOTOS_ONLY = 2
@@ -40,6 +42,31 @@ class SettingsFragment : BottomSheetDialogFragment() {
          */
         val binding: FragmentSettingsBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
+
+
+        /**
+         * [getDialog] listener triggers motion layout animation when state changes
+         */
+        dialog?.setOnShowListener {
+            val bottomSheetBehavior = (dialog as BottomSheetDialog).behavior
+
+            val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_EXPANDED -> {
+                            binding.motionSettings.transitionToEnd()
+                        }
+                        else -> {
+                            binding.motionSettings.transitionToStart()
+                        }
+                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                }
+            }
+            bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
+        }
 
         viewModel.flagsLiveData.observe(viewLifecycleOwner, {
             viewModel.flags = it
