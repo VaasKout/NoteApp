@@ -13,10 +13,6 @@ import kotlin.math.abs
 
 open class CustomTouchListener(ctx: Context?) : OnTouchListener {
 
-    /**
-     * Custom realisation of OnTouchListener for swipe events
-     */
-
     companion object {
         private const val DIFF = 10
 //        private const val SWIPE_VELOCITY_THRESHOLD = 1

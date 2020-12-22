@@ -2,6 +2,7 @@ package com.example.noteexample.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -128,8 +129,10 @@ class OneNotePagerFragment : Fragment() {
 //        binding.photoPager.isUserInputEnabled = false
         pagerAdapter.holder.observe(viewLifecycleOwner, { holder ->
 
-
             holder.binding.imgOnePhoto.setOnClickListener {
+                //catches current state of zoom
+                binding.photoPager.isUserInputEnabled =
+                    !holder.binding.imgOnePhoto.isZoomed
                 if (!viewModel.animationOnEnd) {
                     binding.motionOnePhoto.transitionToEnd()
                     viewModel.animationOnEnd = true
@@ -144,6 +147,7 @@ class OneNotePagerFragment : Fragment() {
                 .setOnTouchListener(object : CustomTouchListener(requireContext()) {
 
                     override fun onSwipeTop() {
+
                         //check if image zoomed
                         if (!holder.binding.imgOnePhoto.isZoomed) {
                             binding.titleViewOnePhoto.visibility = View.INVISIBLE
@@ -168,7 +172,6 @@ class OneNotePagerFragment : Fragment() {
                     }
 
                     override fun onSwipeBottom() {
-
                         if (!holder.binding.imgOnePhoto.isZoomed) {
                             binding.titleViewOnePhoto.visibility = View.INVISIBLE
                             binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
@@ -191,7 +194,8 @@ class OneNotePagerFragment : Fragment() {
                         }
                     }
 
-                    //TODO get callback
+                    //Catch previous state of zoom
+                    //It changes after the method returns
                     override fun onDoubleTap() {
                         binding.photoPager.isUserInputEnabled =
                             holder.binding.imgOnePhoto.isZoomed
