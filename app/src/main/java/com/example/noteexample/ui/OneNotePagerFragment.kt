@@ -2,7 +2,6 @@ package com.example.noteexample.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
