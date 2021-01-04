@@ -131,7 +131,7 @@ class EditNoteFragment : Fragment() {
                         this@EditNoteFragment.findNavController()
                             .navigate(
                                 EditNoteFragmentDirections
-                                    .actionEditNoteFragmentToGalleryFragment(item.noteID)
+                                    .actionEditNoteFragmentToGalleryFragment(item.headerID)
                             )
                     }
                 } else {
@@ -190,7 +190,7 @@ class EditNoteFragment : Fragment() {
                                                 .navigate(
                                                     EditNoteFragmentDirections
                                                         .actionEditNoteFragmentToGalleryFragment(
-                                                            item.noteID
+                                                            item.headerID
                                                         )
                                                 )
                                         }
@@ -233,12 +233,14 @@ class EditNoteFragment : Fragment() {
          * or accidentally close app if this is note is new
          * @see onPause
          */
+
+        //TODO if check for todo list
         noteAdapter.headerHolder.observe(viewLifecycleOwner) { holder ->
             holder.binding.titleEdit.addTextChangedListener {
                 viewModel.currentNote?.header?.title = it.toString()
             }
             holder.binding.firstNoteEdit.addTextChangedListener {
-                viewModel.currentNote?.header?.text = it.toString()
+//                viewModel.currentNote?.header?.text = it.toString()
             }
         }
 
@@ -344,7 +346,7 @@ class EditNoteFragment : Fragment() {
                 viewModel.currentNote?.let {
                     if (it.images.isEmpty() &&
                         it.header.title.isEmpty() &&
-                        it.header.text.isEmpty() &&
+                        it.notes.isEmpty() &&
                         viewModel.allHidden
                     ) {
                         viewModel.deleteUnused()
@@ -374,7 +376,7 @@ class EditNoteFragment : Fragment() {
                     when {
                         viewModel.backPressed -> {
                             if (viewModel.startNote?.header?.title != noteWithImages.header.title ||
-                                viewModel.startNote?.header?.text != noteWithImages.header.text ||
+                                viewModel.startNote?.notes != noteWithImages.notes ||
                                 viewModel.startNote?.images != noteWithImages.images
                             ) {
                                 MaterialAlertDialogBuilder(requireContext())

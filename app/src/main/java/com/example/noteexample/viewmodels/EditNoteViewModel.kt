@@ -76,7 +76,7 @@ class EditNoteViewModel(
                 val localList = it.images.filter { list -> list.hidden }
                 if (localList.isEmpty()) {
                     val image = Image(
-                        parentNoteID = it.header.noteID,
+                        parentImgNoteID = it.header.headerID,
                         photoPath = path
                     )
                     repository.insertImage(image)
@@ -101,7 +101,7 @@ class EditNoteViewModel(
         } else {
             position = repository.allASCSortedNotes().size
             val header = Header(pos = position)
-            repository.insertNote(header)
+            repository.insertHeader(header)
             startNote = repository.getLastNote()
             repository.getLastLiveData()
         }

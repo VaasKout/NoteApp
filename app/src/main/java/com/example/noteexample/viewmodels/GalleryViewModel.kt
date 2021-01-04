@@ -55,7 +55,7 @@ class GalleryViewModel(
                 }
                 photoList.forEach { photo ->
                     val image = Image(
-                        parentNoteID = noteID,
+                        parentImgNoteID = noteID,
                         photoPath = photo.imgSrcUrl
                     )
                     newNoteContentList.add(image)

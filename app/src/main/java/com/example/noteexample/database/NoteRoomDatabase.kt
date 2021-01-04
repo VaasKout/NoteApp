@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
  */
 
 @Database(
-    entities = [Header::class, Image::class, Flags::class],
+    entities = [Header::class, FirstNote::class, Image::class, Flags::class],
     version = 2,
     exportSchema = false
 )
@@ -29,7 +29,18 @@ abstract class NoteRoomDatabase : RoomDatabase() {
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
-                    "ALTER TABLE header_table ADD COLUMN todoList INTEGER default 0"
+                    "CREATE TABLE IF NOT EXISTS `first_note_table` " +
+                            "(`noteID` INTEGER NOT NULL default 0, " +
+                            "`parentNoteID` INTEGER NOT NULL, " +
+                            "`text` TEXT NOT NULL, PRIMARY KEY(`noteID`))"
+                )
+                database.execSQL("DROP TABLE IF EXISTS header_table")
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `header_table` " +
+                            "(`headerID` INTEGER NOT NULL default 0, " +
+                            "`position` INTEGER NOT NULL default 0, `title` TEXT NOT NULL, " +
+                            "`date` TEXT NOT NULL, `isChecked` INTEGER NOT NULL default 0, " +
+                            "`todoList` INTEGER NOT NULL default 0, PRIMARY KEY(`headerID`))"
                 )
             }
         }
@@ -52,7 +63,8 @@ abstract class NoteRoomDatabase : RoomDatabase() {
                                 getDatabase(context).noteDao().insertFlags(Flags())
                             }
                         }
-                    }).addMigrations(MIGRATION_1_2)
+                    })
+                        .addMigrations(MIGRATION_1_2)
                         .build()
                     INSTANCE = instance
                 }

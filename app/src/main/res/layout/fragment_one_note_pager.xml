@@ -7,6 +7,9 @@
         <variable
             name="header"
             type="com.example.noteexample.database.Header" />
+        <variable
+            name="firstNote"
+            type="com.example.noteexample.database.FirstNote" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -50,7 +53,7 @@
                 tools:visibility="visible"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 android:textColor="@color/secondaryTextColor"
-                app:firstNoteText="@{header}"
+                app:firstNoteText="@{firstNote}"
                 tools:text="Заметка" />
 
 

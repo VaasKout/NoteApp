@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule
+import com.example.noteexample.database.FirstNote
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
 
@@ -40,7 +41,7 @@ fun TextView.titleText(header: Header?) {
 
 
 @BindingAdapter("firstNoteText")
-fun TextView.firstNoteText(header: Header?) {
+fun TextView.firstNoteText(header: FirstNote?) {
     header?.let {
         when {
             this is EditText && it.text.isNotEmpty() -> {

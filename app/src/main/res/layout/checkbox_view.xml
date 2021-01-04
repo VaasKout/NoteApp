@@ -6,7 +6,7 @@
 
         <variable
             name="text"
-            type="com.example.noteexample.database.Header" />
+            type="com.example.noteexample.database.FirstNote" />
     </data>
 
     <com.google.android.material.checkbox.MaterialCheckBox

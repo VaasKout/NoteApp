@@ -10,6 +10,12 @@ import androidx.room.*
 // */
 
 
+data class GalleryData(
+    val imgSrcUrl: String,
+    var isChecked: Boolean = false,
+)
+
+
 /**
  * [Flags] Entity sorts notes in [com.example.noteexample.ui.AllNotesFragment]
  * and updated in [com.example.noteexample.ui.SettingsFragment]
@@ -21,12 +27,6 @@ data class Flags(
     var ascendingOrder: Boolean = false,
     var showDate: Boolean = true,
     var columns: Int = 2,
-)
-
-
-data class GalleryData (
-    val imgSrcUrl: String,
-    var isChecked: Boolean = false,
 )
 
 
@@ -42,13 +42,19 @@ data class GalleryData (
 
 @Entity(tableName = "header_table")
 data class Header(
-    @PrimaryKey(autoGenerate = true) var noteID: Long = 0,
+    @PrimaryKey(autoGenerate = true) var headerID: Long = 0,
     @ColumnInfo(name = "position") var pos: Int = 0,
     var title: String = "",
-    var text: String = "",
     var date: String = "",
     var isChecked: Boolean = false,
     var todoList: Boolean = false,
+)
+
+@Entity(tableName = "first_note_table")
+data class FirstNote(
+    @PrimaryKey(autoGenerate = true) var noteID: Long = 0,
+    val parentNoteID: Long,
+    val text: String = "",
 )
 
 /**
@@ -60,20 +66,25 @@ data class Header(
 @Entity(tableName = "image_table")
 data class Image(
     @PrimaryKey(autoGenerate = true) var imgID: Long = 0,
-    val parentNoteID: Long,
+    val parentImgNoteID: Long,
     var signature: String = "",
     var photoPath: String,
     var hidden: Boolean = false,
 )
 
 /**
- * This class binds two @Entity objects [Header], [Image] in relation to One-To-Many
+ * This class binds @Entity objects [Header], [Note], [Image],  in relation to One-To-Many
  */
 data class NoteWithImages(
     @Embedded val header: Header,
     @Relation(
-        parentColumn = "noteID",
-        entityColumn = "parentNoteID",
+        parentColumn = "headerID",
+        entityColumn = "parentNoteID"
     )
-    val images: List<Image>
+    val notes: List<FirstNote>,
+    @Relation(
+        parentColumn = "headerID",
+        entityColumn = "parentImgNoteID",
+    )
+    val images: List<Image>,
 )

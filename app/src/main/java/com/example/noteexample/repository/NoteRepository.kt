@@ -40,6 +40,7 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
     suspend fun insertNoteWithImages(note: NoteWithImages) {
         withContext(Dispatchers.IO) {
             noteDao.insertHeader(note.header)
+            noteDao.insertFirstNotes(note.notes)
             noteDao.insertImages(note.images)
         }
     }
@@ -47,29 +48,33 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
     suspend fun deleteAllNotesWithImages() {
         withContext(Dispatchers.IO) {
             noteDao.deleteAllNotes()
+            noteDao.deleteAllFirstNotes()
             noteDao.deleteAllImages()
         }
     }
 
     suspend fun deleteNoteWithImagesList(noteList: List<NoteWithImages>) {
-        val notes = mutableListOf<Header>()
+        val headers = mutableListOf<Header>()
+        val notes = mutableListOf<FirstNote>()
         val images = mutableListOf<Image>()
         withContext(Dispatchers.Default) {
             noteList.forEach {
-                notes.add(it.header)
+                headers.add(it.header)
+                notes.addAll(it.notes)
                 images.addAll(it.images)
             }
         }
         withContext(Dispatchers.IO) {
-            noteDao.deleteNoteList(notes)
+            noteDao.deleteNoteList(headers)
+            noteDao.deleteFirstNotes(notes)
             noteDao.deleteImages(images)
         }
-
     }
 
     suspend fun deleteNoteWithImages(item: NoteWithImages) {
         withContext(Dispatchers.IO) {
             noteDao.deleteNote(item.header)
+            noteDao.deleteFirstNotes(item.notes)
             noteDao.deleteImages(item.images)
         }
     }
@@ -82,16 +87,19 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
     }
 
     suspend fun updateNoteWithImagesList(noteList: List<NoteWithImages>) {
-        val notes = mutableListOf<Header>()
+        val headers = mutableListOf<Header>()
+        val notes = mutableListOf<FirstNote>()
         val images = mutableListOf<Image>()
         withContext(Dispatchers.Default) {
             noteList.forEach {
-                notes.add(it.header)
+                headers.add(it.header)
+                notes.addAll(it.notes)
                 images.addAll(it.images)
             }
         }
         withContext(Dispatchers.IO) {
-            noteDao.updateNoteList(notes)
+            noteDao.updateNoteList(headers)
+            noteDao.updateFirstNotes(notes)
             noteDao.updateImages(images)
         }
     }
@@ -100,9 +108,36 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
     /**
      * @see Header
      */
-    suspend fun insertNote(header: Header) {
+    suspend fun insertHeader(header: Header) {
         withContext(Dispatchers.IO) {
             noteDao.insertHeader(header)
+        }
+    }
+
+    /**
+     * @see FirstNote
+     */
+    suspend fun insertFirstNote(firstNote: FirstNote){
+        withContext(Dispatchers.IO){
+            noteDao.insertFirstNote(firstNote)
+        }
+    }
+
+    suspend fun insertFirstNotes(firstNotes: List<FirstNote>){
+        withContext(Dispatchers.IO){
+            noteDao.insertFirstNotes(firstNotes)
+        }
+    }
+
+    suspend fun updateFirstNote(firstNote: FirstNote){
+        withContext(Dispatchers.IO){
+            noteDao.updateFirstNote(firstNote)
+        }
+    }
+
+    suspend fun deleteFirstNote(firstNote: FirstNote){
+        withContext(Dispatchers.IO){
+            noteDao.deleteFirstNote(firstNote)
         }
     }
 
@@ -134,19 +169,7 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
-    /**
-     * @see GalleryData
-     */
-
-//    suspend fun updateGalleryData() {
-//        return withContext(Dispatchers.IO) {
-////            noteDao.deleteAllGalleryData()
-//            val cameraList = camera.loadImagesFromStorage()
-////            noteDao.insertGalleryData(cameraList)
-//        }
-//    }
-
-   fun getGalleryData(): List<GalleryData> = camera.loadImagesFromStorage()
+    fun getGalleryData(): List<GalleryData> = camera.loadImagesFromStorage()
 
     /**
      * @see Flags

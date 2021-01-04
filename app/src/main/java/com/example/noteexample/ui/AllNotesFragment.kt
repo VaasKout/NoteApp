@@ -226,8 +226,12 @@ class AllNotesFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.Default) {
                     val noteList = viewModel.noteList.filter { item ->
                         item.header.title.contains(it.toString()) ||
-                                item.header.text.contains(it.toString()) ||
-                                item.images.any { image -> image.signature.contains(it.toString()) }
+                                item.notes.any { firstNote ->
+                                    firstNote.text.contains(it.toString())
+                                } ||
+                                item.images.any { image ->
+                                    image.signature.contains(it.toString())
+                                }
                     }
                     withContext(Dispatchers.Main) {
                         if (it.toString().isEmpty()) {
@@ -336,10 +340,11 @@ class AllNotesFragment : Fragment() {
                             title.text = it.header.title
                         }
 
-                        if (it.header.text.isNotEmpty()) {
-                            text.visibility = View.VISIBLE
-                            text.text = it.header.text
-                        }
+                        //TODO change to list
+//                        if (it.header.text.isNotEmpty()) {
+//                            text.visibility = View.VISIBLE
+//                            text.text = it.header.text
+//                        }
 
                         if (it.images.isNotEmpty()) {
                             var photoInserted = false
@@ -353,8 +358,9 @@ class AllNotesFragment : Fragment() {
                                     break
                                 }
                             }
+
                             if (!photoInserted &&
-                                it.header.text.isEmpty() &&
+                                it.notes.isEmpty() &&
                                 it.images[0].signature.isNotEmpty()
                             ) {
                                 text.text = it.images[0].signature
@@ -362,10 +368,10 @@ class AllNotesFragment : Fragment() {
                             }
                         }
 
-                        if (it.header.title.isNotEmpty() && it.header.text.isNotEmpty()) {
+                        if (it.header.title.isNotEmpty() && it.notes.isNotEmpty()) {
                             view1.visibility = View.VISIBLE
                         }
-                        if ((it.header.text.isNotEmpty() || it.header.title.isNotEmpty()) &&
+                        if ((it.notes.isNotEmpty() || it.header.title.isNotEmpty()) &&
                             img.visibility == View.VISIBLE
                         ) {
                             view2.visibility = View.VISIBLE
@@ -433,14 +439,14 @@ class AllNotesFragment : Fragment() {
                                             .navigate(
                                                 AllNotesFragmentDirections
                                                     .actionAllNotesFragmentToOnePhotoFragment(
-                                                        header.noteID,
+                                                        header.headerID,
                                                     )
                                             )
                                     } else {
                                         this@AllNotesFragment.findNavController()
                                             .navigate(
                                                 AllNotesFragmentDirections
-                                                    .actionAllNotesFragmentToOneNoteFragment(header.noteID)
+                                                    .actionAllNotesFragmentToOneNoteFragment(header.headerID)
                                             )
                                     }
                                 }

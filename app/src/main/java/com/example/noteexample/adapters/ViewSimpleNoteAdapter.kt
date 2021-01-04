@@ -89,7 +89,7 @@ class ViewSimpleNoteAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(header: Header) {
             binding.header = header
-            if (header.title.isNotEmpty() && header.text.isNotEmpty()){
+            if (header.title.isNotEmpty()){
                 binding.headerView.visibility = View.VISIBLE
             }
         }

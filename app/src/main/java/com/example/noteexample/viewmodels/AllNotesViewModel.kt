@@ -66,7 +66,7 @@ class AllNotesViewModel @ViewModelInject constructor(
             var updateNeeded = false
             for (item in noteList) {
                 if (item.header.title.isEmpty() &&
-                    item.header.text.isEmpty() &&
+                    item.notes.isEmpty() &&
                     (item.images.isEmpty() ||
                             item.images.none { !it.hidden || it.signature.isNotEmpty() })
                 ) {

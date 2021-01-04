@@ -7,6 +7,9 @@
         <variable
             name="header"
             type="com.example.noteexample.database.Header" />
+        <variable
+            name="firstNote"
+            type="com.example.noteexample.database.FirstNote" />
     </data>
 
     <LinearLayout
@@ -43,7 +46,7 @@
             android:paddingTop="@dimen/dp_8"
             android:paddingEnd="@dimen/dp_16"
             android:paddingBottom="@dimen/dp_16"
-            app:firstNoteText="@{header}" />
+            app:firstNoteText="@{firstNote}" />
 
     </LinearLayout>
 </layout>

@@ -24,19 +24,19 @@ interface NoteDao {
     suspend fun getAllASCSortedNotes(): List<NoteWithImages>
 
     @Transaction
-    @Query("SELECT * from header_table ORDER BY noteID DESC LIMIT 1")
+    @Query("SELECT * from header_table ORDER BY headerID DESC LIMIT 1")
     suspend fun getLastNote(): NoteWithImages
 
     @Transaction
-    @Query("SELECT * from header_table ORDER BY noteID DESC LIMIT 1")
+    @Query("SELECT * from header_table ORDER BY headerID DESC LIMIT 1")
     fun getLastNoteLiveData(): LiveData<NoteWithImages>
 
     @Transaction
-    @Query("SELECT * from header_table WHERE noteID = :key")
+    @Query("SELECT * from header_table WHERE headerID = :key")
     suspend fun getNote(key: Long): NoteWithImages
 
     @Transaction
-    @Query("SELECT * from header_table WHERE noteID = :key")
+    @Query("SELECT * from header_table WHERE headerID = :key")
     fun getNoteLiveData(key: Long): LiveData<NoteWithImages>
 
     @Transaction
@@ -58,18 +58,31 @@ interface NoteDao {
     @Delete
     suspend fun deleteNoteList(headerList: List<Header>)
 
-//    /**
-//     * [GalleryData] Queries
-//     */
-//    @Insert
-//    suspend fun insertGalleryData(galleryData: List<GalleryData>)
-//
-//    @Query("DELETE FROM gallery_images")
-//    suspend fun deleteAllGalleryData()
-//
-//    @Query("select * from gallery_images")
-//    suspend fun getAllGalleryData(): List<GalleryData>
+    /**
+     * [FirstNote] Queries
+     */
 
+    @Insert
+    suspend fun insertFirstNote(note: FirstNote)
+
+    @Insert
+    suspend fun insertFirstNotes(notes: List<FirstNote>)
+
+    @Update
+    suspend fun updateFirstNote(note: FirstNote)
+
+    @Update
+    suspend fun updateFirstNotes(notes: List<FirstNote>)
+
+    @Delete
+    suspend fun deleteFirstNote(note: FirstNote)
+
+    @Delete
+    suspend fun deleteFirstNotes(notes: List<FirstNote>)
+
+    @Transaction
+    @Query("DELETE FROM first_note_table")
+    suspend fun deleteAllFirstNotes()
 
     /**
      * [Image] Queries

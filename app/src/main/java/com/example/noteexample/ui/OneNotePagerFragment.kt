@@ -71,9 +71,10 @@ class OneNotePagerFragment : Fragment() {
             if (it.header.title.isNotEmpty()) {
                 binding.titleViewOnePhoto.visibility = View.VISIBLE
             }
-            if (it.header.text.isNotEmpty()) {
-                binding.firstNoteViewOnePhoto.visibility = View.VISIBLE
-            }
+            //TODO recyclerView in viewPager
+//            if (it.header.text.isNotEmpty()) {
+//                binding.firstNoteViewOnePhoto.visibility = View.VISIBLE
+//            }
             binding.photoPager.adapter = pagerAdapter
             lifecycleScope.launch {
                 launch {
