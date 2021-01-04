@@ -28,6 +28,8 @@ class EditNoteViewModel(
     var allHidden = true
     var backPressed = false
     var itemListSame = false
+    var todoList = false
+
 
     //Variables
     var position = 0

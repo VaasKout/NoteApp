@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.databinding.HeaderEditBinding
+import com.example.noteexample.databinding.RecyclerHeaderEditBinding
 import com.example.noteexample.databinding.RecyclerImageEditItemBinding
 
 /**
  * ListAdapter for [com.example.noteexample.ui.EditNoteFragment] with header on 0 position
  *
- * [OneNoteEditAdapter.headerHolder] LiveData for header
- * [OneNoteEditAdapter.imgHolder] LiveData for other items
+ * [EditSimpleNoteAdapter.headerHolder] LiveData for header
+ * [EditSimpleNoteAdapter.imgHolder] LiveData for other items
  */
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
@@ -69,10 +69,10 @@ class EditSimpleNoteAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> {
-                val binding: HeaderEditBinding =
+                val binding: RecyclerHeaderEditBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.header_edit,
+                        R.layout.recycler_header_edit,
                         parent,
                         false
                     )
@@ -106,7 +106,7 @@ class EditSimpleNoteAdapter :
         }
     }
 
-    inner class NoteEditHolder(val binding: HeaderEditBinding) :
+    inner class NoteEditHolder(val binding: RecyclerHeaderEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(header: Header) {
             _headerHolder.value = this

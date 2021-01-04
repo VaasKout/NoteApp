@@ -13,27 +13,17 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_one_note"
-                android:layout_width="match_parent"
-                app:navigationIcon="@drawable/ic_back_arrow"
-                android:layout_height="?attr/actionBarSize"
                 style="@style/ToolbarStyle"
-                app:menu="@menu/note_view_menu" />
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:menu="@menu/note_view_menu"
+                app:navigationIcon="@drawable/ic_back_arrow" />
         </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_one_note"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_one_note"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/recycler_image_view_item" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/recycler_image_view_item" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

@@ -15,15 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
-import com.example.noteexample.viewmodels.AllNotesViewModel
 import com.example.noteexample.adapters.NoteAdapter
 import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.utils.GlideApp
+import com.example.noteexample.viewmodels.AllNotesViewModel
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

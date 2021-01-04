@@ -7,8 +7,8 @@ import com.example.noteexample.database.Image
 /**
  * DiffUtil and data class for adapters with header
  *
- * @see com.example.noteexample.adapters.OneNoteEditAdapter
- * @see com.example.noteexample.adapters.OneNoteViewAdapter
+ * @see com.example.noteexample.adapters.EditSimpleNoteAdapter
+ * @see com.example.noteexample.adapters.ViewSimpleNoteAdapter
  */
 data class NoteWithImagesRecyclerItems(
     val header: Header? = null,

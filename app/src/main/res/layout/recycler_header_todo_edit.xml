@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="header"
+            type="com.example.noteexample.database.Header" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/title_edit_todo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="@string/title"
+            android:background="@android:color/transparent"
+            android:hint="@string/title"
+            android:inputType="text|textMultiLine"
+            android:maxLength="200"
+            android:paddingStart="@dimen/dp_16"
+            android:paddingTop="@dimen/dp_12"
+            android:paddingEnd="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_16"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            app:titleText="@{header}" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_header_todo_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    </LinearLayout>
+</layout>

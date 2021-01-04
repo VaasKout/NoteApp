@@ -8,6 +8,12 @@
         android:icon="@drawable/ic_accept"
         />
     <item
+        android:id="@+id/todo"
+        android:title="@string/todo_list"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_todo_list"
+        />
+    <item
         android:id="@+id/insert_photo"
         android:title="@string/photo"
         app:showAsAction="ifRoom"

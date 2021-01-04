@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.noteexample.utils.Camera
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Room Database itself
@@ -17,7 +16,7 @@ import javax.inject.Inject
 
 @Database(
     entities = [Header::class, Image::class, Flags::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class NoteRoomDatabase : RoomDatabase() {
@@ -26,6 +25,14 @@ abstract class NoteRoomDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: NoteRoomDatabase? = null
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE header_table ADD COLUMN todoList INTEGER default 0"
+                )
+            }
+        }
 
         fun getDatabase(context: Context): NoteRoomDatabase {
             synchronized(this) {
@@ -45,7 +52,7 @@ abstract class NoteRoomDatabase : RoomDatabase() {
                                 getDatabase(context).noteDao().insertFlags(Flags())
                             }
                         }
-                    }).fallbackToDestructiveMigration()
+                    }).addMigrations(MIGRATION_1_2)
                         .build()
                     INSTANCE = instance
                 }

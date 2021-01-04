@@ -48,6 +48,7 @@ data class Header(
     var text: String = "",
     var date: String = "",
     var isChecked: Boolean = false,
+    var todoList: Boolean = false,
 )
 
 /**

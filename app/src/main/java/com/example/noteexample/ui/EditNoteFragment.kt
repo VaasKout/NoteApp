@@ -23,11 +23,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.adapters.EditSimpleNoteAdapter
-import com.example.noteexample.databinding.FragmentEditNoteBinding
-import com.example.noteexample.viewmodels.EditNoteViewModel
-import com.example.noteexample.utils.Camera
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
+import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.repository.NoteRepository
+import com.example.noteexample.utils.Camera
+import com.example.noteexample.viewmodels.EditNoteViewModel
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -49,6 +49,7 @@ class EditNoteFragment : Fragment() {
 
     @Inject
     lateinit var camera: Camera
+
     @Inject
     lateinit var repository: NoteRepository
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
@@ -126,14 +127,12 @@ class EditNoteFragment : Fragment() {
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
-                    lifecycleScope.launch {
-                        viewModel.startNote?.header?.let { item ->
-                            this@EditNoteFragment.findNavController()
-                                .navigate(
-                                    EditNoteFragmentDirections
-                                        .actionEditNoteFragmentToGalleryFragment(item.noteID)
-                                )
-                        }
+                    viewModel.startNote?.header?.let { item ->
+                        this@EditNoteFragment.findNavController()
+                            .navigate(
+                                EditNoteFragmentDirections
+                                    .actionEditNoteFragmentToGalleryFragment(item.noteID)
+                            )
                     }
                 } else {
                     Snackbar.make(
@@ -164,6 +163,8 @@ class EditNoteFragment : Fragment() {
 
         //menuClickListener
         binding.toolbarNoteEdit.setOnMenuItemClickListener {
+
+//            val newIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_back_arrow)
             when (it.itemId) {
                 R.id.insert_photo -> {
                     viewModel.updateCurrentNote()
@@ -202,6 +203,18 @@ class EditNoteFragment : Fragment() {
                                 }
                             }
                         }.show()
+                    true
+                }
+                R.id.todo -> {
+                    if (viewModel.todoList) {
+                        it.icon =
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_todo_list)
+                        viewModel.todoList = false
+                    } else {
+                        it.icon =
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_simple_list)
+                        viewModel.todoList = true
+                    }
                     true
                 }
                 R.id.save_note -> {

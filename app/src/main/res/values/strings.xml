@@ -34,6 +34,7 @@
     <string name="one_column">1 колонка</string>
     <string name="two_columns">2 колонки</string>
     <string name="sign">Подпись</string>
+    <string name="todo_list">TODO list</string>
     <string-array name="dialog_array">
         <item>Фото с камеры</item>
         <item>Фото из галереи</item>

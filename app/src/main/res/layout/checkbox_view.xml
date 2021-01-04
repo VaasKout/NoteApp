@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="text"
+            type="com.example.noteexample.database.Header" />
+    </data>
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/checkbox_edit"
+        firstNoteText="@{text}"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Text" />
+</layout>

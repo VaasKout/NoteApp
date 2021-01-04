@@ -10,9 +10,10 @@
             type="com.example.noteexample.database.Header" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/title_view"
@@ -23,9 +24,6 @@
             android:paddingEnd="@dimen/dp_16"
             android:paddingBottom="@dimen/dp_12"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:titleText="@{header}"
             tools:text="@string/title" />
 
@@ -35,9 +33,6 @@
             android:layout_height="2dp"
             android:background="@color/primaryDarkColor"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title_view"
             tools:visibility="visible" />
 
         <TextView
@@ -50,10 +45,7 @@
             android:paddingBottom="@dimen/dp_8"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
             app:firstNoteText="@{header}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/header_view"
             tools:text="Заметка" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>

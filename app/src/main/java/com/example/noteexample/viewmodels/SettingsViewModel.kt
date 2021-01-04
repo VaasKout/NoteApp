@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.noteexample.database.Flags
 import com.example.noteexample.repository.NoteRepository
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * ViewModel for [com.example.noteexample.ui.SettingsFragment]

@@ -16,9 +16,10 @@
         app:strokeColor="@color/primaryDarkColor"
         app:strokeWidth="2dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/title_main"
@@ -34,9 +35,6 @@
                 android:visibility="gone"
                 tools:visibility="visible"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Title" />
 
             <View
@@ -46,9 +44,7 @@
                 android:background="@color/primaryDarkColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:visibility="gone"
-                tools:visibility="visible"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title_main" />
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/note_main"
@@ -63,19 +59,13 @@
                 android:visibility="gone"
                 tools:visibility="visible"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view1"
                 tools:text="Note" />
 
             <View
                 android:id="@+id/view2"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryDarkColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/note_main" />
+                android:background="@color/primaryDarkColor" />
 
             <ImageView
                 android:id="@+id/photo_main"
@@ -86,19 +76,13 @@
                 android:scaleType="centerCrop"
                 android:visibility="gone"
                 tools:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view2"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
             <View
                 android:id="@+id/view3"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryDarkColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/photo_main" />
+                android:background="@color/primaryDarkColor" />
 
             <TextView
                 android:id="@+id/date_main"
@@ -110,10 +94,7 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                 android:visibility="gone"
                 tools:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view3"
                 tools:text="date" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

@@ -10,31 +10,35 @@
             type="com.example.noteexample.database.Image" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <View
-            android:id="@+id/view_img_item"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_4"
-            android:background="@color/primaryDarkColor"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/photo_one_note"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:contentDescription="@string/photo"
             android:scaleType="fitCenter"
             app:imageUrl="@{data.photoPath}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/view_img_item"
             tools:src="@tools:sample/backgrounds/scenic" />
+
+        <View
+            android:id="@+id/view_img_item"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_4"
+            android:background="@color/primaryDarkColor" />
+
+        <TextView
+            android:id="@+id/note_one_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_16"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            app:photoNoteText="@{data}"
+            tools:text="Note" />
 
         <View
             android:id="@+id/view_note_item"
@@ -42,21 +46,6 @@
             android:layout_height="@dimen/dp_4"
             android:background="@color/primaryDarkColor"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/photo_one_note"
             tools:visibility="visible" />
-
-        <TextView
-            android:id="@+id/note_one_note"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/dp_16"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/photo_one_note"
-            app:photoNoteText="@{data}"
-            tools:text="Note" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>

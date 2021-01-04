@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.databinding.HeaderViewBinding
+import com.example.noteexample.databinding.RecyclerHeaderViewBinding
 import com.example.noteexample.databinding.RecyclerImageViewItemBinding
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
@@ -22,7 +22,7 @@ class ViewSimpleNoteAdapter :
 
     /**
      * ListAdapter for [com.example.noteexample.ui.OneNoteFragment]
-     * similar with [com.example.noteexample.adapters.OneNoteEditAdapter]
+     * similar with [com.example.noteexample.adapters.EditSimpleNoteAdapter]
      */
     private val _noteContentHolder = MutableLiveData<NoteContentViewHolder>()
     val noteContentHolder: LiveData<NoteContentViewHolder> = _noteContentHolder
@@ -49,10 +49,10 @@ class ViewSimpleNoteAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> {
-                val binding: HeaderViewBinding =
+                val binding: RecyclerHeaderViewBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.header_view,
+                        R.layout.recycler_header_view,
                         parent,
                         false
                     )
@@ -85,7 +85,7 @@ class ViewSimpleNoteAdapter :
         }
     }
 
-    inner class NoteViewHolder(val binding: HeaderViewBinding) :
+    inner class NoteViewHolder(val binding: RecyclerHeaderViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(header: Header) {
             binding.header = header

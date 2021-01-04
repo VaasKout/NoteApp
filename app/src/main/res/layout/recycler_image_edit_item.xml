@@ -15,14 +15,14 @@
         android:id="@+id/edit_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dp_4"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
         android:longClickable="true"
         app:cardCornerRadius="@dimen/dp_4"
         app:strokeColor="@color/primaryDarkColor"
-        app:strokeWidth="2dp"
-        android:layout_marginBottom="@dimen/dp_4">
+        app:strokeWidth="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
