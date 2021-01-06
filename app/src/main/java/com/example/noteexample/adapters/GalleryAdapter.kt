@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.GalleryData
-import com.example.noteexample.databinding.GalleryRecyclerItemBinding
+import com.example.noteexample.databinding.RecyclerGalleryItemBinding
 
 /**
  * Data class for image items
@@ -40,10 +40,10 @@ class GalleryAdapter :
         /**
          * Use only DataBindingUtil else layout options crash in recycler_main_item
          */
-        val binding: GalleryRecyclerItemBinding =
+        val binding: RecyclerGalleryItemBinding =
             DataBindingUtil.inflate(
                 layoutInflater,
-                R.layout.gallery_recycler_item,
+                R.layout.recycler_gallery_item,
                 parent,
                 false
             )
@@ -51,7 +51,7 @@ class GalleryAdapter :
         return GalleryViewHolder(binding)
     }
 
-    inner class GalleryViewHolder(val binding: GalleryRecyclerItemBinding) :
+    inner class GalleryViewHolder(val binding: RecyclerGalleryItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         /**
          * Checked state of card depends on [GalleryData.isChecked] state

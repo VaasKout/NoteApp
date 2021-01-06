@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -31,10 +30,6 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:titleText="@{header}" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_header_todo_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
     </LinearLayout>
 </layout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="firstNote"
+            type="com.example.noteexample.database.FirstNote" />
+    </data>
+
+    <TextView
+        android:id="@+id/first_note_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingTop="@dimen/dp_8"
+        android:paddingEnd="@dimen/dp_16"
+        android:paddingBottom="@dimen/dp_8"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        app:firstNoteText="@{firstNote}"
+        tools:text="Заметка" />
+</layout>

@@ -3,6 +3,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/main_card"
         android:layout_width="match_parent"
@@ -32,18 +33,18 @@
                 android:paddingEnd="@dimen/dp_16"
                 android:paddingBottom="@dimen/dp_8"
                 android:singleLine="false"
-                android:visibility="gone"
-                tools:visibility="visible"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                tools:text="Title" />
+                android:visibility="gone"
+                tools:text="Title"
+                tools:visibility="visible" />
 
             <View
                 android:id="@+id/view1"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_1"
                 android:background="@color/primaryDarkColor"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
                 tools:visibility="visible" />
 
             <TextView
@@ -56,10 +57,10 @@
                 android:paddingTop="@dimen/dp_8"
                 android:paddingEnd="@dimen/dp_16"
                 android:paddingBottom="@dimen/dp_8"
-                android:visibility="gone"
-                tools:visibility="visible"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                tools:text="Note" />
+                android:visibility="gone"
+                tools:text="Note"
+                tools:visibility="visible" />
 
             <View
                 android:id="@+id/view2"
@@ -75,8 +76,8 @@
                 android:contentDescription="@string/photo_main"
                 android:scaleType="centerCrop"
                 android:visibility="gone"
-                tools:visibility="visible"
-                tools:src="@tools:sample/backgrounds/scenic" />
+                tools:src="@tools:sample/backgrounds/scenic"
+                tools:visibility="visible" />
 
             <View
                 android:id="@+id/view3"
@@ -93,8 +94,8 @@
                 android:textAlignment="viewEnd"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                 android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="date" />
+                tools:text="date"
+                tools:visibility="visible" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

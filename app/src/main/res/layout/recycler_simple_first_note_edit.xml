@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="firstNote"
+            type="com.example.noteexample.database.FirstNote" />
+    </data>
+
+    <EditText
+        android:id="@+id/first_note_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints="@string/note"
+        android:background="@android:color/transparent"
+        android:hint="@string/note"
+        android:inputType="textMultiLine|text"
+        android:maxLength="400"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingTop="@dimen/dp_8"
+        android:paddingEnd="@dimen/dp_16"
+        android:paddingBottom="@dimen/dp_16"
+        app:firstNoteText="@{firstNote}" />
+</layout>

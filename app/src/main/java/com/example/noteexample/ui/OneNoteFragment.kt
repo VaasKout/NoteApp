@@ -86,7 +86,7 @@ class OneNoteFragment : Fragment() {
          * goto [OneNotePagerFragment] with specific photo
          */
 
-        oneNoteAdapter.noteContentHolder.observe(viewLifecycleOwner, { holder ->
+        oneNoteAdapter.imgHolder.observe(viewLifecycleOwner, { holder ->
             holder.binding.photoOneNote.setOnClickListener {
                 viewModel.scrollPosition = holder.absoluteAdapterPosition
                 oneNoteAdapter.currentList[holder.absoluteAdapterPosition].image?.let {

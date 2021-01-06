@@ -4,15 +4,11 @@
 
     <data>
 
-        <variable
-            name="text"
-            type="com.example.noteexample.database.FirstNote" />
     </data>
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/checkbox_edit"
-        firstNoteText="@{text}"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_header_todo_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Text" />
+        tools:listitem="@layout/recycler_simple_checkbox_view" />
 </layout>
