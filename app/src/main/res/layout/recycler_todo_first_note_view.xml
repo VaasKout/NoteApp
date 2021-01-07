@@ -10,5 +10,5 @@
         android:id="@+id/recycler_header_todo_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/recycler_simple_checkbox_view" />
+        tools:listitem="@layout/recycler_todo_checkbox_view" />
 </layout>

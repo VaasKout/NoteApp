@@ -8,5 +8,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/recycler_simple_checkbox_edit" />
+        tools:listitem="@layout/recycler_todo_checkbox_edit" />
 </layout>

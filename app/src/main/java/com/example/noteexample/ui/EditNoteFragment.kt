@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
+import com.example.noteexample.adapters.CheckBoxEditAdapter
 import com.example.noteexample.adapters.EditSimpleNoteAdapter
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.example.noteexample.databinding.FragmentEditNoteBinding
@@ -55,11 +57,12 @@ class EditNoteFragment : Fragment() {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
+    private val noteAdapter = EditSimpleNoteAdapter()
+    private val checkboxEditAdapter = noteAdapter.checkBoxEditAdapter
 
     private val viewModel by viewModels<EditNoteViewModel> {
         NoteViewModelFactory(args.noteID, repository)
     }
-
 
     val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
@@ -104,7 +107,6 @@ class EditNoteFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-
         /**
          * binding for EditNoteFragment
          * @see R.layout.fragment_edit_note
@@ -114,7 +116,7 @@ class EditNoteFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note, container, false)
         binding.lifecycleOwner = this
 
-        val noteAdapter = EditSimpleNoteAdapter()
+
         binding.editRecycler.apply {
             adapter = noteAdapter
             setHasFixedSize(true)
@@ -209,10 +211,16 @@ class EditNoteFragment : Fragment() {
                     if (viewModel.todoList) {
                         it.icon =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_todo_list)
+                        viewModel.currentNote?.header?.todoList = false
+                        viewModel.updateCurrentNote()
+                        noteAdapter.notifyDataSetChanged()
                         viewModel.todoList = false
                     } else {
                         it.icon =
                             ContextCompat.getDrawable(requireContext(), R.drawable.ic_simple_list)
+                        viewModel.currentNote?.header?.todoList = true
+                        viewModel.updateCurrentNote()
+                        noteAdapter.notifyDataSetChanged()
                         viewModel.todoList = true
                     }
                     true
@@ -234,15 +242,30 @@ class EditNoteFragment : Fragment() {
          * @see onPause
          */
 
-        //TODO if check for todo list
         noteAdapter.headerHolder.observe(viewLifecycleOwner) { holder ->
             holder.binding.titleEdit.addTextChangedListener {
                 viewModel.currentNote?.header?.title = it.toString()
             }
-            holder.binding.firstNoteEdit.addTextChangedListener {
-//                viewModel.currentNote?.header?.text = it.toString()
-            }
         }
+
+        noteAdapter.firstNoteSimpleHolder.observe(viewLifecycleOwner, { holder ->
+            holder.binding.firstNoteEdit.addTextChangedListener {
+                noteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.get(0)?.text =
+                    it.toString()
+            }
+        })
+
+        //TODO bug in todo list
+        checkboxEditAdapter.checkBoxHolder.observe(viewLifecycleOwner, { holder ->
+            Log.e("text",
+                noteAdapter.currentList[1].firstNote?.get(holder.absoluteAdapterPosition)?.text.toString())
+            holder.binding.text =
+                noteAdapter.currentList[1].firstNote?.get(holder.absoluteAdapterPosition)
+            holder.binding.editTextCheckbox.addTextChangedListener {
+                noteAdapter.currentList[1].firstNote?.get(holder.absoluteAdapterPosition)?.text =
+                    it.toString()
+            }
+        })
 
         /**
          * LiveData for images
@@ -321,12 +344,16 @@ class EditNoteFragment : Fragment() {
                     if (!viewModel.itemListSame) {
                         viewModel.noteList = mutableListOf()
                         viewModel.noteList.add(0, NoteWithImagesRecyclerItems(note.header))
+                        viewModel.noteList.add(
+                            1,
+                            NoteWithImagesRecyclerItems(firstNote = note.notes)
+                        )
                         note.images.forEach { image ->
                             viewModel.noteList.add(NoteWithImagesRecyclerItems(image = image))
                         }
                     } else {
                         viewModel.noteList.forEachIndexed { index, item ->
-                            if (index > 0) {
+                            if (index > 1) {
                                 item.image = note.images[index - 1]
                             }
                         }
@@ -338,6 +365,7 @@ class EditNoteFragment : Fragment() {
                 }
             }
         })
+
 
 
         //Inner function to reduce repetitive code

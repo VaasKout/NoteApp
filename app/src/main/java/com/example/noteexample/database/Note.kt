@@ -54,7 +54,7 @@ data class Header(
 data class FirstNote(
     @PrimaryKey(autoGenerate = true) var noteID: Long = 0,
     val parentNoteID: Long,
-    val text: String = "",
+    var text: String = "",
 )
 
 /**

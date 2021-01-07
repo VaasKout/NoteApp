@@ -6,6 +6,7 @@ import com.example.noteexample.database.Image
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
+import com.example.noteexample.database.FirstNote
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -102,6 +103,8 @@ class EditNoteViewModel(
             position = repository.allASCSortedNotes().size
             val header = Header(pos = position)
             repository.insertHeader(header)
+            val firstNote = FirstNote(parentNoteID = repository.getLastNote().header.headerID)
+            repository.insertFirstNote(firstNote)
             startNote = repository.getLastNote()
             repository.getLastLiveData()
         }

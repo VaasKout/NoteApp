@@ -82,6 +82,7 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
     suspend fun updateNoteWithImages(item: NoteWithImages) {
         withContext(Dispatchers.IO) {
             noteDao.updateNote(item.header)
+            noteDao.updateFirstNotes(item.notes)
             noteDao.updateImages(item.images)
         }
     }

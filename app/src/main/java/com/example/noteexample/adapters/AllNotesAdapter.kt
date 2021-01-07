@@ -12,6 +12,8 @@ import com.example.noteexample.R
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.databinding.RecyclerMainItemBinding
 
+//TODO adapter depends on type (simple | todo)
+
 class NoteAdapter :
     ListAdapter<NoteWithImages, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
 
@@ -44,15 +46,5 @@ class NoteAdapter :
             _holder.value = this
             binding.executePendingBindings()
         }
-    }
-}
-
-class NoteDiffCallBack : DiffUtil.ItemCallback<NoteWithImages>() {
-    override fun areItemsTheSame(oldItem: NoteWithImages, newItem: NoteWithImages): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: NoteWithImages, newItem: NoteWithImages): Boolean {
-        return oldItem == newItem
     }
 }
