@@ -28,6 +28,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class OneNoteFragment : Fragment() {
 
+    //TODO todo-list for this fragment
     @Inject
     lateinit var repository: NoteRepository
     lateinit var binding: FragmentOneNoteBinding
@@ -104,6 +105,7 @@ class OneNoteFragment : Fragment() {
         /**
          * NavIcon clickListener
          */
+
         binding.toolbarOneNote.setNavigationOnClickListener {
             this.findNavController().popBackStack()
         }

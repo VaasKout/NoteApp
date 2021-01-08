@@ -29,7 +29,6 @@ class EditNoteViewModel(
     var allHidden = true
     var backPressed = false
     var itemListSame = false
-    var todoList = false
 
 
     //Variables
@@ -56,16 +55,23 @@ class EditNoteViewModel(
     }
 
     /**
-     * [swap] is attached to [com.example.noteexample.ui.EditNoteFragment.helper]
+     * [swapImgs] is attached to [com.example.noteexample.ui.EditNoteFragment.helper]
      * to sort images manually, this function swaps imgIDs
      */
-    fun swap(from: Int, to: Int) {
+    fun swapImgs(from: Int, to: Int) {
         itemListSame = true
         currentNote?.let {
             val tmpID = it.images[from].imgID
             it.images[from].imgID = it.images[to].imgID
             it.images[to].imgID = tmpID
         }
+    }
+
+    fun swapNotes(list: List<FirstNote>, from: Int, to: Int) {
+        itemListSame = true
+        val tmpID = list[from].noteID
+        list[from].noteID = list[to].noteID
+        list[to].noteID = tmpID
     }
 
     /**
@@ -113,11 +119,8 @@ class EditNoteViewModel(
     /**
      * Database methods
      */
-//    suspend fun updateGalleryData(){
-//            repository.updateGalleryData()
-//    }
 
-    fun updateCurrentNote() {
+    fun updateCurrentNote(list: List<FirstNote>? = null) {
         viewModelScope.launch {
             if (noteID > -1) {
                 currentNote?.let {
@@ -136,6 +139,9 @@ class EditNoteViewModel(
                     repository.updateNoteWithImages(it)
                 }
             }
+            list?.let {
+                repository.updateFirstNotes(it)
+            }
         }
     }
 
@@ -148,6 +154,27 @@ class EditNoteViewModel(
     suspend fun deleteNoteWithImages(noteWithImages: NoteWithImages?) {
         noteWithImages?.let {
             repository.deleteNoteWithImages(it)
+        }
+    }
+
+    fun deleteFirstNote(firstNote: FirstNote) {
+        viewModelScope.launch {
+            repository.deleteFirstNote(firstNote)
+        }
+    }
+
+    fun updateFirstNote(list: List<FirstNote>) {
+        viewModelScope.launch {
+            repository.updateFirstNotes(list)
+        }
+    }
+
+    fun insertNewFirstNote() {
+        viewModelScope.launch {
+            currentNote?.let {
+                val firstNote = FirstNote(parentNoteID = it.header.headerID)
+                repository.insertFirstNote(firstNote)
+            }
         }
     }
 

@@ -5,12 +5,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.NoteWithImages
-import com.example.noteexample.databinding.RecyclerMainItemBinding
+import com.example.noteexample.databinding.RecyclerItemMainBinding
 
 //TODO adapter depends on type (simple | todo)
 
@@ -35,12 +34,12 @@ class NoteAdapter :
         /**
          * Use only DataBindingUtil else layout options crash in recycler_main_item
          */
-        val binding: RecyclerMainItemBinding =
-            DataBindingUtil.inflate(layoutInflater, R.layout.recycler_main_item, parent, false)
+        val binding: RecyclerItemMainBinding =
+            DataBindingUtil.inflate(layoutInflater, R.layout.recycler_item_main, parent, false)
         return NoteViewHolder(binding)
     }
 
-    inner class NoteViewHolder(val binding: RecyclerMainItemBinding) :
+    inner class NoteViewHolder(val binding: RecyclerItemMainBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind() {
             _holder.value = this

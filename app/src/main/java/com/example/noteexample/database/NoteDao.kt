@@ -62,10 +62,10 @@ interface NoteDao {
      * [FirstNote] Queries
      */
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFirstNote(note: FirstNote)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFirstNotes(notes: List<FirstNote>)
 
     @Update
@@ -88,10 +88,10 @@ interface NoteDao {
      * [Image] Queries
      */
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertImages(images: List<Image>)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertImage(image: Image)
 
     @Update

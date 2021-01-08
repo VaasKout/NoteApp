@@ -9,37 +9,36 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
 import com.example.noteexample.database.FirstNote
-import com.example.noteexample.databinding.RecyclerMainItemBinding
-import com.example.noteexample.databinding.RecyclerTodoCheckboxEditBinding
+import com.example.noteexample.databinding.RecyclerItemTodoFirstNoteEditBinding
 
-class CheckBoxEditAdapter:
-    ListAdapter<FirstNote, CheckBoxEditAdapter.CheckBoxEditHolder>(FirstNoteDiffCallback()) {
+class FirstNoteCheckBoxEditAdapter:
+    ListAdapter<FirstNote, FirstNoteCheckBoxEditAdapter.CheckBoxEditHolder>(FirstNoteDiffCallback()) {
 
     private val _checkBoxHolder = MutableLiveData<CheckBoxEditHolder>()
     val checkBoxHolder: LiveData<CheckBoxEditHolder> = _checkBoxHolder
 
-    override fun onBindViewHolder(holder: CheckBoxEditAdapter.CheckBoxEditHolder, position: Int) {
+    override fun onBindViewHolder(holder: CheckBoxEditHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheckBoxEditHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
 
-        val binding: RecyclerTodoCheckboxEditBinding =
+        val binding: RecyclerItemTodoFirstNoteEditBinding =
             DataBindingUtil.inflate(
                 layoutInflater,
-                R.layout.recycler_todo_checkbox_edit,
+                R.layout.recycler_item_todo_first_note_edit,
                 parent,
                 false
             )
         return CheckBoxEditHolder(binding)
     }
 
-    inner class CheckBoxEditHolder(val binding: RecyclerTodoCheckboxEditBinding) :
+    inner class CheckBoxEditHolder(val binding: RecyclerItemTodoFirstNoteEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(firstNote: FirstNote) {
-            _checkBoxHolder.value = this
             binding.text = firstNote
+            _checkBoxHolder.value = this
             binding.executePendingBindings()
         }
     }

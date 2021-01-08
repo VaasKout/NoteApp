@@ -36,6 +36,7 @@ class AllNotesFragment : Fragment() {
     /**
      *  Define [AllNotesViewModel] object for [AllNotesFragment]
      */
+
     private val viewModel: AllNotesViewModel by viewModels()
 
     /**

@@ -100,7 +100,7 @@ class SettingsFragment : BottomSheetDialogFragment() {
 
         /**
          * Show or hide date
-         * @see R.layout.recycler_main_item
+         * @see R.layout.recycler_item_main
          */
         binding.switchDate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {

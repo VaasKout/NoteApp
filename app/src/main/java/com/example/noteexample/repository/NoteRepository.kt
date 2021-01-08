@@ -136,6 +136,12 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
+    suspend fun updateFirstNotes(firstNotes: List<FirstNote>){
+        withContext(Dispatchers.IO){
+            noteDao.updateFirstNotes(firstNotes)
+        }
+    }
+
     suspend fun deleteFirstNote(firstNote: FirstNote){
         withContext(Dispatchers.IO){
             noteDao.deleteFirstNote(firstNote)

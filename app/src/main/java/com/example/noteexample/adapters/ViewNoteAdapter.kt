@@ -12,20 +12,16 @@ import com.example.noteexample.R
 import com.example.noteexample.database.FirstNote
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.databinding.RecyclerSimpleFirstNoteViewBinding
-import com.example.noteexample.databinding.RecyclerSimpleHeaderViewBinding
-import com.example.noteexample.databinding.RecyclerSimpleImageViewBinding
-import com.example.noteexample.databinding.RecyclerTodoFirstNoteViewBinding
+import com.example.noteexample.databinding.*
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
-private const val ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE = 1
-private const val ITEM_VIEW_TYPE_TODO_FIRST_NOTE = 2
-private const val ITEM_VIEW_TYPE_IMAGE = 3
+private const val ITEM_VIEW_TYPE_FIRST_NOTE = 1
+private const val ITEM_VIEW_TYPE_IMAGE = 2
 
 class ViewSimpleNoteAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(NoteWithImagesDiffCallback()) {
 
-    val checkBoxViewAdapter = CheckBoxViewAdapter()
+    val checkBoxViewAdapter = FirstNoteCheckBoxViewAdapter()
 
     /**
      * ListAdapter for [com.example.noteexample.ui.OneNoteFragment]
@@ -35,9 +31,6 @@ class ViewSimpleNoteAdapter :
     private val _headerHolder = MutableLiveData<HeaderViewHolder>()
     val headerHolder: LiveData<HeaderViewHolder> = _headerHolder
 
-    private val _firstNoteSimpleHolder = MutableLiveData<FirstNoteSimpleViewHolder>()
-    val firstNoteSimpleHolder: LiveData<FirstNoteSimpleViewHolder> = _firstNoteSimpleHolder
-
     private val _imgHolder = MutableLiveData<ImageViewHolder>()
     val imgHolder: LiveData<ImageViewHolder> = _imgHolder
 
@@ -45,12 +38,7 @@ class ViewSimpleNoteAdapter :
         return when (position) {
             0 -> ITEM_VIEW_TYPE_HEADER
             1 -> {
-                getItem(0).header?.let {
-                    if (it.todoList) {
-                        ITEM_VIEW_TYPE_TODO_FIRST_NOTE
-                    }
-                }
-                ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE
+                ITEM_VIEW_TYPE_FIRST_NOTE
             }
             else -> ITEM_VIEW_TYPE_IMAGE
         }
@@ -61,14 +49,7 @@ class ViewSimpleNoteAdapter :
             is HeaderViewHolder -> {
                 getItem(position).header?.let { holder.bind(it) }
             }
-            is FirstNoteSimpleViewHolder -> {
-                getItem(position).firstNote?.let {
-                    if (it.isNotEmpty()) {
-                        holder.bind(it[0])
-                    }
-                }
-            }
-            is FirstNoteTodoViewHolder -> {
+            is FirstNoteViewHolder -> {
                 getItem(position).firstNote?.let { holder.bind(it) }
             }
             is ImageViewHolder -> {
@@ -80,44 +61,33 @@ class ViewSimpleNoteAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> {
-                val binding: RecyclerSimpleHeaderViewBinding =
+                val binding: RecyclerItemHeaderViewBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.recycler_simple_header_view,
+                        R.layout.recycler_item_header_view,
                         parent,
                         false
                     )
                 return HeaderViewHolder(binding)
             }
 
-            ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE -> {
-                val binding: RecyclerSimpleFirstNoteViewBinding =
+            ITEM_VIEW_TYPE_FIRST_NOTE -> {
+                val binding: RecyclerFirstNoteBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.recycler_simple_first_note_view,
+                        R.layout.recycler_first_note,
                         parent,
                         false
                     )
-                return FirstNoteSimpleViewHolder(binding)
-            }
-
-            ITEM_VIEW_TYPE_TODO_FIRST_NOTE -> {
-                val binding: RecyclerTodoFirstNoteViewBinding =
-                    DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.context),
-                        R.layout.recycler_todo_first_note_view,
-                        parent,
-                        false
-                    )
-                return FirstNoteTodoViewHolder(binding)
+                return FirstNoteViewHolder(binding)
             }
 
             ITEM_VIEW_TYPE_IMAGE -> {
-                val binding: RecyclerSimpleImageViewBinding =
+                val binding: RecyclerItemImageViewBinding =
                     DataBindingUtil
                         .inflate(
                             LayoutInflater.from(parent.context),
-                            R.layout.recycler_simple_image_view,
+                            R.layout.recycler_item_image_view,
                             parent,
                             false
                         )
@@ -127,7 +97,7 @@ class ViewSimpleNoteAdapter :
         }
     }
 
-    inner class HeaderViewHolder(val binding: RecyclerSimpleHeaderViewBinding) :
+    inner class HeaderViewHolder(val binding: RecyclerItemHeaderViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(header: Header) {
             binding.header = header
@@ -138,19 +108,10 @@ class ViewSimpleNoteAdapter :
         }
     }
 
-    inner class FirstNoteSimpleViewHolder(val binding: RecyclerSimpleFirstNoteViewBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(firstNote: FirstNote) {
-            _firstNoteSimpleHolder.value = this
-            binding.firstNote = firstNote
-            binding.executePendingBindings()
-        }
-    }
-
-    inner class FirstNoteTodoViewHolder(val binding: RecyclerTodoFirstNoteViewBinding) :
+    inner class FirstNoteViewHolder(val binding: RecyclerFirstNoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(firstNote: List<FirstNote>) {
-            binding.recyclerHeaderTodoView.apply {
+            binding.recyclerFirstNote.apply {
                 adapter = checkBoxViewAdapter
                 setHasFixedSize(true)
             }
@@ -159,7 +120,7 @@ class ViewSimpleNoteAdapter :
         }
     }
 
-    inner class ImageViewHolder(val binding: RecyclerSimpleImageViewBinding) :
+    inner class ImageViewHolder(val binding: RecyclerItemImageViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(image: Image) {

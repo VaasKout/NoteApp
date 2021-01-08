@@ -12,33 +12,32 @@ import com.example.noteexample.R
 import com.example.noteexample.database.FirstNote
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.databinding.RecyclerSimpleFirstNoteEditBinding
-import com.example.noteexample.databinding.RecyclerSimpleHeaderEditBinding
-import com.example.noteexample.databinding.RecyclerSimpleImageEditBinding
-import com.example.noteexample.databinding.RecyclerTodoFirstNoteEditBinding
+import com.example.noteexample.databinding.RecyclerFirstNoteBinding
+import com.example.noteexample.databinding.RecyclerItemHeaderEditBinding
+import com.example.noteexample.databinding.RecyclerItemImageEditBinding
 
 /**
  * ListAdapter for [com.example.noteexample.ui.EditNoteFragment] with header on 0 position
  *
- * [EditSimpleNoteAdapter.headerHolder] LiveData for header
- * [EditSimpleNoteAdapter.imgHolder] LiveData for other items
+ * [EditNoteAdapter.headerHolder] LiveData for header
+ * [EditNoteAdapter.imgHolder] LiveData for other items
  */
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
-private const val ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE = 1
-private const val ITEM_VIEW_TYPE_TODO_FIRST_NOTE = 2
-private const val ITEM_VIEW_TYPE_IMAGE = 3
+private const val ITEM_VIEW_TYPE_FIRST_NOTE = 1
+private const val ITEM_VIEW_TYPE_IMAGE = 2
 
-class EditSimpleNoteAdapter :
+class EditNoteAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(NoteWithImagesDiffCallback()) {
 
-    val checkBoxEditAdapter = CheckBoxEditAdapter()
+    val checkBoxEditAdapter = FirstNoteCheckBoxEditAdapter()
+    val simpleEditAdapter = FirstNoteSimpleEditAdapter()
 
     private val _headerHolder = MutableLiveData<HeaderEditHolder>()
     val headerHolder: LiveData<HeaderEditHolder> = _headerHolder
 
-    private val _firstNoteSimpleHolder = MutableLiveData<FirstNoteSimpleEditHolder>()
-    val firstNoteSimpleHolder: LiveData<FirstNoteSimpleEditHolder> = _firstNoteSimpleHolder
+    private val _firstNoteHolder = MutableLiveData<FirstNoteEditHolder>()
+    val firstNoteHolder: LiveData<FirstNoteEditHolder> = _firstNoteHolder
 
     private val _imgHolder = MutableLiveData<ImageEditHolder>()
     val imgHolder: LiveData<ImageEditHolder> = _imgHolder
@@ -46,14 +45,7 @@ class EditSimpleNoteAdapter :
     override fun getItemViewType(position: Int): Int {
         return when (position) {
             0 -> ITEM_VIEW_TYPE_HEADER
-            1 -> {
-                getItem(0).header?.let {
-                    if (it.todoList) {
-                      return ITEM_VIEW_TYPE_TODO_FIRST_NOTE
-                    }
-                }
-               return ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE
-            }
+            1 -> ITEM_VIEW_TYPE_FIRST_NOTE
             else -> ITEM_VIEW_TYPE_IMAGE
         }
     }
@@ -63,14 +55,7 @@ class EditSimpleNoteAdapter :
             is HeaderEditHolder -> {
                 getItem(position).header?.let { holder.bind(it) }
             }
-            is FirstNoteSimpleEditHolder -> {
-                getItem(position).firstNote?.let {
-                    if (it.isNotEmpty()) {
-                        holder.bind(it[0])
-                    }
-                }
-            }
-            is FirstNoteTodoEditHolder -> {
+            is FirstNoteEditHolder -> {
                 getItem(position).firstNote?.let { holder.bind(it) }
             }
             is ImageEditHolder -> {
@@ -82,44 +67,33 @@ class EditSimpleNoteAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> {
-                val binding: RecyclerSimpleHeaderEditBinding =
+                val binding: RecyclerItemHeaderEditBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.recycler_simple_header_edit,
+                        R.layout.recycler_item_header_edit,
                         parent,
                         false
                     )
                 return HeaderEditHolder(binding)
             }
 
-            ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE -> {
-                val binding: RecyclerSimpleFirstNoteEditBinding =
+            ITEM_VIEW_TYPE_FIRST_NOTE -> {
+                val binding: RecyclerFirstNoteBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.recycler_simple_first_note_edit,
+                        R.layout.recycler_first_note,
                         parent,
                         false
                     )
-                return FirstNoteSimpleEditHolder(binding)
-            }
-
-            ITEM_VIEW_TYPE_TODO_FIRST_NOTE -> {
-                val binding: RecyclerTodoFirstNoteEditBinding =
-                    DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.context),
-                        R.layout.recycler_todo_first_note_edit,
-                        parent,
-                        false
-                    )
-                return FirstNoteTodoEditHolder(binding)
+                return FirstNoteEditHolder(binding)
             }
 
             ITEM_VIEW_TYPE_IMAGE -> {
-                val binding: RecyclerSimpleImageEditBinding =
+                val binding: RecyclerItemImageEditBinding =
                     DataBindingUtil
                         .inflate(
                             LayoutInflater.from(parent.context),
-                            R.layout.recycler_simple_image_edit,
+                            R.layout.recycler_item_image_edit,
                             parent,
                             false
                         )
@@ -130,9 +104,8 @@ class EditSimpleNoteAdapter :
     }
 
 
-    inner class HeaderEditHolder(val binding: RecyclerSimpleHeaderEditBinding) :
+    inner class HeaderEditHolder(val binding: RecyclerItemHeaderEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         fun bind(header: Header) {
             _headerHolder.value = this
             binding.header = header
@@ -140,34 +113,32 @@ class EditSimpleNoteAdapter :
         }
     }
 
-    inner class FirstNoteSimpleEditHolder(val binding: RecyclerSimpleFirstNoteEditBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(firstNote: FirstNote) {
-            binding.firstNote = firstNote
-            _firstNoteSimpleHolder.value = this
-            binding.executePendingBindings()
-        }
-    }
-
-    inner class FirstNoteTodoEditHolder(val binding: RecyclerTodoFirstNoteEditBinding) :
+    inner class FirstNoteEditHolder(val binding: RecyclerFirstNoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(firstNote: List<FirstNote>) {
-            binding.recyclerHeaderTodoEdit.apply {
-                adapter = checkBoxEditAdapter
-                setHasFixedSize(true)
+            getItem(0).header?.let { header ->
+                binding.recyclerFirstNote.apply {
+                    adapter = if (header.todoList) {
+                        checkBoxEditAdapter
+                    } else {
+                        simpleEditAdapter
+                    }
+                }
             }
             checkBoxEditAdapter.submitList(firstNote)
+            simpleEditAdapter.submitList(firstNote)
+            _firstNoteHolder.value = this
             binding.executePendingBindings()
         }
     }
 
-    inner class ImageEditHolder(val binding: RecyclerSimpleImageEditBinding) :
+    inner class ImageEditHolder(val binding: RecyclerItemImageEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(images: Image) {
+        fun bind(image: Image) {
             _imgHolder.value = this
-            binding.data = images
-            if (images.photoPath.isEmpty()) {
+            binding.data = image
+            if (image.photoPath.isEmpty()) {
                 binding.deleteCircle.visibility = View.GONE
                 binding.deleteCircleIcon.visibility = View.GONE
             }

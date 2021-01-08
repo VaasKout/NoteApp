@@ -1,14 +1,15 @@
 package com.example.noteexample.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,23 +21,19 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
-import com.example.noteexample.adapters.CheckBoxEditAdapter
-import com.example.noteexample.adapters.EditSimpleNoteAdapter
+import com.example.noteexample.adapters.EditNoteAdapter
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
+import com.example.noteexample.utils.ItemHelperCallback
 import com.example.noteexample.viewmodels.EditNoteViewModel
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,53 +51,42 @@ class EditNoteFragment : Fragment() {
 
     @Inject
     lateinit var repository: NoteRepository
+
+    private val noteAdapter = EditNoteAdapter()
+    private val itemHelperCallback = ItemHelperCallback()
+    private val checkboxEditAdapter = noteAdapter.checkBoxEditAdapter
+    private val simpleEditAdapter = noteAdapter.simpleEditAdapter
+
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
-    private val noteAdapter = EditSimpleNoteAdapter()
-    private val checkboxEditAdapter = noteAdapter.checkBoxEditAdapter
 
     private val viewModel by viewModels<EditNoteViewModel> {
         NoteViewModelFactory(args.noteID, repository)
     }
 
-    val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
-                ItemTouchHelper.DOWN or ItemTouchHelper.UP,
-        0
-    ) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            val from = viewHolder.absoluteAdapterPosition - 1
-            val to = target.absoluteAdapterPosition - 1
-
-            if (from >= 0 && to >= 0) {
-                viewModel.swap(from, to)
-                recyclerView.adapter?.notifyItemMoved(from + 1, to + 1)
-            }
-            return true
-        }
-
-        override fun clearView(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder
-        ) {
-            super.clearView(recyclerView, viewHolder)
+    private val imgHelper = itemHelperCallback.getHelper(
+        range = 2,
+        swapAction = { from: Int, to: Int ->
+            viewModel.swapImgs(from, to)
+        },
+        clearViewAction = {
             viewModel.updateCurrentNote()
         }
+    )
 
-        override fun onSwiped(
-            viewHolder: RecyclerView.ViewHolder,
-            direction: Int
-        ) {
+    private val firstNoteHelper = itemHelperCallback.getHelper(
+        range = 0,
+        swapAction = { from: Int, to: Int ->
+            viewModel.swapNotes(checkboxEditAdapter.currentList, from, to)
+        },
+        clearViewAction = {
+            viewModel.updateCurrentNote(checkboxEditAdapter.currentList)
         }
+    )
 
-    })
 
-
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -115,14 +101,6 @@ class EditNoteFragment : Fragment() {
         val binding: FragmentEditNoteBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note, container, false)
         binding.lifecycleOwner = this
-
-
-        binding.editRecycler.apply {
-            adapter = noteAdapter
-            setHasFixedSize(true)
-        }
-        helper.attachToRecyclerView(binding.editRecycler)
-
 
         requestPermissionLauncher =
             registerForActivityResult(
@@ -155,6 +133,12 @@ class EditNoteFragment : Fragment() {
                     noteAdapter.notifyDataSetChanged()
                 }
             }
+
+
+        binding.editRecycler.apply {
+            adapter = noteAdapter
+        }
+        imgHelper.attachToRecyclerView(binding.editRecycler)
 
         //navIcon clickListener
         binding.toolbarNoteEdit.setNavigationOnClickListener {
@@ -208,20 +192,24 @@ class EditNoteFragment : Fragment() {
                     true
                 }
                 R.id.todo -> {
-                    if (viewModel.todoList) {
-                        it.icon =
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_todo_list)
-                        viewModel.currentNote?.header?.todoList = false
-                        viewModel.updateCurrentNote()
-                        noteAdapter.notifyDataSetChanged()
-                        viewModel.todoList = false
-                    } else {
-                        it.icon =
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_simple_list)
-                        viewModel.currentNote?.header?.todoList = true
-                        viewModel.updateCurrentNote()
-                        noteAdapter.notifyDataSetChanged()
-                        viewModel.todoList = true
+                    viewModel.currentNote?.header?.let { header ->
+                        if (header.todoList) {
+                            it.icon = ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.ic_todo_list
+                            )
+                            header.todoList = false
+                            viewModel.updateCurrentNote(checkboxEditAdapter.currentList)
+                            noteAdapter.notifyDataSetChanged()
+                        } else {
+                            it.icon = ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.ic_simple_list
+                            )
+                            header.todoList = true
+                            viewModel.updateCurrentNote(simpleEditAdapter.currentList)
+                            noteAdapter.notifyDataSetChanged()
+                        }
                     }
                     true
                 }
@@ -235,7 +223,7 @@ class EditNoteFragment : Fragment() {
 
         /**
          * LiveData for header
-         * @see EditSimpleNoteAdapter.headerHolder
+         * @see EditNoteAdapter.headerHolder
          *
          * TextChangeListener write title and text values and updates them when exit
          * or accidentally close app if this is note is new
@@ -248,28 +236,64 @@ class EditNoteFragment : Fragment() {
             }
         }
 
-        noteAdapter.firstNoteSimpleHolder.observe(viewLifecycleOwner, { holder ->
+        noteAdapter.firstNoteHolder.observe(viewLifecycleOwner, {
+            firstNoteHelper.attachToRecyclerView(it.binding.recyclerFirstNote)
+        })
+
+//            holder.binding.firstNoteEdit.imeOptions = EditorInfo.IME_MASK_ACTION
+//            holder.binding.firstNoteEdit.setRawInputType(InputType.TYPE_CLASS_TEXT)
+
+        simpleEditAdapter.simpleHolder.observe(viewLifecycleOwner, { holder ->
+            holder.binding.firstNoteEdit.setOnEditorActionListener { _, actionId, _ ->
+                return@setOnEditorActionListener when (actionId) {
+                    EditorInfo.IME_ACTION_NEXT -> {
+                        noteAdapter.currentList[1]
+                            .firstNote?.get(holder.absoluteAdapterPosition)?.let {
+                                it.text = "${it.text}\n"
+                            }
+                        viewModel.updateFirstNote(checkboxEditAdapter.currentList)
+                        viewModel.insertNewFirstNote()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
             holder.binding.firstNoteEdit.addTextChangedListener {
-                noteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.get(0)?.text =
+                simpleEditAdapter.currentList[holder.absoluteAdapterPosition].text =
                     it.toString()
             }
         })
 
-        //TODO bug in todo list
         checkboxEditAdapter.checkBoxHolder.observe(viewLifecycleOwner, { holder ->
-            Log.e("text",
-                noteAdapter.currentList[1].firstNote?.get(holder.absoluteAdapterPosition)?.text.toString())
-            holder.binding.text =
-                noteAdapter.currentList[1].firstNote?.get(holder.absoluteAdapterPosition)
+
             holder.binding.editTextCheckbox.addTextChangedListener {
-                noteAdapter.currentList[1].firstNote?.get(holder.absoluteAdapterPosition)?.text =
+                checkboxEditAdapter.currentList[holder.absoluteAdapterPosition].text =
                     it.toString()
             }
+
+            holder.binding.editTextCheckbox.setOnEditorActionListener { _, actionId, _ ->
+                return@setOnEditorActionListener when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> {
+                        viewModel.updateFirstNote(checkboxEditAdapter.currentList)
+                        viewModel.insertNewFirstNote()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+            holder.binding.deleteFirstNoteItemButton.setOnClickListener {
+                viewModel.deleteFirstNote(
+                    checkboxEditAdapter.currentList[holder.absoluteAdapterPosition]
+                )
+            }
         })
+
 
         /**
          * LiveData for images
-         * @see EditSimpleNoteAdapter.imgHolder
+         * @see EditNoteAdapter.imgHolder
          *
          * set visibility and clickListeners when the
          * image is in normal state or in hidden state
@@ -329,14 +353,13 @@ class EditNoteFragment : Fragment() {
             viewModel.backPressed = true
             viewModel.onStartNavigating()
         }
-
-
         /**
-         * [EditNoteViewModel.currentNoteLiveData] submits list for [EditSimpleNoteAdapter]
+         * [EditNoteViewModel.currentNoteLiveData] submits list for [EditNoteAdapter]
          *
          * It doesn't define new list each time to prevent blinks each time
          * [EditNoteViewModel.currentNoteLiveData] is observed
          */
+        //TODO Fix item touch helpers
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
             viewModel.currentNote = it
             lifecycleScope.launch(Dispatchers.Default) {
@@ -353,8 +376,11 @@ class EditNoteFragment : Fragment() {
                         }
                     } else {
                         viewModel.noteList.forEachIndexed { index, item ->
+                            if (index == 1) {
+                                item.firstNote = note.notes
+                            }
                             if (index > 1) {
-                                item.image = note.images[index - 1]
+                                item.image = note.images[index - 2]
                             }
                         }
                         viewModel.itemListSame = false

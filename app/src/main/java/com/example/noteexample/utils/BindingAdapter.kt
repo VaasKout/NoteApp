@@ -41,8 +41,8 @@ fun TextView.titleText(header: Header?) {
 
 
 @BindingAdapter("firstNoteText")
-fun TextView.firstNoteText(header: FirstNote?) {
-    header?.let {
+fun TextView.firstNoteText(firstNote: FirstNote?) {
+    firstNote?.let {
         when {
             this is EditText && it.text.isNotEmpty() -> {
                 setText(it.text)

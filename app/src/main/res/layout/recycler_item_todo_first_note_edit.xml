@@ -31,10 +31,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+
             app:layout_constraintBottom_toBottomOf="@id/colon_edit"
             app:layout_constraintStart_toEndOf="@id/colon_edit"
             app:layout_constraintTop_toTopOf="@id/colon_edit"
-            app:layout_constraintVertical_bias="0.35"
             tools:text=" " />
 
         <EditText
@@ -44,14 +44,25 @@
             android:autofillHints="@string/note"
             android:background="@android:color/transparent"
             android:hint="@string/note"
-            android:inputType="textMultiLine|text"
+            android:imeOptions="actionDone"
+            android:inputType="text"
             android:maxLength="400"
             app:firstNoteText="@{text}"
             app:layout_constraintBottom_toBottomOf="@+id/checkbox_edit"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/delete_first_note_item_button"
             app:layout_constraintStart_toEndOf="@+id/checkbox_edit"
             app:layout_constraintTop_toTopOf="@+id/checkbox_edit"
             tools:ignore="LabelFor" />
+
+        <ImageView
+            android:id="@+id/delete_first_note_item_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/clear_row"
+            android:src="@drawable/ic_clear_normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

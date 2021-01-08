@@ -54,7 +54,7 @@
             android:id="@+id/gallery_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/recycler_gallery_item" />
+            tools:listitem="@layout/recycler_item_gallery" />
 
     </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>
