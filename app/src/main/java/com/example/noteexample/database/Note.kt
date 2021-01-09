@@ -40,6 +40,7 @@ data class Flags(
  * [com.example.noteexample.ui.AllNotesFragment]
  */
 
+//TODO check migration
 @Entity(tableName = "header_table")
 data class Header(
     @PrimaryKey(autoGenerate = true) var headerID: Long = 0,

@@ -78,10 +78,10 @@ class EditNoteFragment : Fragment() {
     private val firstNoteHelper = itemHelperCallback.getHelper(
         range = 0,
         swapAction = { from: Int, to: Int ->
-            viewModel.swapNotes(checkboxEditAdapter.currentList, from, to)
+            viewModel.swapNotes(from, to)
         },
         clearViewAction = {
-            viewModel.updateCurrentNote(checkboxEditAdapter.currentList)
+            viewModel.updateCurrentNote()
         }
     )
 
@@ -137,6 +137,7 @@ class EditNoteFragment : Fragment() {
 
         binding.editRecycler.apply {
             adapter = noteAdapter
+            setHasFixedSize(true)
         }
         imgHelper.attachToRecyclerView(binding.editRecycler)
 

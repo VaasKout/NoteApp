@@ -67,11 +67,13 @@ class EditNoteViewModel(
         }
     }
 
-    fun swapNotes(list: List<FirstNote>, from: Int, to: Int) {
+    fun swapNotes(from: Int, to: Int) {
         itemListSame = true
-        val tmpID = list[from].noteID
-        list[from].noteID = list[to].noteID
-        list[to].noteID = tmpID
+        currentNote?.let {
+            val tmpID = it.notes[from].noteID
+            it.notes[from].noteID = it.notes[to].noteID
+            it.notes[to].noteID = tmpID
+        }
     }
 
     /**
