@@ -53,7 +53,7 @@ data class Header(
 
 @Entity(tableName = "first_note_table")
 data class FirstNote(
-    @PrimaryKey(autoGenerate = true) var noteID: Long = 0,
+    @PrimaryKey var notePos: Int,
     val parentNoteID: Long,
     var text: String = "",
 )
@@ -66,7 +66,8 @@ data class FirstNote(
 
 @Entity(tableName = "image_table")
 data class Image(
-    @PrimaryKey(autoGenerate = true) var imgID: Long = 0,
+    @PrimaryKey
+    var imgPos: Int,
     val parentImgNoteID: Long,
     var signature: String = "",
     var photoPath: String,

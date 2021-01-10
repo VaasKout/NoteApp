@@ -53,8 +53,9 @@ class GalleryViewModel(
                         return@forEach
                     }
                 }
-                photoList.forEach { photo ->
+                photoList.forEachIndexed {index, photo ->
                     val image = Image(
+                        imgPos = index,
                         parentImgNoteID = noteID,
                         photoPath = photo.imgSrcUrl
                     )

@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="text"
+            name="firstNote"
             type="com.example.noteexample.database.FirstNote" />
     </data>
 
@@ -47,7 +47,7 @@
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLength="400"
-            app:firstNoteText="@{text}"
+            app:firstNoteText="@{firstNote}"
             app:layout_constraintBottom_toBottomOf="@+id/checkbox_edit"
             app:layout_constraintEnd_toStartOf="@+id/delete_first_note_item_button"
             app:layout_constraintStart_toEndOf="@+id/checkbox_edit"

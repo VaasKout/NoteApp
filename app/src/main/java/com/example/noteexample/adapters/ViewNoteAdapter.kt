@@ -21,8 +21,6 @@ private const val ITEM_VIEW_TYPE_IMAGE = 2
 class ViewSimpleNoteAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(NoteWithImagesDiffCallback()) {
 
-    val checkBoxViewAdapter = FirstNoteCheckBoxViewAdapter()
-
     /**
      * ListAdapter for [com.example.noteexample.ui.OneNoteFragment]
      * similar with [com.example.noteexample.adapters.EditSimpleNoteAdapter]
@@ -110,12 +108,7 @@ class ViewSimpleNoteAdapter :
 
     inner class FirstNoteViewHolder(val binding: RecyclerFirstNoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(firstNote: List<FirstNote>) {
-            binding.recyclerFirstNote.apply {
-                adapter = checkBoxViewAdapter
-                setHasFixedSize(true)
-            }
-            checkBoxViewAdapter.submitList(firstNote)
+        fun bind(firstNote: FirstNote) {
             binding.executePendingBindings()
         }
     }

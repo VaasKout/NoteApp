@@ -12,9 +12,7 @@ import com.example.noteexample.R
 import com.example.noteexample.database.FirstNote
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.databinding.RecyclerFirstNoteBinding
-import com.example.noteexample.databinding.RecyclerItemHeaderEditBinding
-import com.example.noteexample.databinding.RecyclerItemImageEditBinding
+import com.example.noteexample.databinding.*
 
 /**
  * ListAdapter for [com.example.noteexample.ui.EditNoteFragment] with header on 0 position
@@ -24,29 +22,45 @@ import com.example.noteexample.databinding.RecyclerItemImageEditBinding
  */
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
-private const val ITEM_VIEW_TYPE_FIRST_NOTE = 1
-private const val ITEM_VIEW_TYPE_IMAGE = 2
+private const val ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE = 1
+private const val ITEM_VIEW_TYPE_TODO_FIRST_NOTE = 2
+private const val ITEM_VIEW_TYPE_IMAGE = 3
 
 class EditNoteAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(NoteWithImagesDiffCallback()) {
 
-    val checkBoxEditAdapter = FirstNoteCheckBoxEditAdapter()
-    val simpleEditAdapter = FirstNoteSimpleEditAdapter()
+    private var todoList = false
 
     private val _headerHolder = MutableLiveData<HeaderEditHolder>()
     val headerHolder: LiveData<HeaderEditHolder> = _headerHolder
 
-    private val _firstNoteHolder = MutableLiveData<FirstNoteEditHolder>()
-    val firstNoteHolder: LiveData<FirstNoteEditHolder> = _firstNoteHolder
+    private val _firstNoteSimpleHolder = MutableLiveData<FirstNoteSimpleEditHolder>()
+    val firstNoteSimpleHolder: LiveData<FirstNoteSimpleEditHolder> = _firstNoteSimpleHolder
+
+    private val _firstNoteTodoHolder = MutableLiveData<FirstNoteTodoEditHolder>()
+    val firstNoteTodoHolder: LiveData<FirstNoteTodoEditHolder> = _firstNoteTodoHolder
 
     private val _imgHolder = MutableLiveData<ImageEditHolder>()
     val imgHolder: LiveData<ImageEditHolder> = _imgHolder
 
     override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            0 -> ITEM_VIEW_TYPE_HEADER
-            1 -> ITEM_VIEW_TYPE_FIRST_NOTE
-            else -> ITEM_VIEW_TYPE_IMAGE
+        when (position) {
+            0 -> {
+                getItem(position).header?.let {
+                    todoList = it.todoList
+                }
+                return ITEM_VIEW_TYPE_HEADER
+            }
+            else -> {
+                getItem(position).firstNote?.let {
+                    return if (!todoList) {
+                        ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE
+                    } else {
+                        ITEM_VIEW_TYPE_TODO_FIRST_NOTE
+                    }
+                }
+                return ITEM_VIEW_TYPE_IMAGE
+            }
         }
     }
 
@@ -55,7 +69,10 @@ class EditNoteAdapter :
             is HeaderEditHolder -> {
                 getItem(position).header?.let { holder.bind(it) }
             }
-            is FirstNoteEditHolder -> {
+            is FirstNoteSimpleEditHolder -> {
+                getItem(position).firstNote?.let { holder.bind(it) }
+            }
+            is FirstNoteTodoEditHolder -> {
                 getItem(position).firstNote?.let { holder.bind(it) }
             }
             is ImageEditHolder -> {
@@ -77,15 +94,26 @@ class EditNoteAdapter :
                 return HeaderEditHolder(binding)
             }
 
-            ITEM_VIEW_TYPE_FIRST_NOTE -> {
-                val binding: RecyclerFirstNoteBinding =
+            ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE -> {
+                val binding: RecyclerItemSimpleFirstNoteEditBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.recycler_first_note,
+                        R.layout.recycler_item_simple_first_note_edit,
                         parent,
                         false
                     )
-                return FirstNoteEditHolder(binding)
+                return FirstNoteSimpleEditHolder(binding)
+            }
+
+            ITEM_VIEW_TYPE_TODO_FIRST_NOTE -> {
+                val binding: RecyclerItemTodoFirstNoteEditBinding =
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.context),
+                        R.layout.recycler_item_todo_first_note_edit,
+                        parent,
+                        false
+                    )
+                return FirstNoteTodoEditHolder(binding)
             }
 
             ITEM_VIEW_TYPE_IMAGE -> {
@@ -113,21 +141,20 @@ class EditNoteAdapter :
         }
     }
 
-    inner class FirstNoteEditHolder(val binding: RecyclerFirstNoteBinding) :
+    inner class FirstNoteSimpleEditHolder(val binding: RecyclerItemSimpleFirstNoteEditBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(firstNote: List<FirstNote>) {
-            getItem(0).header?.let { header ->
-                binding.recyclerFirstNote.apply {
-                    adapter = if (header.todoList) {
-                        checkBoxEditAdapter
-                    } else {
-                        simpleEditAdapter
-                    }
-                }
-            }
-            checkBoxEditAdapter.submitList(firstNote)
-            simpleEditAdapter.submitList(firstNote)
-            _firstNoteHolder.value = this
+        fun bind(firstNote: FirstNote) {
+            _firstNoteSimpleHolder.value = this
+            binding.firstNote = firstNote
+            binding.executePendingBindings()
+        }
+    }
+
+    inner class FirstNoteTodoEditHolder(val binding: RecyclerItemTodoFirstNoteEditBinding):
+    RecyclerView.ViewHolder(binding.root){
+        fun bind(firstNote: FirstNote){
+            _firstNoteTodoHolder.value = this
+            binding.firstNote = firstNote
             binding.executePendingBindings()
         }
     }
@@ -142,7 +169,6 @@ class EditNoteAdapter :
                 binding.deleteCircle.visibility = View.GONE
                 binding.deleteCircleIcon.visibility = View.GONE
             }
-            binding.executePendingBindings()
         }
     }
 }

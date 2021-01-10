@@ -14,7 +14,7 @@ import com.example.noteexample.database.NoteWithImages
  */
 data class NoteWithImagesRecyclerItems(
     val header: Header? = null,
-    var firstNote: List<FirstNote>? = null,
+    var firstNote: FirstNote? = null,
     var image: Image? = null,
 )
 

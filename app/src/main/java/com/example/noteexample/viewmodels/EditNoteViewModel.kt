@@ -1,5 +1,6 @@
 package com.example.noteexample.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
@@ -61,18 +62,30 @@ class EditNoteViewModel(
     fun swapImgs(from: Int, to: Int) {
         itemListSame = true
         currentNote?.let {
-            val tmpID = it.images[from].imgID
-            it.images[from].imgID = it.images[to].imgID
-            it.images[to].imgID = tmpID
+            val tmpID = it.images[from].imgPos
+            Log.e("img", tmpID.toString())
+            Log.e("from", from.toString())
+            it.images[from].imgPos = it.images[to].imgPos
+            it.images[to].imgPos = tmpID
         }
     }
 
+    //TODO add positions in tables
     fun swapNotes(from: Int, to: Int) {
+
+//        val fromItem = noteList[from]
+//            (noteList as MutableList<NoteWithImages>).remove(noteList[from])
+//            (noteList as MutableList<NoteWithImages>).add(to, fromItem)
+//            if (it.ascendingOrder) {
+//                noteList.forEachIndexed { index, item ->
+//                    item.header.pos = index
+//                }
+//            }
         itemListSame = true
         currentNote?.let {
-            val tmpID = it.notes[from].noteID
-            it.notes[from].noteID = it.notes[to].noteID
-            it.notes[to].noteID = tmpID
+            val tmpID = it.notes[from].notePos
+            it.notes[from].notePos = it.notes[to].notePos
+            it.notes[to].notePos = tmpID
         }
     }
 
@@ -85,6 +98,7 @@ class EditNoteViewModel(
                 val localList = it.images.filter { list -> list.hidden }
                 if (localList.isEmpty()) {
                     val image = Image(
+                        imgPos = it.images.size,
                         parentImgNoteID = it.header.headerID,
                         photoPath = path
                     )
@@ -111,7 +125,10 @@ class EditNoteViewModel(
             position = repository.allASCSortedNotes().size
             val header = Header(pos = position)
             repository.insertHeader(header)
-            val firstNote = FirstNote(parentNoteID = repository.getLastNote().header.headerID)
+            val firstNote = FirstNote(
+                notePos = 0,
+                parentNoteID = repository.getLastNote().header.headerID
+            )
             repository.insertFirstNote(firstNote)
             startNote = repository.getLastNote()
             repository.getLastLiveData()
@@ -174,7 +191,10 @@ class EditNoteViewModel(
     fun insertNewFirstNote() {
         viewModelScope.launch {
             currentNote?.let {
-                val firstNote = FirstNote(parentNoteID = it.header.headerID)
+                val firstNote = FirstNote(
+                    notePos = it.notes.size,
+                    parentNoteID = it.header.headerID
+                )
                 repository.insertFirstNote(firstNote)
             }
         }
