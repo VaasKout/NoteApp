@@ -1,5 +1,6 @@
 package com.example.noteexample.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.noteexample.database.*
 import com.example.noteexample.utils.Camera
@@ -105,6 +106,14 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
+    suspend fun deleteNoteImagesAndFirstNotes(id: Long){
+        withContext(Dispatchers.IO){
+            val note = noteDao.getNote(id)
+            noteDao.deleteFirstNotes(note.notes)
+            noteDao.deleteImages(note.images)
+        }
+    }
+
 
     /**
      * @see Header
@@ -148,6 +157,12 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
+    suspend fun deleteFirstNotes(firstNotes: List<FirstNote>){
+        withContext(Dispatchers.IO){
+            noteDao.deleteFirstNotes(firstNotes)
+        }
+    }
+
 
     /**
      * @see Image
@@ -170,9 +185,21 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
+    suspend fun updateImages(images: List<Image>){
+        withContext(Dispatchers.IO){
+            noteDao.updateImages(images)
+        }
+    }
+
     suspend fun deleteImage(image: Image) {
         withContext(Dispatchers.IO) {
             noteDao.deleteImage(image)
+        }
+    }
+
+    suspend fun deleteImages(images: List<Image>){
+        withContext(Dispatchers.IO){
+            noteDao.deleteImages(images)
         }
     }
 

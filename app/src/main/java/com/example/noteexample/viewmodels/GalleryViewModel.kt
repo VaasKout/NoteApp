@@ -44,6 +44,7 @@ class GalleryViewModel(
         photoList.addAll(galleryList.filter { list -> list.isChecked })
         if (photoList.isNotEmpty()) {
             currentNote?.let { current ->
+                val lastPos = current.notes.size + current.images.size
                 current.images.forEach {
                     if (it.hidden || it.photoPath.isEmpty()) {
                         it.photoPath = photoList[0].imgSrcUrl
@@ -55,7 +56,7 @@ class GalleryViewModel(
                 }
                 photoList.forEachIndexed {index, photo ->
                     val image = Image(
-                        imgPos = index,
+                        imgPos = index + lastPos,
                         parentImgNoteID = noteID,
                         photoPath = photo.imgSrcUrl
                     )

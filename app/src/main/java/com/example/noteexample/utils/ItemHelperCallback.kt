@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 class ItemHelperCallback {
     fun getHelper(
         startIndex: Int,
-        firstListSize: Int = -1,
-        swapActionFirstList: (Int, Int) -> Unit,
-        swapActionSecondList: (Int, Int) -> Unit,
+        swapAction: (Int, Int) -> Unit,
         clearViewAction: () -> Unit,
     ):
             ItemTouchHelper {
@@ -27,23 +25,12 @@ class ItemHelperCallback {
                 val from = viewHolder.absoluteAdapterPosition
                 val to = target.absoluteAdapterPosition
 
-                if (from >= startIndex &&
-                    to >= startIndex &&
-                    from <= firstListSize &&
-                    to <= firstListSize
-                ) {
-                    swapActionFirstList(from - startIndex, to - startIndex)
-                    recyclerView.adapter?.notifyItemMoved(from, to)
-                } else if (
-                    from >= firstListSize + 1 &&
-                    to >= firstListSize + 1
-                ) {
-                    swapActionSecondList(from - firstListSize, to - firstListSize)
-                    recyclerView.adapter?.notifyItemMoved(
-                        from + firstListSize,
-                        to + firstListSize
-                    )
-                }
+                    if (from >= startIndex &&
+                        to >= startIndex
+                    ) {
+                        swapAction(from - startIndex, to - startIndex)
+                        recyclerView.adapter?.notifyItemMoved(from, to)
+                    }
                 return true
             }
 

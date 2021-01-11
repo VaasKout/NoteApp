@@ -43,7 +43,7 @@ data class Flags(
 //TODO check migration
 @Entity(tableName = "header_table")
 data class Header(
-    @PrimaryKey(autoGenerate = true) var headerID: Long = 0,
+    @PrimaryKey(autoGenerate = true) val headerID: Long = 0,
     @ColumnInfo(name = "position") var pos: Int = 0,
     var title: String = "",
     var date: String = "",
@@ -53,7 +53,8 @@ data class Header(
 
 @Entity(tableName = "first_note_table")
 data class FirstNote(
-    @PrimaryKey var notePos: Int,
+    @PrimaryKey
+    var notePos: Int,
     val parentNoteID: Long,
     var text: String = "",
 )
@@ -83,10 +84,10 @@ data class NoteWithImages(
         parentColumn = "headerID",
         entityColumn = "parentNoteID"
     )
-    val notes: List<FirstNote>,
+    var notes: List<FirstNote>,
     @Relation(
         parentColumn = "headerID",
         entityColumn = "parentImgNoteID",
     )
-    val images: List<Image>,
+    var images: List<Image>,
 )

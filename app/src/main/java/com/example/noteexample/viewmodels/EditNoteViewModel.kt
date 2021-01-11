@@ -55,38 +55,30 @@ class EditNoteViewModel(
         }
     }
 
-    /**
-     * [swapImgs] is attached to [com.example.noteexample.ui.EditNoteFragment.helper]
-     * to sort images manually, this function swaps imgIDs
-     */
-    fun swapImgs(from: Int, to: Int) {
-        itemListSame = true
-        currentNote?.let {
-            val tmpID = it.images[from].imgPos
-            Log.e("img", tmpID.toString())
-            Log.e("from", from.toString())
-            it.images[from].imgPos = it.images[to].imgPos
-            it.images[to].imgPos = tmpID
-        }
-    }
+    private var firstNoteList = mutableListOf<FirstNote>()
+    private var imgList = mutableListOf<Image>()
+    fun swapItems(from: Int, to: Int) {
+            itemListSame = true
+            currentNote?.let { note ->
+                val tmpItem = noteList[from + 1].copy()
+                noteList[from + 1] = noteList[to + 1].copy()
+                noteList[to + 1] = tmpItem
+                firstNoteList = mutableListOf()
+                imgList = mutableListOf()
 
-    //TODO add positions in tables
-    fun swapNotes(from: Int, to: Int) {
-
-//        val fromItem = noteList[from]
-//            (noteList as MutableList<NoteWithImages>).remove(noteList[from])
-//            (noteList as MutableList<NoteWithImages>).add(to, fromItem)
-//            if (it.ascendingOrder) {
-//                noteList.forEachIndexed { index, item ->
-//                    item.header.pos = index
-//                }
-//            }
-        itemListSame = true
-        currentNote?.let {
-            val tmpID = it.notes[from].notePos
-            it.notes[from].notePos = it.notes[to].notePos
-            it.notes[to].notePos = tmpID
-        }
+                noteList.forEachIndexed { index, item ->
+                    item.firstNote?.let {
+                        Log.e("indexNote", index.toString())
+                        it.notePos = index - 1
+                        firstNoteList.add(it)
+                    }
+                    item.image?.let {
+                        Log.e("indexImg", index.toString())
+                        it.imgPos = index - 1
+                        imgList.add(it)
+                    }
+                }
+            }
     }
 
     /**
@@ -139,60 +131,40 @@ class EditNoteViewModel(
      * Database methods
      */
 
-    fun updateCurrentNote(list: List<FirstNote>? = null) {
-        viewModelScope.launch {
-            if (noteID > -1) {
-                currentNote?.let {
-                    repository.updateNoteWithImages(it)
-                }
-            } else {
-                /**
-                 * Each note has it's date
-                 * @see com.example.noteexample.database.Header.date
-                 */
-                val cal = Calendar.getInstance().time
-                val time =
-                    SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
-                currentNote?.let {
-                    it.header.date = time
-                    repository.updateNoteWithImages(it)
-                }
-            }
-            list?.let {
-                repository.updateFirstNotes(it)
-            }
-        }
-    }
-
     suspend fun insertNoteWithImages(noteWithImages: NoteWithImages?) {
         noteWithImages?.let {
             repository.insertNoteWithImages(noteWithImages)
         }
     }
 
-    suspend fun deleteNoteWithImages(noteWithImages: NoteWithImages?) {
-        noteWithImages?.let {
-            repository.deleteNoteWithImages(it)
-        }
-    }
-
-    fun deleteFirstNote(firstNote: FirstNote) {
-        viewModelScope.launch {
-            repository.deleteFirstNote(firstNote)
-        }
-    }
-
-    fun updateFirstNote(list: List<FirstNote>) {
-        viewModelScope.launch {
-            repository.updateFirstNotes(list)
-        }
-    }
-
     fun insertNewFirstNote() {
         viewModelScope.launch {
             currentNote?.let {
+                var pos = 0
+                for (i in it.notes.indices) {
+                    if (i != it.notes[i].notePos) {
+                        break
+                    } else {
+                        pos = i + 1
+                    }
+                }
+
+                it.notes.forEach { firstNote ->
+                    if (firstNote.notePos >= pos) {
+                        repository.deleteFirstNote(firstNote)
+                        firstNote.notePos += 1
+                        repository.insertFirstNote(firstNote)
+                    }
+                }
+                it.images.forEach { image ->
+                    if (image.imgPos >= pos) {
+                        repository.deleteImage(image)
+                        image.imgPos += 1
+                        repository.insertImage(image)
+                    }
+                }
                 val firstNote = FirstNote(
-                    notePos = it.notes.size,
+                    notePos = pos,
                     parentNoteID = it.header.headerID
                 )
                 repository.insertFirstNote(firstNote)
@@ -200,6 +172,67 @@ class EditNoteViewModel(
         }
     }
 
+
+    fun updateCurrentNote() {
+        viewModelScope.launch {
+            updateCurrentNoteSuspend()
+        }
+    }
+
+    fun updateAfterSwap(){
+        viewModelScope.launch {
+            currentNote?.let {
+                repository.deleteNoteImagesAndFirstNotes(it.header.headerID)
+//                it.notes = firstNoteList
+//                it.images = imgList
+                repository.insertImages(imgList)
+                repository.insertFirstNotes(firstNoteList)
+            }
+        }
+    }
+
+    private suspend fun updateCurrentNoteSuspend(){
+        if (noteID > -1) {
+            currentNote?.let {
+                repository.updateNoteWithImages(it)
+            }
+        } else {
+            /**
+             * Each note has it's date
+             * @see com.example.noteexample.database.Header.date
+             */
+            val cal = Calendar.getInstance().time
+            val time =
+                SimpleDateFormat("HH:mm EE dd MMM", Locale.getDefault()).format(cal)
+            currentNote?.let {
+                it.header.date = time
+                repository.updateNoteWithImages(it)
+            }
+        }
+    }
+
+
+    fun updateFirstNote(list: List<FirstNote>) {
+        viewModelScope.launch {
+            repository.updateFirstNotes(list)
+        }
+    }
+
+
+    suspend fun deleteNoteWithImages(noteWithImages: NoteWithImages?) {
+        noteWithImages?.let {
+            repository.deleteNoteWithImages(it)
+        }
+    }
+
+    //TODO delete
+    fun deleteFirstNote(firstNote: FirstNote) {
+        viewModelScope.launch {
+            repository.deleteFirstNote(firstNote)
+        }
+    }
+
+    //TODO delete
     fun deleteImage(image: Image) {
         viewModelScope.launch {
             repository.deleteImage(image)
