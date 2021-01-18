@@ -4,7 +4,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
 
-//TODO write unit test for this
 class ItemHelperCallback {
     fun getHelper(
         startIndex: Int,

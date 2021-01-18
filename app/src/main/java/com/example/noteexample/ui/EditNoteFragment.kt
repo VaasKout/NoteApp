@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -182,22 +183,24 @@ class EditNoteFragment : Fragment() {
                 }
                 R.id.todo -> {
                     viewModel.currentNote?.header?.let { header ->
-                        if (header.todoList) {
-                            it.icon = ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.ic_todo_list
-                            )
-                            header.todoList = false
-                            viewModel.updateCurrentNote()
-                            noteAdapter.notifyDataSetChanged()
-                        } else {
-                            it.icon = ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.ic_simple_list
-                            )
-                            header.todoList = true
-                            viewModel.updateCurrentNote()
-                            noteAdapter.notifyDataSetChanged()
+                        lifecycleScope.launch {
+                            if (header.todoList) {
+                                it.icon = ContextCompat.getDrawable(
+                                    requireContext(),
+                                    R.drawable.ic_todo_list
+                                )
+                                header.todoList = false
+                                viewModel.updateCurrentNoteSuspend()
+                                binding.editRecycler.adapter = noteAdapter
+                            } else {
+                                it.icon = ContextCompat.getDrawable(
+                                    requireContext(),
+                                    R.drawable.ic_simple_list
+                                )
+                                header.todoList = true
+                                viewModel.updateCurrentNoteSuspend()
+                                binding.editRecycler.adapter = noteAdapter
+                            }
                         }
                     }
                     true
@@ -236,8 +239,8 @@ class EditNoteFragment : Fragment() {
                         noteAdapter.currentList[holder.absoluteAdapterPosition]?.firstNote?.let {
                             it.text = "${it.text}\n"
                         }
-                        viewModel.updateCurrentNote()
                         viewModel.insertNewFirstNote()
+                        noteAdapter.notifyDataSetChanged()
                         true
                     }
                     else -> false
@@ -251,10 +254,10 @@ class EditNoteFragment : Fragment() {
         })
 
 
-
-
         noteAdapter.firstNoteTodoHolder.observe(viewLifecycleOwner, { holder ->
-
+            noteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.text?.let {
+                holder.binding.editTextCheckbox.setText(it)
+            }
             holder.binding.editTextCheckbox.addTextChangedListener {
                 noteAdapter.currentList[holder.absoluteAdapterPosition]?.firstNote?.text =
                     it.toString()
@@ -263,7 +266,6 @@ class EditNoteFragment : Fragment() {
             holder.binding.editTextCheckbox.setOnEditorActionListener { _, actionId, _ ->
                 return@setOnEditorActionListener when (actionId) {
                     EditorInfo.IME_ACTION_DONE -> {
-                        viewModel.updateCurrentNote()
                         viewModel.insertNewFirstNote()
                         true
                     }
@@ -272,8 +274,12 @@ class EditNoteFragment : Fragment() {
             }
 
             holder.binding.deleteFirstNoteItemButton.setOnClickListener {
-                noteAdapter.currentList[holder.absoluteAdapterPosition]?.firstNote?.let { firstNote ->
-                    viewModel.deleteFirstNote(firstNote)
+                viewModel.currentNote?.notes?.let { list ->
+                    if (list.size > 1) {
+                        noteAdapter.currentList[holder.absoluteAdapterPosition]?.firstNote?.let { firstNote ->
+                            viewModel.deleteFirstNote(firstNote)
+                        }
+                    }
                 }
             }
         })
@@ -348,25 +354,36 @@ class EditNoteFragment : Fragment() {
          * [EditNoteViewModel.currentNoteLiveData] is observed
          */
 
-        //TODO loop
-
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
             viewModel.currentNote = it
             lifecycleScope.launch(Dispatchers.Default) {
                 it?.let { item ->
                     if (!viewModel.itemListSame) {
+                        Log.e("size", viewModel.noteList.size.toString())
                         viewModel.noteList = mutableListOf()
                         viewModel.noteList.add(0, NoteWithImagesRecyclerItems(item.header))
+                        val size = item.notes.size + item.images.size
 
-//                        for (firstNote in item.notes.sortedBy { note -> note.notePos }){
-//                            if (firstNote.notePos == viewModel.noteList.size){
-//                                viewModel.noteList.add(NoteWithImagesRecyclerItems(firstNote = firstNote))
-//                            }
-//                        }
-//                        for (image in item.images.sortedBy { img -> img.imgPos }){
-//
-//                            viewModel.noteList.add(NoteWithImagesRecyclerItems(image = image))
-//                        }
+                        for (i in 0 until size) {
+                            item.notes.forEach { note ->
+                                if (note.notePos == i) {
+                                    viewModel.noteList.add(
+                                        NoteWithImagesRecyclerItems(
+                                            firstNote = note
+                                        )
+                                    )
+                                }
+                            }
+                            item.images.forEach { image ->
+                                if (image.imgPos == i) {
+                                    viewModel.noteList.add(
+                                        NoteWithImagesRecyclerItems(
+                                            image = image
+                                        )
+                                    )
+                                }
+                            }
+                        }
                     } else {
                         viewModel.itemListSame = false
                     }

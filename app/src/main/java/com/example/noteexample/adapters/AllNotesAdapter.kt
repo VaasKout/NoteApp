@@ -11,8 +11,6 @@ import com.example.noteexample.R
 import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.databinding.RecyclerItemMainBinding
 
-//TODO adapter depends on type (simple | todo)
-
 class NoteAdapter :
     ListAdapter<NoteWithImages, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
 

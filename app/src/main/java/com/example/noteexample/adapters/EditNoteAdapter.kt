@@ -73,7 +73,7 @@ class EditNoteAdapter :
                 getItem(position).firstNote?.let { holder.bind(it) }
             }
             is FirstNoteTodoEditHolder -> {
-                getItem(position).firstNote?.let { holder.bind(it) }
+               holder.bind()
             }
             is ImageEditHolder -> {
                 getItem(position).image?.let { holder.bind(it) }
@@ -145,16 +145,15 @@ class EditNoteAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(firstNote: FirstNote) {
             _firstNoteSimpleHolder.value = this
-            binding.firstNote = firstNote
+//            binding.firstNote = firstNote
             binding.executePendingBindings()
         }
     }
 
     inner class FirstNoteTodoEditHolder(val binding: RecyclerItemTodoFirstNoteEditBinding):
     RecyclerView.ViewHolder(binding.root){
-        fun bind(firstNote: FirstNote){
+        fun bind(){
             _firstNoteTodoHolder.value = this
-            binding.firstNote = firstNote
             binding.executePendingBindings()
         }
     }

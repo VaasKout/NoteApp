@@ -341,7 +341,7 @@ class AllNotesFragment : Fragment() {
                             title.text = it.header.title
                         }
 
-//                        //TODO change to list
+//                        //TODO change todo list
 //                        if (it.notes.isNotEmpty()) {
 //                            text.visibility = View.VISIBLE
 //                            text.text = it.header.text

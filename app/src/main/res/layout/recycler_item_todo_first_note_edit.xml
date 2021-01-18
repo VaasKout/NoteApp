@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="firstNote"
-            type="com.example.noteexample.database.FirstNote" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -47,7 +40,6 @@
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLength="400"
-            app:firstNoteText="@{firstNote}"
             app:layout_constraintBottom_toBottomOf="@+id/checkbox_edit"
             app:layout_constraintEnd_toStartOf="@+id/delete_first_note_item_button"
             app:layout_constraintStart_toEndOf="@+id/checkbox_edit"
