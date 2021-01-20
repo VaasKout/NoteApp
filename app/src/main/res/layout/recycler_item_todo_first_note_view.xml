@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="text"
+            name="firstNote"
             type="com.example.noteexample.database.FirstNote" />
     </data>
         <com.google.android.material.checkbox.MaterialCheckBox
@@ -14,10 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            app:firstNoteText="@{text}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:firstNoteText="@{firstNote}"
             tools:text="Text" />
 </layout>

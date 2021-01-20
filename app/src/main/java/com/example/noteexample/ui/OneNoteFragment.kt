@@ -15,7 +15,7 @@ import com.example.noteexample.R
 import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
 import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
-import com.example.noteexample.adapters.ViewSimpleNoteAdapter
+import com.example.noteexample.adapters.ViewNoteAdapter
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +33,7 @@ class OneNoteFragment : Fragment() {
     lateinit var repository: NoteRepository
     lateinit var binding: FragmentOneNoteBinding
     private val args by navArgs<OneNoteFragmentArgs>()
-    private val oneNoteAdapter = ViewSimpleNoteAdapter()
+    private val oneNoteAdapter = ViewNoteAdapter()
     private val viewModel: OneNoteViewModel by viewModels {
         NoteViewModelFactory(args.noteID, repository)
     }

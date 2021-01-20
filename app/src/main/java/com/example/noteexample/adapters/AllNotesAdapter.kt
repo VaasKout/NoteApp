@@ -19,6 +19,8 @@ class NoteAdapter :
      * [com.example.noteexample.ui.AllNotesFragment] to set clickListeners for recycler items
      */
 
+    val cardAdapter = ViewNoteAdapter()
+
     private val _holder = MutableLiveData<NoteViewHolder>()
     val holder: LiveData<NoteViewHolder> = _holder
 
@@ -40,6 +42,11 @@ class NoteAdapter :
     inner class NoteViewHolder(val binding: RecyclerItemMainBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind() {
+            binding.recyclerInMainItem.apply {
+                if(adapter == null){
+                    adapter = cardAdapter
+                }
+            }
             _holder.value = this
             binding.executePendingBindings()
         }

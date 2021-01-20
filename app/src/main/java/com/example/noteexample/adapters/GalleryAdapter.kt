@@ -65,13 +65,3 @@ class GalleryAdapter :
     }
 }
 
-class GalleryDiffCallBack : DiffUtil.ItemCallback<GalleryData>() {
-    override fun areItemsTheSame(oldItem: GalleryData, newItem: GalleryData): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: GalleryData, newItem: GalleryData): Boolean {
-        return oldItem == newItem
-    }
-
-}

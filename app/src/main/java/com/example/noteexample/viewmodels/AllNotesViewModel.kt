@@ -12,7 +12,7 @@ import kotlinx.coroutines.*
 
 class AllNotesViewModel @ViewModelInject constructor(
     private val repository: NoteRepository
-): ViewModel(){
+) : ViewModel() {
 
     //Flags
     var startedMove = false
@@ -21,6 +21,10 @@ class AllNotesViewModel @ViewModelInject constructor(
     //Variables
     var flags: Flags? = null
     var noteList = listOf<NoteWithImages>()
+        set(value) {
+            field = value
+            sortItems()
+        }
 
     //LiveData
     private val _searchModeFlag = MutableLiveData<Boolean>()
@@ -37,6 +41,13 @@ class AllNotesViewModel @ViewModelInject constructor(
      * Position in recyclerView is attached to
      * [com.example.noteexample.database.Header.pos] in ACS or DESC order
      */
+    private fun sortItems(){
+        noteList.forEach { noteWithImages ->
+            noteWithImages.notes = noteWithImages.notes.sortedBy { note -> note.notePos }
+            noteWithImages.images = noteWithImages.images.sortedBy { image -> image.imgPos }
+        }
+    }
+
     fun swap(from: Int, to: Int) {
         flags?.let {
             val fromItem = noteList[from]
@@ -108,9 +119,8 @@ class AllNotesViewModel @ViewModelInject constructor(
                     .filter { it.images.isEmpty() }
             }
             PHOTOS_ONLY -> {
-                noteList =
-                    repository.allASCSortedNotes()
-                        .filter { it.images.isNotEmpty() }
+                noteList = repository.allASCSortedNotes()
+                    .filter { it.images.isNotEmpty() }
             }
         }
     }

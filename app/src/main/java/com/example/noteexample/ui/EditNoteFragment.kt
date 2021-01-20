@@ -140,7 +140,6 @@ class EditNoteFragment : Fragment() {
         //menuClickListener
         binding.toolbarNoteEdit.setOnMenuItemClickListener {
 
-//            val newIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_back_arrow)
             when (it.itemId) {
                 R.id.insert_photo -> {
                     viewModel.updateCurrentNote()
@@ -357,7 +356,7 @@ class EditNoteFragment : Fragment() {
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
             viewModel.currentNote = it
             lifecycleScope.launch(Dispatchers.Default) {
-                it?.let { item ->
+                viewModel.currentNote?.let { item ->
                     if (!viewModel.itemListSame) {
                         Log.e("size", viewModel.noteList.size.toString())
                         viewModel.noteList = mutableListOf()

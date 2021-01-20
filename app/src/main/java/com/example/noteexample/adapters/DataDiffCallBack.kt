@@ -1,10 +1,7 @@
 package com.example.noteexample.adapters
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.noteexample.database.FirstNote
-import com.example.noteexample.database.Header
-import com.example.noteexample.database.Image
-import com.example.noteexample.database.NoteWithImages
+import com.example.noteexample.database.*
 
 /**
  * DiffUtil and data class for adapters with header
@@ -16,6 +13,7 @@ data class NoteWithImagesRecyclerItems(
     val header: Header? = null,
     var firstNote: FirstNote? = null,
     var image: Image? = null,
+    var date: String? = null,
 )
 
 class NoteWithImagesDiffCallback :
@@ -54,6 +52,27 @@ class NoteDiffCallBack : DiffUtil.ItemCallback<NoteWithImages>() {
     }
 
     override fun areContentsTheSame(oldItem: NoteWithImages, newItem: NoteWithImages): Boolean {
+        return oldItem == newItem
+    }
+}
+
+class GalleryDiffCallBack : DiffUtil.ItemCallback<GalleryData>() {
+    override fun areItemsTheSame(oldItem: GalleryData, newItem: GalleryData): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(oldItem: GalleryData, newItem: GalleryData): Boolean {
+        return oldItem == newItem
+    }
+
+}
+
+class ImageDiffCallback : DiffUtil.ItemCallback<Image>() {
+    override fun areItemsTheSame(oldItem: Image, newItem: Image): Boolean {
+        return oldItem.imgPos == newItem.imgPos
+    }
+
+    override fun areContentsTheSame(oldItem: Image, newItem: Image): Boolean {
         return oldItem == newItem
     }
 }

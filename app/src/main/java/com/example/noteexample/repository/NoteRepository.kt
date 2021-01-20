@@ -25,14 +25,36 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
     //    val allNotes = noteDao.getAllNotes()
     fun getNoteLiveData(id: Long): LiveData<NoteWithImages> = noteDao.getNoteLiveData(id)
     fun getLastLiveData(): LiveData<NoteWithImages> = noteDao.getLastNoteLiveData()
-    suspend fun getLastNote() = withContext(Dispatchers.IO) { noteDao.getLastNote() }
+    suspend fun getLastNote(): NoteWithImages =
+        withContext(Dispatchers.IO) {
+            val noteWithImages = noteDao.getLastNote()
+            noteWithImages.apply {
+                this.notes = notes.sortedBy { note -> note.notePos }
+                this.images = images.sortedBy { image -> image.imgPos }
+            }
+            noteWithImages
+        }
 
 
     suspend fun allDESCSortedNotes(): List<NoteWithImages> =
-        withContext(Dispatchers.IO) { noteDao.getAllDESCSortedNotes() }
+        withContext(Dispatchers.IO) {
+            val descSortedNotes = noteDao.getAllDESCSortedNotes()
+            descSortedNotes.forEach { noteWithImages ->
+                noteWithImages.notes = noteWithImages.notes.sortedBy { note -> note.notePos }
+                noteWithImages.images = noteWithImages.images.sortedBy { image -> image.imgPos }
+            }
+            descSortedNotes
+        }
 
     suspend fun allASCSortedNotes(): List<NoteWithImages> =
-        withContext(Dispatchers.IO) { noteDao.getAllASCSortedNotes() }
+        withContext(Dispatchers.IO) {
+            val ascSortedNotes = noteDao.getAllASCSortedNotes()
+            ascSortedNotes.forEach { noteWithImages ->
+                noteWithImages.notes = noteWithImages.notes.sortedBy { note -> note.notePos }
+                noteWithImages.images = noteWithImages.images.sortedBy { img -> img.imgPos }
+            }
+            ascSortedNotes
+        }
 
     suspend fun getNote(key: Long): NoteWithImages =
         withContext(Dispatchers.IO) { noteDao.getNote(key) }
@@ -106,8 +128,8 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
-    suspend fun deleteNoteImagesAndFirstNotes(id: Long){
-        withContext(Dispatchers.IO){
+    suspend fun deleteNoteImagesAndFirstNotes(id: Long) {
+        withContext(Dispatchers.IO) {
             val note = noteDao.getNote(id)
             noteDao.deleteFirstNotes(note.notes)
             noteDao.deleteImages(note.images)
@@ -127,38 +149,38 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
     /**
      * @see FirstNote
      */
-    suspend fun insertFirstNote(firstNote: FirstNote){
-        withContext(Dispatchers.IO){
+    suspend fun insertFirstNote(firstNote: FirstNote) {
+        withContext(Dispatchers.IO) {
             noteDao.insertFirstNote(firstNote)
         }
     }
 
-    suspend fun insertFirstNotes(firstNotes: List<FirstNote>){
-        withContext(Dispatchers.IO){
+    suspend fun insertFirstNotes(firstNotes: List<FirstNote>) {
+        withContext(Dispatchers.IO) {
             noteDao.insertFirstNotes(firstNotes)
         }
     }
 
-    suspend fun updateFirstNote(firstNote: FirstNote){
-        withContext(Dispatchers.IO){
+    suspend fun updateFirstNote(firstNote: FirstNote) {
+        withContext(Dispatchers.IO) {
             noteDao.updateFirstNote(firstNote)
         }
     }
 
-    suspend fun updateFirstNotes(firstNotes: List<FirstNote>){
-        withContext(Dispatchers.IO){
+    suspend fun updateFirstNotes(firstNotes: List<FirstNote>) {
+        withContext(Dispatchers.IO) {
             noteDao.updateFirstNotes(firstNotes)
         }
     }
 
-    suspend fun deleteFirstNote(firstNote: FirstNote){
-        withContext(Dispatchers.IO){
+    suspend fun deleteFirstNote(firstNote: FirstNote) {
+        withContext(Dispatchers.IO) {
             noteDao.deleteFirstNote(firstNote)
         }
     }
 
-    suspend fun deleteFirstNotes(firstNotes: List<FirstNote>){
-        withContext(Dispatchers.IO){
+    suspend fun deleteFirstNotes(firstNotes: List<FirstNote>) {
+        withContext(Dispatchers.IO) {
             noteDao.deleteFirstNotes(firstNotes)
         }
     }
@@ -185,8 +207,8 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
-    suspend fun updateImages(images: List<Image>){
-        withContext(Dispatchers.IO){
+    suspend fun updateImages(images: List<Image>) {
+        withContext(Dispatchers.IO) {
             noteDao.updateImages(images)
         }
     }
@@ -197,8 +219,8 @@ constructor(private val noteDao: NoteDao, private val camera: Camera) {
         }
     }
 
-    suspend fun deleteImages(images: List<Image>){
-        withContext(Dispatchers.IO){
+    suspend fun deleteImages(images: List<Image>) {
+        withContext(Dispatchers.IO) {
             noteDao.deleteImages(images)
         }
     }

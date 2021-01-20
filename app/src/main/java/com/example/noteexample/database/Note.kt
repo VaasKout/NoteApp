@@ -15,7 +15,7 @@ data class GalleryData(
     var isChecked: Boolean = false,
 )
 
-
+//TODO flag to hide photos
 /**
  * [Flags] Entity sorts notes in [com.example.noteexample.ui.AllNotesFragment]
  * and updated in [com.example.noteexample.ui.SettingsFragment]
@@ -53,10 +53,12 @@ data class Header(
 
 @Entity(tableName = "first_note_table")
 data class FirstNote(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
     var notePos: Int,
     val parentNoteID: Long,
     var text: String = "",
+    var isChecked: Boolean = false,
 )
 
 /**
@@ -67,7 +69,8 @@ data class FirstNote(
 
 @Entity(tableName = "image_table")
 data class Image(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
     var imgPos: Int,
     val parentImgNoteID: Long,
     var signature: String = "",
@@ -76,7 +79,7 @@ data class Image(
 )
 
 /**
- * This class binds @Entity objects [Header], [Note], [Image],  in relation to One-To-Many
+ * This class binds @Entity objects [Header], [FirstNote], [Image],  in relation to One-To-Many
  */
 data class NoteWithImages(
     @Embedded val header: Header,

@@ -19,5 +19,5 @@
         android:paddingBottom="@dimen/dp_8"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         app:firstNoteText="@{firstNote}"
-        tools:text="Заметка" />
+        tools:text="Note" />
 </layout>

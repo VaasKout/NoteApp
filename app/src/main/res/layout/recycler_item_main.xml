@@ -17,85 +17,15 @@
         app:strokeColor="@color/primaryDarkColor"
         app:strokeWidth="2dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/title_main"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_in_main_item"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="5"
-                android:paddingStart="@dimen/dp_16"
-                android:paddingTop="@dimen/dp_8"
-                android:paddingEnd="@dimen/dp_16"
-                android:paddingBottom="@dimen/dp_8"
-                android:singleLine="false"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                android:visibility="gone"
-                tools:text="Title"
-                tools:visibility="visible" />
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/recycler_item_simple_first_note_view"/>
 
-            <View
-                android:id="@+id/view1"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryDarkColor"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:visibility="visible" />
 
-            <TextView
-                android:id="@+id/note_main"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="8"
-                android:paddingStart="@dimen/dp_16"
-                android:paddingTop="@dimen/dp_8"
-                android:paddingEnd="@dimen/dp_16"
-                android:paddingBottom="@dimen/dp_8"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                android:visibility="gone"
-                tools:text="Note"
-                tools:visibility="visible" />
 
-            <View
-                android:id="@+id/view2"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryDarkColor" />
-
-            <ImageView
-                android:id="@+id/photo_main"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/small_img_height"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/photo_main"
-                android:scaleType="centerCrop"
-                android:visibility="gone"
-                tools:src="@tools:sample/backgrounds/scenic"
-                tools:visibility="visible" />
-
-            <View
-                android:id="@+id/view3"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_1"
-                android:background="@color/primaryDarkColor" />
-
-            <TextView
-                android:id="@+id/date_main"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/dp_8"
-                android:paddingEnd="@dimen/dp_8"
-                android:textAlignment="viewEnd"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                android:visibility="gone"
-                tools:text="date"
-                tools:visibility="visible" />
-        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

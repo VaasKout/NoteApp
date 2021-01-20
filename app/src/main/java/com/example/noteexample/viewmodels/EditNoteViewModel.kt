@@ -30,11 +30,14 @@ class EditNoteViewModel(
     var backPressed = false
     var itemListSame = false
 
-
     //Variables
     var position = 0
     var startNote: NoteWithImages? = null
     var currentNote: NoteWithImages? = null
+    set(value) {
+        field = value
+        sortItems()
+    }
     var noteList = mutableListOf<NoteWithImagesRecyclerItems>()
 
     //LiveData
@@ -56,6 +59,16 @@ class EditNoteViewModel(
 
     private var firstNoteList = mutableListOf<FirstNote>()
     private var imgList = mutableListOf<Image>()
+
+    private fun sortItems(){
+        currentNote?.let { it ->
+            it.forEach { noteWithImages ->
+                noteWithImages.notes = noteWithImages.notes.sortedBy { note -> note.notePos }
+                noteWithImages.images = noteWithImages.images.sortedBy { image -> image.imgPos }
+            }
+        }
+    }
+
     fun swapItems(from: Int, to: Int) {
         itemListSame = true
         val tmpItem = noteList[from + 1].copy()
@@ -164,11 +177,11 @@ class EditNoteViewModel(
     fun updateAfterSwap() {
         viewModelScope.launch {
             currentNote?.let {
-                repository.deleteNoteImagesAndFirstNotes(it.header.headerID)
+//                repository.deleteNoteImagesAndFirstNotes(it.header.headerID)
 //                it.notes = firstNoteList
 //                it.images = imgList
-                repository.insertImages(imgList)
-                repository.insertFirstNotes(firstNoteList)
+                repository.updateImages(imgList)
+                repository.updateFirstNotes(firstNoteList)
             }
         }
     }
@@ -211,16 +224,14 @@ class EditNoteViewModel(
         currentNote?.let {
             it.notes.forEach { firstNote ->
                 if (firstNote.notePos > pos) {
-                    repository.deleteFirstNote(firstNote)
                     firstNote.notePos -= 1
-                    repository.insertFirstNote(firstNote)
+                    repository.updateFirstNote(firstNote)
                 }
             }
             it.images.forEach { image ->
                 if (image.imgPos > pos) {
-                    repository.deleteImage(image)
                     image.imgPos -= 1
-                    repository.insertImage(image)
+                    repository.updateImage(image)
                 }
             }
         }
@@ -230,16 +241,14 @@ class EditNoteViewModel(
         currentNote?.let {
             it.notes.forEach { firstNote ->
                 if (firstNote.notePos >= pos) {
-                    repository.deleteFirstNote(firstNote)
                     firstNote.notePos += 1
-                    repository.insertFirstNote(firstNote)
+                    repository.updateFirstNote(firstNote)
                 }
             }
             it.images.forEach { image ->
                 if (image.imgPos >= pos) {
-                    repository.deleteImage(image)
                     image.imgPos += 1
-                    repository.insertImage(image)
+                    repository.updateImage(image)
                 }
             }
         }
