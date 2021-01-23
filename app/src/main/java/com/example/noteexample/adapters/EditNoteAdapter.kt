@@ -9,10 +9,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.noteexample.R
-import com.example.noteexample.database.FirstNote
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
-import com.example.noteexample.databinding.*
+import com.example.noteexample.databinding.RecyclerItemHeaderEditBinding
+import com.example.noteexample.databinding.RecyclerItemImageEditBinding
+import com.example.noteexample.databinding.RecyclerItemSimpleFirstNoteEditBinding
+import com.example.noteexample.databinding.RecyclerItemTodoFirstNoteEditBinding
 
 /**
  * ListAdapter for [com.example.noteexample.ui.EditNoteFragment] with header on 0 position
@@ -29,8 +31,6 @@ private const val ITEM_VIEW_TYPE_IMAGE = 3
 class EditNoteAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(NoteWithImagesDiffCallback()) {
 
-    private var todoList = false
-
     private val _headerHolder = MutableLiveData<HeaderEditHolder>()
     val headerHolder: LiveData<HeaderEditHolder> = _headerHolder
 
@@ -45,15 +45,10 @@ class EditNoteAdapter :
 
     override fun getItemViewType(position: Int): Int {
         when (position) {
-            0 -> {
-                getItem(position).header?.let {
-                    todoList = it.todoList
-                }
-                return ITEM_VIEW_TYPE_HEADER
-            }
+            0 -> return ITEM_VIEW_TYPE_HEADER
             else -> {
                 getItem(position).firstNote?.let {
-                    return if (!todoList) {
+                    return if (!it.todoItem) {
                         ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE
                     } else {
                         ITEM_VIEW_TYPE_TODO_FIRST_NOTE

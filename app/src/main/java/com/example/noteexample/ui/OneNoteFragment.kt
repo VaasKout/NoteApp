@@ -1,9 +1,11 @@
 package com.example.noteexample.ui
 
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,12 +14,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteexample.R
+import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
-import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.example.noteexample.adapters.ViewNoteAdapter
+import com.example.noteexample.database.FirstNote
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.NoteViewModelFactory
+import com.google.android.material.checkbox.MaterialCheckBox
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -60,25 +64,25 @@ class OneNoteFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
+
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, { current ->
-            lifecycleScope.launch(Dispatchers.Default) {
-                if (viewModel.dataItemList.isEmpty()) {
-                    viewModel.dataItemList.add(0, NoteWithImagesRecyclerItems(current.header))
-                    current.images.forEach { image ->
-                        viewModel.dataItemList.add(NoteWithImagesRecyclerItems(image = image))
-                    }
-                    withContext(Dispatchers.Main) {
-                        oneNoteAdapter.submitList(viewModel.dataItemList)
-                    }
-                }
+            lifecycleScope.launch {
+                viewModel.currentNote = current
+                viewModel.createNoteList()
+//                if (viewModel.dataItemList.isEmpty()) {
+
+//                }
+
                 /**
                  * Scroll to specific position when user returns from [OneNotePagerFragment]
                  * by default it gets to 0, so user can have bad experience
                  */
+                oneNoteAdapter.submitList(viewModel.dataItemList)
 
-                withContext(Dispatchers.Main) {
-                    delay(16)
-                    binding.recyclerOneNote.scrollToPosition(viewModel.scrollPosition)
+                if (viewModel.scrollPosition > 0) {
+                    delay(96)
+                    binding.recyclerOneNote.smoothScrollToPosition(viewModel.scrollPosition)
+                    viewModel.scrollPosition = 0
                 }
             }
         })
@@ -86,6 +90,16 @@ class OneNoteFragment : Fragment() {
         /**
          * goto [OneNotePagerFragment] with specific photo
          */
+        oneNoteAdapter.firstNoteTodoHolder.observe(viewLifecycleOwner, { holder ->
+            oneNoteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.also {
+                crossText(it, holder.binding.checkboxView)
+                holder.binding.checkboxView.setOnCheckedChangeListener { _, isChecked ->
+                    it.isChecked = isChecked
+                    viewModel.updateFirstNote(it)
+                    crossText(it, holder.binding.checkboxView)
+                }
+            }
+        })
 
         oneNoteAdapter.imgHolder.observe(viewLifecycleOwner, { holder ->
             holder.binding.photoOneNote.setOnClickListener {
@@ -95,7 +109,7 @@ class OneNoteFragment : Fragment() {
                         .navigate(
                             OneNoteFragmentDirections.actionOneNoteFragmentToOnePhotoFragment(
                                 args.noteID,
-                                viewModel.scrollPosition - 1
+                                viewModel.scrollPosition - 2
                             )
                         )
                 }
@@ -118,7 +132,8 @@ class OneNoteFragment : Fragment() {
                 R.id.edit_item -> {
                     this.findNavController()
                         .navigate(
-                            OneNoteFragmentDirections.actionOneNoteFragmentToEditNoteFragment(args.noteID)
+                            OneNoteFragmentDirections
+                                .actionOneNoteFragmentToEditNoteFragment(args.noteID)
                         )
                     true
                 }
@@ -127,5 +142,13 @@ class OneNoteFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun crossText(firstNote: FirstNote, edit: MaterialCheckBox) {
+        if (firstNote.isChecked) {
+            edit.paintFlags = edit.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            edit.paintFlags = edit.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
     }
 }

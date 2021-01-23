@@ -4,9 +4,11 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule
+import com.example.noteexample.R
 import com.example.noteexample.database.FirstNote
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
@@ -20,6 +22,13 @@ class GlideAppModule : AppGlideModule()
  * R.layout.header_edit
  * R.layout.header_view
  */
+
+@BindingAdapter("pagerStyle")
+fun TextView.setPagerStyle(pagerStyle: Boolean){
+    if (pagerStyle){
+        setTextColor(resources.getColor(R.color.secondaryTextColor, null))
+    }
+}
 
 @BindingAdapter("titleText")
 fun TextView.titleText(header: Header?) {

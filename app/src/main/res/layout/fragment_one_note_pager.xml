@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="header"
             type="com.example.noteexample.database.Header" />
+
         <variable
             name="firstNote"
             type="com.example.noteexample.database.FirstNote" />
@@ -14,47 +16,61 @@
 
     <androidx.constraintlayout.motion.widget.MotionLayout
         android:id="@+id/motion_one_photo"
-        android:background="@color/grey_material"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/grey_material"
         app:layoutDescription="@xml/fragment_one_photo_xml_one_photo_constraint_scene">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/photo_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
-            <TextView
-                android:id="@+id/title_view_one_photo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/greyTransparent"
-                android:paddingStart="@dimen/dp_16"
-                android:paddingTop="@dimen/dp_8"
-                android:paddingEnd="@dimen/dp_16"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:paddingBottom="@dimen/dp_8"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                android:textColor="@color/secondaryTextColor"
-                app:titleText="@{header}"
-                tools:text="@string/title" />
+        <TextView
+            android:id="@+id/title_view_one_photo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/greyTransparent"
+            android:paddingStart="@dimen/dp_16"
+            android:paddingTop="@dimen/dp_8"
+            android:paddingEnd="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_8"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textColor="@color/secondaryTextColor"
+            android:visibility="gone"
+            app:titleText="@{header}"
+            tools:text="@string/title"
+            tools:visibility="visible" />
 
-            <TextView
-                android:id="@+id/first_note_view_one_photo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/greyTransparent"
-                android:paddingStart="@dimen/dp_16"
-                android:paddingTop="@dimen/dp_4"
-                android:paddingEnd="@dimen/dp_16"
-                android:paddingBottom="@dimen/dp_8"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                android:textColor="@color/secondaryTextColor"
-                app:firstNoteText="@{firstNote}"
-                tools:text="Заметка" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_in_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="150dp"
+            android:background="@color/greyTransparent"
+            android:paddingStart="@dimen/dp_16"
+            android:paddingTop="@dimen/dp_4"
+            android:paddingEnd="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_8"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+
+            tools:listitem="@layout/recycler_item_todo_first_note_view" />
+
+        <!--            <TextView-->
+        <!--                android:id="@+id/recycler_in_view_pager"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:background="@color/greyTransparent"-->
+        <!--                android:paddingStart="@dimen/dp_16"-->
+        <!--                android:paddingTop="@dimen/dp_4"-->
+        <!--                android:paddingEnd="@dimen/dp_16"-->
+        <!--                android:paddingBottom="@dimen/dp_8"-->
+        <!--                android:visibility="gone"-->
+        <!--                tools:visibility="visible"-->
+        <!--                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"-->
+        <!--                android:textColor="@color/secondaryTextColor"-->
+        <!--                app:firstNoteText="@{firstNote}"-->
+        <!--                tools:text="Заметка" />-->
 
 
         <TextView
@@ -81,9 +97,9 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/greyTransparent"
             android:theme="@style/OnePhoto"
-            app:titleTextColor="@color/secondaryTextColor"
             app:menu="@menu/note_view_menu"
-            app:navigationIcon="@drawable/ic_back_arrow" />
+            app:navigationIcon="@drawable/ic_back_arrow"
+            app:titleTextColor="@color/secondaryTextColor" />
 
     </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

@@ -24,7 +24,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-
             app:layout_constraintBottom_toBottomOf="@id/colon_edit"
             app:layout_constraintStart_toEndOf="@id/colon_edit"
             app:layout_constraintTop_toTopOf="@id/colon_edit"

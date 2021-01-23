@@ -1,6 +1,5 @@
 package com.example.noteexample.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.noteexample.database.*
 import com.example.noteexample.utils.Camera

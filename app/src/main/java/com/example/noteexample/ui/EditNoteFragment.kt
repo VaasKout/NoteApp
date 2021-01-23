@@ -5,16 +5,19 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.AutoSizeableTextView
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -24,7 +27,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.noteexample.R
 import com.example.noteexample.adapters.EditNoteAdapter
-import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
+import com.example.noteexample.database.FirstNote
 import com.example.noteexample.databinding.FragmentEditNoteBinding
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.Camera
@@ -181,22 +184,21 @@ class EditNoteFragment : Fragment() {
                     true
                 }
                 R.id.todo -> {
-                    viewModel.currentNote?.header?.let { header ->
+                    viewModel.currentNote?.notes?.get(0)?.let { note ->
                         lifecycleScope.launch {
-                            if (header.todoList) {
+                            if (note.todoItem) {
                                 it.icon = ContextCompat.getDrawable(
                                     requireContext(),
                                     R.drawable.ic_todo_list
                                 )
-                                header.todoList = false
-                                viewModel.updateCurrentNoteSuspend()
+                                viewModel.changeListMod(!note.todoItem)
                                 binding.editRecycler.adapter = noteAdapter
                             } else {
                                 it.icon = ContextCompat.getDrawable(
                                     requireContext(),
                                     R.drawable.ic_simple_list
                                 )
-                                header.todoList = true
+                                viewModel.changeListMod(!note.todoItem)
                                 viewModel.updateCurrentNoteSuspend()
                                 binding.editRecycler.adapter = noteAdapter
                             }
@@ -221,6 +223,9 @@ class EditNoteFragment : Fragment() {
          * @see onPause
          */
 
+//        remove flag
+//        someTextView.setPaintFlags(someTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG))
+
         noteAdapter.headerHolder.observe(viewLifecycleOwner) { holder ->
             holder.binding.titleEdit.addTextChangedListener {
                 viewModel.currentNote?.header?.title = it.toString()
@@ -232,6 +237,10 @@ class EditNoteFragment : Fragment() {
 //            holder.binding.firstNoteEdit.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
         noteAdapter.firstNoteSimpleHolder.observe(viewLifecycleOwner, { holder ->
+            noteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.text?.let {
+                holder.binding.firstNoteEdit.setText(it)
+            }
+
             holder.binding.firstNoteEdit.setOnEditorActionListener { _, actionId, _ ->
                 return@setOnEditorActionListener when (actionId) {
                     EditorInfo.IME_ACTION_NEXT -> {
@@ -246,6 +255,7 @@ class EditNoteFragment : Fragment() {
                 }
             }
 
+
             holder.binding.firstNoteEdit.addTextChangedListener {
                 noteAdapter.currentList[holder.absoluteAdapterPosition]?.firstNote?.text =
                     it.toString()
@@ -254,9 +264,20 @@ class EditNoteFragment : Fragment() {
 
 
         noteAdapter.firstNoteTodoHolder.observe(viewLifecycleOwner, { holder ->
-            noteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.text?.let {
-                holder.binding.editTextCheckbox.setText(it)
+            //TODO follow this example
+            noteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.also {
+                crossText(it, holder.binding.editTextCheckbox)
+                holder.binding.editTextCheckbox.setText(it.text)
+                holder.binding.checkboxEdit.isChecked = it.isChecked
+
+                holder.binding.checkboxEdit.setOnCheckedChangeListener { _, isChecked ->
+                    it.isChecked = isChecked
+                    viewModel.updateFirstNote(it)
+                    crossText(it, holder.binding.editTextCheckbox)
+                }
             }
+
+
             holder.binding.editTextCheckbox.addTextChangedListener {
                 noteAdapter.currentList[holder.absoluteAdapterPosition]?.firstNote?.text =
                     it.toString()
@@ -356,39 +377,11 @@ class EditNoteFragment : Fragment() {
         viewModel.currentNoteLiveData.observe(viewLifecycleOwner, {
             viewModel.currentNote = it
             lifecycleScope.launch(Dispatchers.Default) {
-                viewModel.currentNote?.let { item ->
-                    if (!viewModel.itemListSame) {
-                        Log.e("size", viewModel.noteList.size.toString())
-                        viewModel.noteList = mutableListOf()
-                        viewModel.noteList.add(0, NoteWithImagesRecyclerItems(item.header))
-                        val size = item.notes.size + item.images.size
-
-                        for (i in 0 until size) {
-                            item.notes.forEach { note ->
-                                if (note.notePos == i) {
-                                    viewModel.noteList.add(
-                                        NoteWithImagesRecyclerItems(
-                                            firstNote = note
-                                        )
-                                    )
-                                }
-                            }
-                            item.images.forEach { image ->
-                                if (image.imgPos == i) {
-                                    viewModel.noteList.add(
-                                        NoteWithImagesRecyclerItems(
-                                            image = image
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        viewModel.itemListSame = false
-                    }
-                    withContext(Dispatchers.Main) {
-                        noteAdapter.submitList(viewModel.noteList)
-                    }
+                if (!viewModel.itemListSame) {
+                    viewModel.createNoteList()
+                }
+                withContext(Dispatchers.Main) {
+                    noteAdapter.submitList(viewModel.noteList)
                 }
             }
         })
@@ -473,6 +466,15 @@ class EditNoteFragment : Fragment() {
         super.onPause()
         if (args.noteID == -1L) {
             viewModel.updateCurrentNote()
+        }
+    }
+
+    private fun crossText(firstNote: FirstNote, edit: EditText) {
+        if (firstNote.isChecked) {
+            edit.paintFlags =
+                edit.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            edit.paintFlags = edit.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
     }
 }

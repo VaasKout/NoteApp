@@ -7,6 +7,9 @@
         <variable
             name="firstNote"
             type="com.example.noteexample.database.FirstNote" />
+        <variable
+            name="pagerStyle"
+            type="Boolean" />
     </data>
 
     <TextView
@@ -19,5 +22,6 @@
         android:paddingBottom="@dimen/dp_8"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         app:firstNoteText="@{firstNote}"
+        app:pagerStyle="@{pagerStyle}"
         tools:text="Note" />
 </layout>

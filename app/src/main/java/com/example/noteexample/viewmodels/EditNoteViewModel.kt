@@ -34,10 +34,10 @@ class EditNoteViewModel(
     var position = 0
     var startNote: NoteWithImages? = null
     var currentNote: NoteWithImages? = null
-    set(value) {
-        field = value
-        sortItems()
-    }
+        set(value) {
+            field = value
+            sortItems(field)
+        }
     var noteList = mutableListOf<NoteWithImagesRecyclerItems>()
 
     //LiveData
@@ -60,12 +60,38 @@ class EditNoteViewModel(
     private var firstNoteList = mutableListOf<FirstNote>()
     private var imgList = mutableListOf<Image>()
 
-    private fun sortItems(){
-        currentNote?.let { it ->
-            it.forEach { noteWithImages ->
-                noteWithImages.notes = noteWithImages.notes.sortedBy { note -> note.notePos }
-                noteWithImages.images = noteWithImages.images.sortedBy { image -> image.imgPos }
+    fun createNoteList() {
+        noteList = mutableListOf()
+        currentNote?.let { item ->
+            noteList.add(0, NoteWithImagesRecyclerItems(header = item.header))
+            val size = item.notes.size + item.images.size
+            for (i in 0 until size) {
+                item.notes.forEach { note ->
+                    if (note.notePos == i) {
+                        noteList.add(
+                            NoteWithImagesRecyclerItems(
+                                firstNote = note
+                            )
+                        )
+                    }
+                }
+                item.images.forEach { image ->
+                    if (image.imgPos == i) {
+                        noteList.add(
+                            NoteWithImagesRecyclerItems(
+                                image = image
+                            )
+                        )
+                    }
+                }
             }
+        }
+    }
+
+    private fun sortItems(noteWithImages: NoteWithImages?) {
+        noteWithImages?.let {
+            it.notes = noteWithImages.notes.sortedBy { note -> note.notePos }
+            it.images = noteWithImages.images.sortedBy { image -> image.imgPos }
         }
     }
 
@@ -158,10 +184,19 @@ class EditNoteViewModel(
                     }
                 }
                 increasePositions(pos)
-                val firstNote = FirstNote(
-                    notePos = pos,
-                    parentNoteID = it.header.headerID
-                )
+                val firstNote = if (it.notes.isNotEmpty()) {
+                    FirstNote(
+                        notePos = pos,
+                        parentNoteID = it.header.headerID,
+                        todoItem = it.notes[0].todoItem
+                    )
+                } else {
+                    FirstNote(
+                        notePos = pos,
+                        parentNoteID = it.header.headerID
+                    )
+                }
+
                 repository.insertFirstNote(firstNote)
             }
         }
@@ -182,6 +217,7 @@ class EditNoteViewModel(
 //                it.images = imgList
                 repository.updateImages(imgList)
                 repository.updateFirstNotes(firstNoteList)
+                itemListSame = false
             }
         }
     }
@@ -207,9 +243,11 @@ class EditNoteViewModel(
     }
 
 
-    fun updateFirstNote(list: List<FirstNote>) {
+    fun updateFirstNote(firstNote: FirstNote?) {
         viewModelScope.launch {
-            repository.updateFirstNotes(list)
+            firstNote?.let {
+                repository.updateFirstNote(it)
+            }
         }
     }
 
@@ -284,5 +322,13 @@ class EditNoteViewModel(
 
     fun onDoneNavigating() {
         _navigateBack.value = false
+    }
+
+    fun changeListMod(mod: Boolean) {
+        currentNote?.notes?.let {
+            it.forEach { firstNote ->
+                firstNote.todoItem = mod
+            }
+        }
     }
 }

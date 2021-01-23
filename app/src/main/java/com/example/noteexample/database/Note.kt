@@ -48,7 +48,6 @@ data class Header(
     var title: String = "",
     var date: String = "",
     var isChecked: Boolean = false,
-    var todoList: Boolean = false,
 )
 
 @Entity(tableName = "first_note_table")
@@ -59,6 +58,7 @@ data class FirstNote(
     val parentNoteID: Long,
     var text: String = "",
     var isChecked: Boolean = false,
+    var todoItem: Boolean = false,
 )
 
 /**

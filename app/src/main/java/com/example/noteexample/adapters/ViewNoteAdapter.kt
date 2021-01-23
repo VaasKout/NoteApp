@@ -1,8 +1,10 @@
 package com.example.noteexample.adapters
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +20,6 @@ private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_TODO_FIRST_NOTE = 1
 private const val ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE = 2
 private const val ITEM_VIEW_TYPE_IMAGE = 3
-private const val ITEM_VIEW_TYPE_DATE = 4
 
 class ViewNoteAdapter :
     ListAdapter<NoteWithImagesRecyclerItems, RecyclerView.ViewHolder>(NoteWithImagesDiffCallback()) {
@@ -27,16 +28,9 @@ class ViewNoteAdapter :
      * ListAdapter for [com.example.noteexample.ui.OneNoteFragment]
      * similar with [com.example.noteexample.adapters.EditNoteAdapter]
      */
-    private var todoList = false
-
-    private val _headerHolder = MutableLiveData<HeaderViewHolder>()
-    val headerHolder: LiveData<HeaderViewHolder> = _headerHolder
 
     private val _firstNoteTodoHolder = MutableLiveData<FirstNoteTodoViewHolder>()
     val firstNoteTodoHolder: LiveData<FirstNoteTodoViewHolder> = _firstNoteTodoHolder
-
-    private val _firstNoteSimpleHolder = MutableLiveData<FirstNoteSimpleViewHolder>()
-    val firstNoteSimpleHolder: LiveData<FirstNoteSimpleViewHolder> = _firstNoteSimpleHolder
 
     private val _imgHolder = MutableLiveData<ImageViewHolder>()
     val imgHolder: LiveData<ImageViewHolder> = _imgHolder
@@ -44,23 +38,17 @@ class ViewNoteAdapter :
     override fun getItemViewType(position: Int): Int {
         when (position) {
             0 -> {
-                getItem(position).header?.let {
-                    todoList = it.todoList
-                }
                 return ITEM_VIEW_TYPE_HEADER
             }
             else -> {
                 getItem(position).firstNote?.let {
-                    return if (!todoList) {
+                    return if (!it.todoItem) {
                         ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE
                     } else {
                         ITEM_VIEW_TYPE_TODO_FIRST_NOTE
                     }
                 }
-                getItem(position).image?.let {
-                    return ITEM_VIEW_TYPE_IMAGE
-                }
-                return ITEM_VIEW_TYPE_DATE
+                return ITEM_VIEW_TYPE_IMAGE
             }
         }
     }
@@ -79,9 +67,6 @@ class ViewNoteAdapter :
             is ImageViewHolder -> {
                 getItem(position).image?.let { holder.bind(it) }
             }
-            is DateViewHolder -> {
-                getItem(position).date?.let { holder.bind(it) }
-            }
         }
     }
 
@@ -98,7 +83,7 @@ class ViewNoteAdapter :
                 return HeaderViewHolder(binding)
             }
 
-            ITEM_VIEW_TYPE_TODO_FIRST_NOTE -> {
+            ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE -> {
                 val binding: RecyclerItemSimpleFirstNoteViewBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
@@ -109,7 +94,7 @@ class ViewNoteAdapter :
                 return FirstNoteSimpleViewHolder(binding)
             }
 
-            ITEM_VIEW_TYPE_SIMPLE_FIRST_NOTE -> {
+            ITEM_VIEW_TYPE_TODO_FIRST_NOTE -> {
                 val binding: RecyclerItemTodoFirstNoteViewBinding =
                     DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context),
@@ -131,17 +116,6 @@ class ViewNoteAdapter :
                         )
                 return ImageViewHolder(binding)
             }
-
-            ITEM_VIEW_TYPE_DATE -> {
-                val binding: RecyclerItemDateBinding =
-                    DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.context),
-                        R.layout.recycler_item_date,
-                        parent,
-                        false
-                    )
-                return DateViewHolder(binding)
-            }
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -161,6 +135,9 @@ class ViewNoteAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(firstNote: FirstNote) {
             binding.firstNote = firstNote
+            binding.checkboxView.isChecked = firstNote.isChecked
+            _firstNoteTodoHolder.value = this
+//            crossText(firstNote, binding.checkboxView)
             binding.executePendingBindings()
         }
     }
@@ -186,10 +163,11 @@ class ViewNoteAdapter :
         }
     }
 
-    inner class DateViewHolder(val binding: RecyclerItemDateBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(date: String) {
-            binding.dateMain.text = date
+    private fun crossText(firstNote: FirstNote, textView: TextView) {
+        if (firstNote.isChecked) {
+            textView.paintFlags = textView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            textView.paintFlags = textView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
     }
 }

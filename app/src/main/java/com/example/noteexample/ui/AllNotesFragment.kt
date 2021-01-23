@@ -1,7 +1,9 @@
 package com.example.noteexample.ui
 
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.*
+import android.widget.EditText
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -16,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.noteexample.R
 import com.example.noteexample.adapters.NoteAdapter
+import com.example.noteexample.database.FirstNote
 import com.example.noteexample.databinding.FragmentNoteMainBinding
 import com.example.noteexample.utils.GlideApp
+import com.example.noteexample.utils.ItemHelperCallback
 import com.example.noteexample.viewmodels.AllNotesViewModel
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,7 +35,7 @@ class AllNotesFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
     private val noteAdapter = NoteAdapter()
-    private val cardAdapter = noteAdapter.cardAdapter
+//    private val cardAdapter = noteAdapter.cardAdapter
     private var cards = mutableListOf<MaterialCardView>()
 
     /**
@@ -90,65 +94,24 @@ class AllNotesFragment : Fragment() {
      * but sometimes it causes bugs when layout manager is
      * [StaggeredGridLayoutManager] with 2 columns
      */
-
-    private val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or
-                ItemTouchHelper.DOWN or ItemTouchHelper.UP,
-        0
-    ) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
+    private val helper = ItemHelperCallback().getHelper(
+        0,
+        swapAction = { from, to ->
             if (actionMode != null) {
                 actionMode?.finish()
             }
-            val from = viewHolder.absoluteAdapterPosition
-            val to = target.absoluteAdapterPosition
-
             if (from >= 0 && to >= 0) {
                 viewModel.swap(from, to)
-                noteAdapter.notifyItemMoved(from, to)
-//                if (recyclerView.layoutManager is StaggeredGridLayoutManager){
-//                    (recyclerView.layoutManager as StaggeredGridLayoutManager).gapStrategy =
-//                        StaggeredGridLayoutManager.GAP_HANDLING_NONE
-//                }
-//                    if (from == 0 || to == 0){
-//                        recyclerView.scrollToPosition(0)
-//                        recyclerView.layoutManager?.scrollToPosition(0)
-//                    }
-//
                 viewModel.startedMove = true
             }
-            return true
-        }
-
-        /**
-         * Update [AllNotesViewModel.noteList] when item is released
-         * Flag [AllNotesViewModel.startedMove] is used to prevent destruction of action mode
-         */
-        override fun clearView(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder
-        ) {
-            super.clearView(recyclerView, viewHolder)
+        },
+        clearViewAction = {
             if (viewModel.startedMove) {
-//                if (recyclerView.layoutManager is StaggeredGridLayoutManager){
-//                    (recyclerView.layoutManager as StaggeredGridLayoutManager).gapStrategy =
-//                        StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
-//                }
                 viewModel.startedMove = false
                 viewModel.updateNoteList()
             }
         }
-
-        override fun onSwiped(
-            viewHolder: RecyclerView.ViewHolder,
-            direction: Int
-        ) {
-        }
-    })
+    )
 
     init {
         lifecycleScope.launchWhenCreated {
@@ -314,159 +277,151 @@ class AllNotesFragment : Fragment() {
          * Glide and BindingAdapter which set image or title in other items,
          * where it shouldn't be
          */
-//        noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
-//            if (holder.absoluteAdapterPosition >= 0) {
-//                lifecycleScope.launch {
-//                    cards.add(holder.binding.mainCard)
-////                    val card = holder.binding.mainCard
-////                    val title = holder.binding.titleMain
-////                    val text = holder.binding.signatureMain
-////                    val recyclerItem = holder.binding.recyclerInMainItem
-////                    val img = holder.binding.photoMain
-////                    val view1 = holder.binding.view1
-////                    val view2 = holder.binding.view2
-////                    val view3 = holder.binding.view3
-////                    val date = holder.binding.dateMain
-////
-////                    card.isChecked = false
-////                    title.visibility = View.GONE
-////                    text.visibility = View.GONE
-////                    recyclerItem.visibility = View.GONE
-////                    img.visibility = View.GONE
-////                    view1.visibility = View.GONE
-////                    view2.visibility = View.GONE
-////                    view3.visibility = View.GONE
-////                    date.visibility = View.GONE
-//
-//                    noteAdapter.currentList[holder.absoluteAdapterPosition]?.also {
-////                        if (noteAdapter.firstNoteAdapter.currentList.isEmpty() &&
-////                            it.notes.isNotEmpty()
-////                        ) {
-////                            noteAdapter.firstNoteAdapter.submitList(it.notes.sortedBy { note ->
-////                                note.notePos
-////                            })
-////                        }
-//
-//                        if (it.header.title.isNotEmpty()) {
-//                            title.visibility = View.VISIBLE
-//                            title.text = it.header.title
-//                        }
-//
-//
-//                        if (it.notes.isNotEmpty()) {
-//                            recyclerItem.visibility = View.VISIBLE
-//                        }
-//
-//                        if (it.images.isNotEmpty()) {
-//                            var photoInserted = false
-//                            for (content in it.images) {
-//                                if (content.photoPath.isNotEmpty()) {
-//                                    img.visibility = View.VISIBLE
-//                                    GlideApp.with(requireContext())
-//                                        .load(content.photoPath)
-//                                        .into(img)
-//                                    photoInserted = true
-//                                    break
-//                                }
-//                            }
-//
-//                            if (!photoInserted &&
-//                                it.notes.isEmpty() &&
-//                                it.images[0].signature.isNotEmpty()
-//                            ) {
-//                                text.text = it.images[0].signature
-//                                text.visibility = View.VISIBLE
-//                            }
-//                        }
-//
-//                        if (it.header.title.isNotEmpty() && it.notes.isNotEmpty()) {
-//                            view1.visibility = View.VISIBLE
-//                        }
-//                        if ((it.notes.isNotEmpty() || it.header.title.isNotEmpty()) &&
-//                            img.visibility == View.VISIBLE
-//                        ) {
-//                            view2.visibility = View.VISIBLE
-//                        }
-//
-//                        viewModel.flags?.let { flags ->
-//                            if (flags.showDate) {
-//                                date.text = it.header.date
-//                                date.visibility = View.VISIBLE
-//                                view3.visibility = View.VISIBLE
-//                            }
-//                        }
-//                    }
-//
-//
-//                    //MainCard LongCLickListener
-//                    //Long click starts actionMode
-//                    card.setOnLongClickListener {
-//                        if (viewModel.searchStarted) {
-//                            viewModel.onDoneSearch()
-//                        }
-//                        card.isChecked = !card.isChecked
-//                        noteAdapter.currentList[holder.absoluteAdapterPosition].header.isChecked =
-//                            card.isChecked
-//                        if (actionMode == null) {
-//                            actionMode =
-//                                requireActivity().startActionMode(actionModeController)
-//                            actionMode?.title =
-//                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
-//                        } else {
-//                            actionMode?.title =
-//                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
-//                            if (viewModel.noteList.none { it.header.isChecked }) {
-//                                actionMode?.finish()
-//                            }
-//                        }
-//                        true
-//                    }
-//
-//                    //MainCard ClickListener
-//                    card.setOnClickListener {
-//                        if (viewModel.searchStarted) {
-//                            viewModel.onDoneSearch()
-//                        }
-//                        if (actionMode != null) {
-//                            card.isChecked = !card.isChecked
-//                            noteAdapter.currentList[holder.absoluteAdapterPosition].header.isChecked =
-//                                card.isChecked
-//                            actionMode?.title =
-//                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
-//                            if (viewModel.noteList.none { it.header.isChecked }) {
-//                                actionMode?.finish()
-//                            }
-//                        } else {
-//                            noteAdapter.currentList[holder.absoluteAdapterPosition].apply {
-//                                if (this@AllNotesFragment
-//                                        .findNavController()
-//                                        .currentDestination?.id ==
-//                                    R.id.allNotesFragment
-//                                ) {
-//                                    if (images.size == 1 &&
-//                                        images[0].photoPath.isNotEmpty()
-//                                    ) {
-//                                        this@AllNotesFragment.findNavController()
-//                                            .navigate(
-//                                                AllNotesFragmentDirections
-//                                                    .actionAllNotesFragmentToOnePhotoFragment(
-//                                                        header.headerID,
-//                                                    )
-//                                            )
-//                                    } else {
-//                                        this@AllNotesFragment.findNavController()
-//                                            .navigate(
-//                                                AllNotesFragmentDirections
-//                                                    .actionAllNotesFragmentToOneNoteFragment(header.headerID)
-//                                            )
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        })
+        noteAdapter.holder.observe(viewLifecycleOwner, { holder ->
+            if (holder.absoluteAdapterPosition >= 0) {
+                lifecycleScope.launch {
+                    cards.add(holder.binding.mainCard)
+                    val card = holder.binding.mainCard
+                    val title = holder.binding.titleMain
+                    val text = holder.binding.signatureMain
+                    val recyclerItem = holder.binding.recyclerInMainItem
+                    val img = holder.binding.photoMain
+                    val view1 = holder.binding.view1
+                    val view2 = holder.binding.view2
+                    val view3 = holder.binding.view3
+                    val clickableView = holder.binding.viewClickableMain
+                    val date = holder.binding.dateMain
+
+                    card.isChecked = false
+                    title.visibility = View.GONE
+                    text.visibility = View.GONE
+                    recyclerItem.visibility = View.GONE
+                    img.visibility = View.GONE
+                    view1.visibility = View.GONE
+                    view2.visibility = View.GONE
+                    view3.visibility = View.GONE
+                    date.visibility = View.GONE
+
+                    noteAdapter.currentList[holder.absoluteAdapterPosition]?.also {
+                        if (it.header.title.isNotEmpty()) {
+                            title.visibility = View.VISIBLE
+                            title.text = it.header.title
+                        }
+
+                        if (it.notes.isNotEmpty()) {
+                            recyclerItem.visibility = View.VISIBLE
+                        }
+
+                        if (it.images.isNotEmpty()) {
+                            var photoInserted = false
+                            for (content in it.images) {
+                                if (content.photoPath.isNotEmpty()) {
+                                    img.visibility = View.VISIBLE
+                                    GlideApp.with(requireContext())
+                                        .load(content.photoPath)
+                                        .into(img)
+                                    photoInserted = true
+                                    break
+                                }
+                            }
+
+                            if (!photoInserted &&
+                                it.notes.isEmpty() &&
+                                it.images[0].signature.isNotEmpty()
+                            ) {
+                                text.text = it.images[0].signature
+                                text.visibility = View.VISIBLE
+                            }
+                        }
+
+                        if (it.header.title.isNotEmpty() && it.notes.isNotEmpty()) {
+                            view1.visibility = View.VISIBLE
+                        }
+                        if ((it.notes.isNotEmpty() || it.header.title.isNotEmpty()) &&
+                            img.visibility == View.VISIBLE
+                        ) {
+                            view2.visibility = View.VISIBLE
+                        }
+
+                        viewModel.flags?.let { flags ->
+                            if (flags.showDate) {
+                                date.text = it.header.date
+                                date.visibility = View.VISIBLE
+                                view3.visibility = View.VISIBLE
+                            }
+                        }
+                    }
+
+
+                    //MainCard LongCLickListener
+                    //Long click starts actionMode
+                    clickableView.setOnLongClickListener {
+                        if (viewModel.searchStarted) {
+                            viewModel.onDoneSearch()
+                        }
+                        card.isChecked = !card.isChecked
+                        noteAdapter.currentList[holder.absoluteAdapterPosition].header.isChecked =
+                            card.isChecked
+                        if (actionMode == null) {
+                            actionMode =
+                                requireActivity().startActionMode(actionModeController)
+                            actionMode?.title =
+                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
+                        } else {
+                            actionMode?.title =
+                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
+                            if (viewModel.noteList.none { it.header.isChecked }) {
+                                actionMode?.finish()
+                            }
+                        }
+                        true
+                    }
+
+                    //MainCard ClickListener
+                    clickableView.setOnClickListener {
+                        if (viewModel.searchStarted) {
+                            viewModel.onDoneSearch()
+                        }
+                        if (actionMode != null) {
+                            card.isChecked = !card.isChecked
+                            noteAdapter.currentList[holder.absoluteAdapterPosition].header.isChecked =
+                                card.isChecked
+                            actionMode?.title =
+                                "${viewModel.noteList.filter { it.header.isChecked }.size}"
+                            if (viewModel.noteList.none { it.header.isChecked }) {
+                                actionMode?.finish()
+                            }
+                        } else {
+                            noteAdapter.currentList[holder.absoluteAdapterPosition].apply {
+                                if (this@AllNotesFragment
+                                        .findNavController()
+                                        .currentDestination?.id ==
+                                    R.id.allNotesFragment
+                                ) {
+                                    if (images.size == 1 &&
+                                        images[0].photoPath.isNotEmpty()
+                                    ) {
+                                        this@AllNotesFragment.findNavController()
+                                            .navigate(
+                                                AllNotesFragmentDirections
+                                                    .actionAllNotesFragmentToOnePhotoFragment(
+                                                        header.headerID,
+                                                    )
+                                            )
+                                    } else {
+                                        this@AllNotesFragment.findNavController()
+                                            .navigate(
+                                                AllNotesFragmentDirections
+                                                    .actionAllNotesFragmentToOneNoteFragment(header.headerID)
+                                            )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
 
         /**
          * listen to fab click and goto [EditNoteFragment]
@@ -495,4 +450,6 @@ class AllNotesFragment : Fragment() {
         binding.lifecycleOwner = this
         return binding.root
     }
+
+
 }

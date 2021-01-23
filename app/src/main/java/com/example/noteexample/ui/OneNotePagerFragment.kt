@@ -1,8 +1,10 @@
 package com.example.noteexample.ui
 
 import android.annotation.SuppressLint
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -12,7 +14,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.example.noteexample.R
+import com.example.noteexample.adapters.FirstNoteAdapter
 import com.example.noteexample.adapters.ViewPagerAdapter
+import com.example.noteexample.database.FirstNote
 import com.example.noteexample.databinding.FragmentOneNotePagerBinding
 import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.utils.CustomTouchListener
@@ -35,6 +39,7 @@ class OneNotePagerFragment : Fragment() {
     lateinit var binding: FragmentOneNotePagerBinding
     private val args by navArgs<OneNotePagerFragmentArgs>()
     private val pagerAdapter = ViewPagerAdapter()
+    private val firstNoteAdapter = FirstNoteAdapter(true)
 
 
     //viewModel
@@ -65,7 +70,7 @@ class OneNotePagerFragment : Fragment() {
 
         binding = DataBindingUtil
             .inflate(inflater, R.layout.fragment_one_note_pager, container, false)
-        binding.lifecycleOwner = this
+
 
         /**
          * Visibility of text fields depends on [OneNoteViewModel.currentNoteLiveData] value
@@ -75,16 +80,17 @@ class OneNotePagerFragment : Fragment() {
             if (it.header.title.isNotEmpty()) {
                 binding.titleViewOnePhoto.visibility = View.VISIBLE
             }
-            //TODO recyclerView in viewPager
-//            if (it.header.text.isNotEmpty()) {
-//                binding.firstNoteViewOnePhoto.visibility = View.VISIBLE
-//            }
+            binding.recyclerInViewPager.adapter = firstNoteAdapter
             binding.photoPager.adapter = pagerAdapter
             lifecycleScope.launch {
-                launch {
+                if (pagerAdapter.currentList.isEmpty()) {
                     pagerAdapter.submitList(it.images)
-                }.join()
-                binding.photoPager.setCurrentItem(args.pos, false)
+                    binding.photoPager.setCurrentItem(args.pos, false)
+                }
+                if (firstNoteAdapter.currentList.isEmpty()) {
+                    firstNoteAdapter.submitList(it.notes)
+                }
+
             }
         })
 
@@ -120,7 +126,8 @@ class OneNotePagerFragment : Fragment() {
                 } else {
                     binding.noteViewOnePhoto.visibility = View.GONE
                 }
-                binding.toolbarOneNotePager.title = "${position + 1}/${pagerAdapter.currentList.size}"
+                binding.toolbarOneNotePager.title =
+                    "${position + 1}/${pagerAdapter.currentList.size}"
             }
         })
 
@@ -131,6 +138,18 @@ class OneNotePagerFragment : Fragment() {
          */
 
 //        binding.photoPager.isUserInputEnabled = false
+        firstNoteAdapter.firstNoteTodoHolder.observe(viewLifecycleOwner, { holder ->
+            firstNoteAdapter.currentList[holder.absoluteAdapterPosition]?.also {
+
+                holder.binding.checkboxView.setOnCheckedChangeListener { _, isChecked ->
+                    holder.binding.checkboxView.isChecked = isChecked
+                    it.isChecked = isChecked
+                    viewModel.updateFirstNote(it)
+//                    crossText(it, holder.binding.checkboxView)
+                }
+            }
+        })
+
         pagerAdapter.holder.observe(viewLifecycleOwner, { holder ->
 
             holder.binding.imgOnePhoto.setOnClickListener {
@@ -146,7 +165,6 @@ class OneNotePagerFragment : Fragment() {
                 }
             }
 
-
             holder.binding.imgOnePhoto
                 .setOnTouchListener(object : CustomTouchListener(requireContext()) {
 
@@ -155,7 +173,7 @@ class OneNotePagerFragment : Fragment() {
                         //check if image zoomed
                         if (!holder.binding.imgOnePhoto.isZoomed) {
                             binding.titleViewOnePhoto.visibility = View.INVISIBLE
-                            binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                            binding.recyclerInViewPager.visibility = View.INVISIBLE
                             binding.noteViewOnePhoto.visibility = View.INVISIBLE
                             binding.toolbarOneNotePager.visibility = View.INVISIBLE
                             holder.binding.motionPagerItem
@@ -178,7 +196,7 @@ class OneNotePagerFragment : Fragment() {
                     override fun onSwipeBottom() {
                         if (!holder.binding.imgOnePhoto.isZoomed) {
                             binding.titleViewOnePhoto.visibility = View.INVISIBLE
-                            binding.firstNoteViewOnePhoto.visibility = View.INVISIBLE
+                            binding.recyclerInViewPager.visibility = View.INVISIBLE
                             binding.noteViewOnePhoto.visibility = View.INVISIBLE
                             binding.toolbarOneNotePager.visibility = View.INVISIBLE
                             holder.binding.motionPagerItem
@@ -215,7 +233,7 @@ class OneNotePagerFragment : Fragment() {
          * Application uses custom library to zoom image
          * "com.github.MikeOrtiz:TouchImageView:3.0.3"
          */
-
+        binding.lifecycleOwner = this
         return binding.root
     }
 
@@ -223,5 +241,13 @@ class OneNotePagerFragment : Fragment() {
         super.onDestroy()
         requireActivity().window.statusBarColor =
             ContextCompat.getColor(requireActivity(), R.color.primaryDarkColor)
+    }
+
+    private fun crossText(firstNote: FirstNote, textView: TextView) {
+        if (firstNote.isChecked) {
+            textView.paintFlags = textView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            textView.paintFlags = textView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
     }
 }
