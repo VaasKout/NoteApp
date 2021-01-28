@@ -4,10 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-        <variable
-            name="firstNote"
-            type="com.example.noteexample.database.FirstNote" />
         <variable
             name="pagerStyle"
             type="Boolean" />
@@ -17,7 +13,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            app:firstNoteText="@{firstNote}"
             app:pagerStyle="@{pagerStyle}"
             tools:text="Text" />
 </layout>

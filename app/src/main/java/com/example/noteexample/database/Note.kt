@@ -27,6 +27,7 @@ data class Flags(
     var ascendingOrder: Boolean = false,
     var showDate: Boolean = true,
     var columns: Int = 2,
+    var hidePhotos: Boolean = false
 )
 
 

@@ -12,6 +12,7 @@ import com.example.noteexample.R
 import com.example.noteexample.database.FirstNote
 import com.example.noteexample.database.Header
 import com.example.noteexample.database.Image
+import com.google.android.material.checkbox.MaterialCheckBox
 
 @GlideModule
 class GlideAppModule : AppGlideModule()
@@ -66,6 +67,24 @@ fun TextView.firstNoteText(firstNote: FirstNote?) {
         }
     }
 }
+
+@BindingAdapter("materialCheckboxText")
+fun MaterialCheckBox.setCheckboxText(firstNote: FirstNote?){
+    firstNote?.let {
+        when{
+            this !is EditText && it.text.isEmpty() ->{
+                this.isChecked = it.isChecked
+                visibility = View.VISIBLE
+            }
+            this !is EditText && it.text.isNotEmpty() ->{
+                text = firstNote.text
+                this.isChecked = it.isChecked
+                visibility = View.VISIBLE
+            }
+        }
+    }
+}
+
 
 /**
  * Binding adapter functions for [com.example.noteexample.database.Image]

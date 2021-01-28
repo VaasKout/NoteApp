@@ -26,7 +26,7 @@ class EditNoteViewModel(
      * which cause unacceptable animation
      */
     //Flags
-    var allHidden = true
+    var deleteAllowed = true
     var backPressed = false
     var itemListSame = false
 
@@ -212,9 +212,6 @@ class EditNoteViewModel(
     fun updateAfterSwap() {
         viewModelScope.launch {
             currentNote?.let {
-//                repository.deleteNoteImagesAndFirstNotes(it.header.headerID)
-//                it.notes = firstNoteList
-//                it.images = imgList
                 repository.updateImages(imgList)
                 repository.updateFirstNotes(firstNoteList)
                 itemListSame = false
@@ -222,7 +219,7 @@ class EditNoteViewModel(
         }
     }
 
-    suspend fun updateCurrentNoteSuspend() {
+    private suspend fun updateCurrentNoteSuspend() {
         if (noteID > -1) {
             currentNote?.let {
                 repository.updateNoteWithImages(it)
@@ -251,12 +248,17 @@ class EditNoteViewModel(
         }
     }
 
-
-    suspend fun deleteNoteWithImages(noteWithImages: NoteWithImages?) {
-        noteWithImages?.let {
+    suspend fun deleteCurrentNote() {
+        currentNote?.let {
             repository.deleteNoteWithImages(it)
         }
     }
+
+//    suspend fun deleteNoteWithImages(noteWithImages: NoteWithImages?) {
+//        noteWithImages?.let {
+//            repository.deleteNoteWithImages(it)
+//        }
+//    }
 
     private suspend fun decreasePositions(pos: Int) {
         currentNote?.let {
@@ -293,10 +295,12 @@ class EditNoteViewModel(
     }
 
     fun deleteFirstNote(firstNote: FirstNote) {
+        deleteAllowed = false
         viewModelScope.launch {
             val pos = firstNote.notePos
             repository.deleteFirstNote(firstNote)
             decreasePositions(pos)
+            deleteAllowed = true
         }
     }
 
@@ -307,8 +311,41 @@ class EditNoteViewModel(
         }
     }
 
-    suspend fun deleteUnused() {
-        currentNote?.let { repository.deleteNoteWithImages(it) }
+
+    suspend fun checkEmptyNoteAndDelete() {
+        currentNote?.let {
+            if (it.header.title.isEmpty() &&
+                it.notes.none { note -> note.text.isNotEmpty() } &&
+                it.images.isEmpty()
+            ) {
+                repository.deleteNoteWithImages(it)
+            }
+            it.notes.forEach { note ->
+                if (!note.todoItem && note.text.isEmpty()) {
+                    repository.deleteFirstNote(note)
+                } else if (note.todoItem && note.text.isEmpty()) {
+                    note.text = " "
+                    repository.updateFirstNote(note)
+                }
+            }
+            it.images.forEach { img ->
+                if (img.hidden && img.signature.isEmpty()) {
+                    repository.deleteImage(img)
+                }
+            }
+        }
+    }
+
+    fun checkStartNote(): Boolean {
+        currentNote?.let {
+            if (startNote?.header?.title != it.header.title ||
+                startNote?.notes != it.notes ||
+                startNote?.images != it.images
+            ) {
+                return true
+            }
+        }
+        return false
     }
 
     /**
@@ -317,6 +354,7 @@ class EditNoteViewModel(
      */
 
     fun onStartNavigating() {
+        backPressed = true
         _navigateBack.value = true
     }
 
@@ -324,11 +362,12 @@ class EditNoteViewModel(
         _navigateBack.value = false
     }
 
-    fun changeListMod(mod: Boolean) {
+    suspend fun changeListMod() {
         currentNote?.notes?.let {
             it.forEach { firstNote ->
-                firstNote.todoItem = mod
+                firstNote.todoItem = !firstNote.todoItem
             }
+            repository.updateFirstNotes(it)
         }
     }
 }

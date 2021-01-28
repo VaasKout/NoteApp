@@ -35,7 +35,7 @@ class AllNotesFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
     private val noteAdapter = NoteAdapter()
-//    private val cardAdapter = noteAdapter.cardAdapter
+    private val cardAdapter = noteAdapter.cardAdapter
     private var cards = mutableListOf<MaterialCardView>()
 
     /**
@@ -420,6 +420,13 @@ class AllNotesFragment : Fragment() {
                         }
                     }
                 }
+            }
+        })
+
+        cardAdapter.firstNoteTodoHolder.observe(viewLifecycleOwner, { holder ->
+            if (holder.absoluteAdapterPosition >= 0){
+                holder.binding.checkboxView.text =
+                    cardAdapter.currentList[holder.absoluteAdapterPosition].text
             }
         })
 

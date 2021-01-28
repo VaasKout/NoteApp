@@ -17,9 +17,10 @@ import com.example.noteexample.database.NoteWithImages
 import com.example.noteexample.databinding.RecyclerItemMainBinding
 import dagger.hilt.android.qualifiers.ApplicationContext
 
-class NoteAdapter() :
+class NoteAdapter :
     ListAdapter<NoteWithImages, NoteAdapter.NoteViewHolder>(NoteDiffCallBack()) {
 
+    val cardAdapter = FirstNoteAdapter(false)
     /**
      * [holder] gets instance of InsertUpdateViewHolder and observed in
      * [com.example.noteexample.ui.AllNotesFragment] to set clickListeners for recycler items
@@ -48,7 +49,7 @@ class NoteAdapter() :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(noteWithImages: NoteWithImages) {
             _holder.value = this
-            val cardAdapter = FirstNoteAdapter(false)
+
             val layoutManager = object : LinearLayoutManager(
                 binding.recyclerInMainItem.context,
                 RecyclerView.VERTICAL,

@@ -39,8 +39,7 @@ class FirstNoteAdapter(val pagerStyle: Boolean) :
             binding.pagerStyle = pagerStyle
             binding.checkboxView.isChecked = firstNote.isChecked
             _firstNoteTodoHolder.value = this
-            binding.firstNote = firstNote
-            binding.executePendingBindings()
+//            binding.executePendingBindings()
             crossText(firstNote, binding.checkboxView)
         }
     }

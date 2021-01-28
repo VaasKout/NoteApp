@@ -27,10 +27,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO adapter for only first note in OneNoteFragment
-//TODO make ViewNoteAdapterWork
-//TODO check order of items in AllNotesFragment in card
-
 @AndroidEntryPoint
 class OneNotePagerFragment : Fragment() {
 

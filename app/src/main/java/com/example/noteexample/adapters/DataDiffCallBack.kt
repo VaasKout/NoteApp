@@ -13,7 +13,6 @@ data class NoteWithImagesRecyclerItems(
     val header: Header? = null,
     var firstNote: FirstNote? = null,
     var image: Image? = null,
-    var date: String? = null,
 )
 
 class NoteWithImagesDiffCallback :

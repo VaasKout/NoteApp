@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.noteexample.R
-import com.example.noteexample.adapters.NoteWithImagesRecyclerItems
 import com.example.noteexample.databinding.FragmentOneNoteBinding
 import com.example.noteexample.viewmodels.OneNoteViewModel
 import com.example.noteexample.adapters.ViewNoteAdapter
@@ -23,16 +21,14 @@ import com.example.noteexample.repository.NoteRepository
 import com.example.noteexample.viewmodels.NoteViewModelFactory
 import com.google.android.material.checkbox.MaterialCheckBox
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class OneNoteFragment : Fragment() {
 
-    //TODO todo-list for this fragment
+
     @Inject
     lateinit var repository: NoteRepository
     lateinit var binding: FragmentOneNoteBinding
@@ -69,16 +65,13 @@ class OneNoteFragment : Fragment() {
             lifecycleScope.launch {
                 viewModel.currentNote = current
                 viewModel.createNoteList()
-//                if (viewModel.dataItemList.isEmpty()) {
 
-//                }
+                oneNoteAdapter.submitList(viewModel.dataItemList)
 
                 /**
                  * Scroll to specific position when user returns from [OneNotePagerFragment]
                  * by default it gets to 0, so user can have bad experience
                  */
-                oneNoteAdapter.submitList(viewModel.dataItemList)
-
                 if (viewModel.scrollPosition > 0) {
                     delay(96)
                     binding.recyclerOneNote.smoothScrollToPosition(viewModel.scrollPosition)
@@ -93,12 +86,18 @@ class OneNoteFragment : Fragment() {
         oneNoteAdapter.firstNoteTodoHolder.observe(viewLifecycleOwner, { holder ->
             oneNoteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.also {
                 crossText(it, holder.binding.checkboxView)
-                holder.binding.checkboxView.setOnCheckedChangeListener { _, isChecked ->
-                    it.isChecked = isChecked
-                    viewModel.updateFirstNote(it)
-                    crossText(it, holder.binding.checkboxView)
-                }
+                holder.binding.checkboxView.text = it.text
+                holder.binding.checkboxView.isChecked = it.isChecked
             }
+                holder.binding.checkboxView.setOnCheckedChangeListener { _, isChecked ->
+                    oneNoteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.let {
+                            note ->
+                        note.isChecked = isChecked
+                        viewModel.updateFirstNote(note)
+                        crossText(note, holder.binding.checkboxView)
+                    }
+                }
+
         })
 
         oneNoteAdapter.imgHolder.observe(viewLifecycleOwner, { holder ->

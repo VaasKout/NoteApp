@@ -134,11 +134,11 @@ class ViewNoteAdapter :
     inner class FirstNoteTodoViewHolder(val binding: RecyclerItemTodoFirstNoteViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(firstNote: FirstNote) {
-            binding.firstNote = firstNote
-            binding.checkboxView.isChecked = firstNote.isChecked
+//            binding.firstNote = firstNote
+//            binding.checkboxView.isChecked = firstNote.isChecked
             _firstNoteTodoHolder.value = this
 //            crossText(firstNote, binding.checkboxView)
-            binding.executePendingBindings()
+//            binding.executePendingBindings()
         }
     }
 

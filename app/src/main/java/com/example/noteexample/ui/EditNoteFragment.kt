@@ -12,12 +12,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.core.widget.AutoSizeableTextView
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -50,6 +48,10 @@ class EditNoteFragment : Fragment() {
      * @see Camera
      */
 
+    //TODO read about material card
+    //TODO insert header bug in AllNotes
+    //TODO bugs with view in OneNoteFragment
+
     @Inject
     lateinit var camera: Camera
 
@@ -62,6 +64,8 @@ class EditNoteFragment : Fragment() {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var startCamera: ActivityResultLauncher<Intent>
     private val args by navArgs<EditNoteFragmentArgs>()
+
+    lateinit var binding: FragmentEditNoteBinding
 
     private val viewModel by viewModels<EditNoteViewModel> {
         NoteViewModelFactory(args.noteID, repository)
@@ -90,42 +94,14 @@ class EditNoteFragment : Fragment() {
          * @see R.layout.fragment_edit_note
          */
 
-        val binding: FragmentEditNoteBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_edit_note, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_edit_note,
+            container,
+            false
+        )
         binding.lifecycleOwner = this
-
-        requestPermissionLauncher =
-            registerForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { isGranted: Boolean ->
-                if (isGranted) {
-                    viewModel.startNote?.header?.let { item ->
-                        this@EditNoteFragment.findNavController()
-                            .navigate(
-                                EditNoteFragmentDirections
-                                    .actionEditNoteFragmentToGalleryFragment(item.headerID)
-                            )
-                    }
-                } else {
-                    Snackbar.make(
-                        binding.editRecycler,
-                        R.string.camera_request_failed,
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-        //Launcher for camera itself
-        startCamera =
-            registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) {
-                if (it.resultCode == Activity.RESULT_OK) {
-                    viewModel.insertCameraPhoto(camera.currentPhotoPath)
-                    noteAdapter.notifyDataSetChanged()
-                }
-            }
-
+        initCameraAndRequest()
 
         binding.editRecycler.apply {
             adapter = noteAdapter
@@ -135,7 +111,6 @@ class EditNoteFragment : Fragment() {
 
         //navIcon clickListener
         binding.toolbarNoteEdit.setNavigationOnClickListener {
-            viewModel.backPressed = true
             viewModel.onStartNavigating()
         }
 
@@ -191,17 +166,14 @@ class EditNoteFragment : Fragment() {
                                     requireContext(),
                                     R.drawable.ic_todo_list
                                 )
-                                viewModel.changeListMod(!note.todoItem)
-                                binding.editRecycler.adapter = noteAdapter
                             } else {
                                 it.icon = ContextCompat.getDrawable(
                                     requireContext(),
                                     R.drawable.ic_simple_list
                                 )
-                                viewModel.changeListMod(!note.todoItem)
-                                viewModel.updateCurrentNoteSuspend()
-                                binding.editRecycler.adapter = noteAdapter
                             }
+                            viewModel.changeListMod()
+                            binding.editRecycler.adapter = noteAdapter
                         }
                     }
                     true
@@ -264,7 +236,6 @@ class EditNoteFragment : Fragment() {
 
 
         noteAdapter.firstNoteTodoHolder.observe(viewLifecycleOwner, { holder ->
-            //TODO follow this example
             noteAdapter.currentList[holder.absoluteAdapterPosition].firstNote?.also {
                 crossText(it, holder.binding.editTextCheckbox)
                 holder.binding.editTextCheckbox.setText(it.text)
@@ -295,7 +266,7 @@ class EditNoteFragment : Fragment() {
 
             holder.binding.deleteFirstNoteItemButton.setOnClickListener {
                 viewModel.currentNote?.notes?.let { list ->
-                    if (list.size > 1) {
+                    if (list.size > 1 && viewModel.deleteAllowed) {
                         noteAdapter.currentList[holder.absoluteAdapterPosition]?.firstNote?.let { firstNote ->
                             viewModel.deleteFirstNote(firstNote)
                         }
@@ -364,7 +335,6 @@ class EditNoteFragment : Fragment() {
          * Back button triggers [EditNoteViewModel.navigateBack] LiveData
          */
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            viewModel.backPressed = true
             viewModel.onStartNavigating()
         }
         /**
@@ -387,28 +357,6 @@ class EditNoteFragment : Fragment() {
         })
 
 
-
-        //Inner function to reduce repetitive code
-        fun checkAndNavigate() {
-            lifecycleScope.launch {
-                viewModel.currentNote?.let {
-                    if (it.images.isEmpty() &&
-                        it.header.title.isEmpty() &&
-                        it.notes.isEmpty() &&
-                        viewModel.allHidden
-                    ) {
-                        viewModel.deleteUnused()
-                    }
-                }
-                this@EditNoteFragment.findNavController()
-                    .navigate(
-                        EditNoteFragmentDirections.actionEditNoteFragmentToAllNotesFragment()
-                    )
-                viewModel.onDoneNavigating()
-            }
-        }
-
-
         /**
          * [EditNoteViewModel.startNote] and [EditNoteViewModel.currentNote]
          * checks if note is changed comparable to start state
@@ -416,42 +364,39 @@ class EditNoteFragment : Fragment() {
         viewModel.navigateBack.observe(viewLifecycleOwner, {
             if (it == true) {
                 viewModel.updateCurrentNote()
-                viewModel.currentNote?.let { noteWithImages ->
-                    if (noteWithImages.images.any { item -> !item.hidden } ||
-                        noteWithImages.images.any { item -> item.signature.isNotEmpty() }) {
-                        viewModel.allHidden = false
-                    }
-                    when {
-                        viewModel.backPressed -> {
-                            if (viewModel.startNote?.header?.title != noteWithImages.header.title ||
-                                viewModel.startNote?.notes != noteWithImages.notes ||
-                                viewModel.startNote?.images != noteWithImages.images
-                            ) {
-                                MaterialAlertDialogBuilder(requireContext())
-                                    .setMessage("Сохранить изменения?")
-                                    .setNegativeButton("Нет") { _, _ ->
-                                        lifecycleScope.launch {
-                                            if (args.noteID > -1) {
-                                                viewModel.deleteNoteWithImages(noteWithImages)
-                                                viewModel.insertNoteWithImages(viewModel.startNote)
-                                            } else {
-                                                viewModel.deleteUnused()
-                                            }
-                                            this@EditNoteFragment.findNavController().popBackStack()
-                                        }
+                if (viewModel.backPressed) {
+                    if (viewModel.checkStartNote()) {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setMessage("Сохранить изменения?")
+                            .setNegativeButton("Нет") { _, _ ->
+                                finishAndNavigate(false) {
+                                    if (args.noteID > -1) {
+                                        viewModel.insertNoteWithImages(viewModel.startNote)
                                     }
-                                    .setPositiveButton("Да") { _, _ ->
-                                        checkAndNavigate()
-                                    }.show()
-                                viewModel.onDoneNavigating()
-                            } else {
-                                this.findNavController().popBackStack()
-                                viewModel.onDoneNavigating()
+                                    this@EditNoteFragment.findNavController().popBackStack()
+                                }
                             }
+                            .setPositiveButton("Да") { _, _ ->
+                                finishAndNavigate(true) {
+                                    this@EditNoteFragment.findNavController()
+                                        .navigate(
+                                            EditNoteFragmentDirections
+                                                .actionEditNoteFragmentToAllNotesFragment()
+                                        )
+                                }
+                            }.show()
+                    } else {
+                        finishAndNavigate(true) {
+                            this@EditNoteFragment.findNavController().popBackStack()
                         }
-                        !viewModel.backPressed -> {
-                            checkAndNavigate()
-                        }
+                    }
+                } else {
+                    finishAndNavigate(true) {
+                        this@EditNoteFragment.findNavController()
+                            .navigate(
+                                EditNoteFragmentDirections
+                                    .actionEditNoteFragmentToAllNotesFragment()
+                            )
                     }
                 }
             }
@@ -468,6 +413,53 @@ class EditNoteFragment : Fragment() {
             viewModel.updateCurrentNote()
         }
     }
+
+    private fun initCameraAndRequest() {
+        requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+                    viewModel.startNote?.header?.let { item ->
+                        this@EditNoteFragment.findNavController()
+                            .navigate(
+                                EditNoteFragmentDirections
+                                    .actionEditNoteFragmentToGalleryFragment(item.headerID)
+                            )
+                    }
+                } else {
+                    Snackbar.make(
+                        binding.editRecycler,
+                        R.string.camera_request_failed,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        //Launcher for camera itself
+        startCamera =
+            registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) {
+                if (it.resultCode == Activity.RESULT_OK) {
+                    viewModel.insertCameraPhoto(camera.currentPhotoPath)
+                    noteAdapter.notifyDataSetChanged()
+                }
+            }
+    }
+
+    private fun finishAndNavigate(checkNoteBeforeDelete: Boolean, action: suspend () -> Unit) {
+        lifecycleScope.launch {
+            if (checkNoteBeforeDelete) {
+                viewModel.checkEmptyNoteAndDelete()
+            } else {
+                viewModel.deleteCurrentNote()
+            }
+            action()
+            viewModel.onDoneNavigating()
+        }
+    }
+
 
     private fun crossText(firstNote: FirstNote, edit: EditText) {
         if (firstNote.isChecked) {

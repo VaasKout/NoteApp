@@ -1,5 +1,6 @@
 package com.example.noteexample.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,6 +43,7 @@ class OneNoteViewModel(
     fun createNoteList() {
         dataItemList = mutableListOf()
         currentNote?.let { item ->
+
             dataItemList.add(0, NoteWithImagesRecyclerItems(header = item.header))
             val size = item.notes.size + item.images.size
             for (i in 0 until size) {
@@ -64,6 +66,7 @@ class OneNoteViewModel(
                     }
                 }
             }
+            Log.e("header", dataItemList.toString())
         }
     }
 
